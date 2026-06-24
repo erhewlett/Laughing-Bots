@@ -1,0 +1,13 @@
+// cascadia code font import
+
+@import url('https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap');
+
+// import colors file
+@import 'colors';
+
+// set bootstrap font family base variable
+$font-family-base: 'Cascadia Code', monospace;
+
+
+// import bootstrap
+@import "../node_modules/bootstrap/scss/bootstrap";
