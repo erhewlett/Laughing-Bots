@@ -1,0 +1,84 @@
+html, body {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  font-family: "Cascadia Code", monospace;
+}
+
+nav {
+  background-color: #7E96C4;
+  height: 5em;
+  box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.navbar-collapse {
+  margin-right: 3em;
+}
+
+.nav-link {
+  display: inline-block;
+  flex-wrap: nowrap;
+  color: #ffffff;
+  transition: transform 0.3s ease-out, color 0.2s ease-in;
+}
+.nav-link:hover {
+  transform: translateY(-5px);
+  color: #E5E4E2;
+}
+
+.nav-item {
+  margin-right: 2em;
+}
+
+.container {
+  max-width: 100%;
+}
+
+main {
+  padding-top: 3em;
+}
+
+.primary-app-introduction {
+  align-items: center;
+}
+
+.image-block {
+  background-color: #7E96C4;
+  height: 13em;
+}
+
+.buttons-block {
+  height: 15em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.btn.loginBtn {
+  background-color: #D7B7BC;
+  width: 15em;
+  height: 3em;
+  transition: transform 0.3s ease-out, color 0.2s ease-in;
+}
+.btn.loginBtn:hover {
+  transform: translateY(-5px);
+  color: #F7E4E0;
+}
+
+.btn.signUpBtn {
+  background-color: #D7B7BC;
+  width: 15em;
+  height: 3em;
+  transition: transform 0.3s ease-out, color 0.2s ease-in;
+}
+.btn.signUpBtn:hover {
+  transform: translateY(-5px);
+  color: #F7E4E0;
+}
+
+.block-around-text {
+  background-color: cadetblue;
+}

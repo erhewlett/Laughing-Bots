@@ -1,0 +1,130 @@
+// cascadia code font import
+
+// @import url('https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap');
+
+// import colors file
+@use 'colors';
+
+
+
+
+// import bootstrap
+// @import "../node_modules/bootstrap/scss/bootstrap";
+
+html, body {
+
+    height: 100%;
+
+}
+
+body {
+    min-height: 100vh;
+    // set bootstrap font family base variable
+    font-family: 'Cascadia Code', monospace;
+}
+
+
+
+//Navigation bar
+nav {
+    background-color: colors.$dark-blue;
+    height: 5em;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+    
+}
+
+//The block within the navigation bar itself
+.navbar-collapse {
+    margin-right: 3em;
+}
+
+.nav-link {
+    display: inline-block;
+    flex-wrap: nowrap;
+    color: #ffffff;
+    transition: transform 0.3s ease-out, color 0.2s ease-in;
+
+    &:hover {
+        transform: translateY(-5px);
+        color: colors.$platinum;
+    }
+}
+
+.nav-item {
+    margin-right: 2em;
+}
+
+//The block holding the content inside itself.  Navbar sits outside of it
+.container {
+    max-width: 100%;
+}
+
+main {
+    padding-top: 3em;
+}
+
+// the space around the logo, buttons, and app overview
+// .box1 {
+//     // background-color: blue;
+//     // padding-top: 3em;
+
+// }
+
+// the space around the logo and buttons
+.primary-app-introduction{
+    align-items: center;
+    // justify-content: center;
+    
+}
+
+//The block around the logo image
+.image-block {
+    background-color: colors.$dark-blue;
+    
+    height: 13em;
+
+}
+// An image of the group's app logo
+img {
+}
+
+//The block around the login and sign up button
+.buttons-block{
+    // max-width: 175px;
+    height: 15em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+//Login button (had to add .btn at the beginning to make it specific and add color to the buttons)
+.btn.loginBtn {
+    background-color: colors.$pink;
+    width: 15em;
+    height: 3em;
+    transition: transform 0.3s ease-out, color 0.2s ease-in;
+
+    &:hover {
+        transform: translateY(-5px);
+        color: colors.$sandy-pink;
+    }
+}
+
+//Sign Up button
+.btn.signUpBtn {
+    background-color: colors.$pink;
+    width: 15em;
+    height: 3em;
+    transition: transform 0.3s ease-out, color 0.2s ease-in;
+
+    &:hover {
+        transform: translateY(-5px);
+        color: colors.$sandy-pink;
+    }
+}
+
+//The block around the app overview
+.block-around-text {
+    background-color: cadetblue;
+}
