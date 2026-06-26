@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="author" content="The Laughing Bots">
+        <meta name="description" content="This is the registration page for JobHopper.">
+        <meta name="keywords" content="Jobs, JobHopper, Job Search, Skills, Computer Science">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>JobHopper Registration</title>
+
+        <!-- references -->
+
+        <link rel="stylesheet" href="../css/style.css">
+    </head>
+
+
+    <body>
+
+        <!-- page header -->
+        <header class="bg-info p-3">
+
+            <div class="container-fluid">
+                <div class="bg-secondary text-dark p-2 text-center" style="max-width: 120px;">
+                    JobHopper
+                </div>
+            </div>
+
+        </header>
+
+        <!-- main content -->
+        <main class="container my-5">
+            
+            <h2 class="text-center mb-4 fs-4 fw-normal">
+                Welcome to JobHopper - Create an account to get started
+            </h2>
+
+            <!-- registration card -->
+            <div class="card p-5 bg-dark bg-opacity-10 border-0 rounded-top-4">
+                <!-- [USER INPUTS]-->
+                <!-- USERNAME INPUT FIELD -->
+                <div class="mb-4">
+                    <!-- label -->
+                    <label for="usernameInput" class="form-label fw-semibold">Create a username:</label>
+
+                    <!-- input constraints -->
+                     <input
+                        type="text"
+                        class="form-control"
+                        id="usernameInput"
+                        minlength="4"
+                        maxlength="16"
+                        pattern="[a-zA-Z0-9]+"
+                        aria-describedby="usernameHelp"
+                        required
+                        >
+                    
+                    <!-- accessibility text -->
+                    <div id="usernameHelp" class="form-text text-muted">
+                        Username must be between 4 and 16 characters and contain only letters and numbers.
+                    </div>
+                </div>
+
+                <!-- CONFIRM USERNAME INPUT FIELD -->
+                <div class="mb-4">
+                    <!-- label -->
+                    <label for="confirmUsernameInput" class="form-label fw-semibold">Confirm your username:</label>
+
+                    <!-- input constraints -->
+                     <input
+                        type="text"
+                        class="form-control"
+                        id="confirmUsernameInput"
+                        minlength="4"
+                        maxlength="16"
+                        pattern="[a-zA-Z0-9]+"
+                        required
+                        >
+                </div>
+
+                <!-- PASSWORD INPUT FIELD-->
+                <div class="mb-4">
+                    <!-- label -->
+                     <label for="passwordInput" class="form-label fw-semibold">Create a password:</label>
+
+                    <!-- input constraints -->
+                    <input
+                        type="password"
+                        class="form-control"
+                        id="passwordInput"
+                        minlength="8"
+                        maxlength="20"
+                        aria-describedby="passwordHelp"
+                        required
+                    >
+
+                    <!-- accessibility text -->
+                     <div id="passwordHelp" class="form-text text-muted">
+                        Password must be between 8 and 20 characters.
+                     </div>
+                </div>
+
+                <!-- CONFIRM PASSWORD INPUT FIELD-->
+                <div class="mb-4">
+                    <!-- label -->
+                     <label for="confirmPasswordInput" class="form-label fw-semibold">Confirm your password:</label>
+
+                    <!-- input constraints -->
+                    <input
+                        type="password"
+                        class="form-control"
+                        id="confirmPasswordInput"
+                        minlength="8"
+                        maxlength="20"
+                        required
+                    >
+                </div>
+            </div>
+            <div class="bg-primary text-center text-white p-4">Generate a Tools and Skills Word Cloud</div>
+            <!-- [WORD CLOUD INPUTS] -->
+            <div class="card p-5 bg-dark bg-opacity-10 border-0 rounded-bottom-4"></div>
+            
+
+            <p class="text-center text-muted"> TODO </p>
+
+        </main>
+
+        <!-- footer -->
+        <footer class="bg-primary text-white text-center py-3">
+            <div class="container">
+                Created by the Laughing Bots
+            </div>
+        </footer>
+
+    </body>
+
+</html>
