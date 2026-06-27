@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="author" content="The Laughing Bots">
+        <meta name="description" content="This is the sign in page for JobHopper.">
+        <meta name="keywords" content="Jobs, JobHopper, Job Search, Skills, Computer Science">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>JobHopper Sign In</title>
+
+        <!-- references -->
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link rel="stylesheet" href="../css/style.css">
+        
+    </head>
+
+    <body>
+
+         <!-- page header -->
+        <header class="bg-info p-3">
+            <div class="container-fluid">
+                <div class="bg-secondary text-dark p-2 text-center" style="max-width: 120px;">
+                    JobHopper
+                </div>
+            </div>
+        </header>
+
+        <!-- main content -->
+        <main class="container my-5">
+
+            <h2 class="text-center mb-5 fs-4 fw-normal">
+                Welcome to JobHopper - Sign In
+            </h2>
+
+            <!-- sign in card -->
+            <form>
+                <div class="card p-5 bg-dark bg-opacity-10 border-0 rounded-4">
+
+                    <!-- username input -->
+                    <div class="mb-4">
+                        <!-- label -->
+                        <label for="accountUsernameInput" class="form-label fw-semibold">Username:</label>
+
+                        <!-- input constraints -->
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="accountUsernameInput"
+                            minlength="4"
+                            maxlength="16"
+                            pattern="[a-zA-Z0-9]+"
+                            aria-describedby="accountUsernameHelp"
+                            required
+                            >
+
+                        <!-- accessibility text -->
+                        <div id="accountUsernameHelp" class="form-text text-muted">
+                            Please enter the username associated with your account.
+                        </div>
+
+                    </div>
+
+                    <!-- password input -->
+                    <div class="mb-4">
+                        <!-- label -->
+                        <label for="accountPasswordInput" class="form-label fw-semibold">Password:</label>
+
+                        <!-- input constraints -->
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="accountPasswordInput"
+                            minlength="8"
+                            maxlength="20"
+                            aria-describedby="accountPasswordHelp"
+                            required
+                        >
+
+                        <!-- accessibility text -->
+                        <div id="accountPasswordHelp" class="form-text text-muted">
+                            Please enter your JobHopper account password.
+                        </div>
+                    </div>
+
+                    <!-- sign in button -->
+                    <div class="d-flex justify-content-center mt-5">
+                        <button
+                            type="submit"
+                            class="btn btn-secondary fw-semibold px-5 py-3 text-dark fs-5 rounded-4"
+                        >
+                        Sign In
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+
+        </main>
+
+        <!-- footer -->
+        <footer class="bg-primary text-white text-center py-3" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 60-px; text-align: center">
+            <div class="container">
+                Created by the Laughing Bots
+            </div>
+        </footer>
+
+    </body>
+
+</html>

@@ -38,218 +38,220 @@
             </h2>
 
             <!-- registration card -->
-            <div class="card p-5 bg-dark bg-opacity-10 border-0 rounded-top-4">
-                <!-- [USER INPUTS]-->
-                <!-- USERNAME INPUT FIELD -->
-                <div class="mb-4">
-                    <!-- label -->
-                    <label for="usernameInput" class="form-label fw-semibold">Create a username:</label>
+            <form>
+                <div class="card p-5 bg-dark bg-opacity-10 border-0 rounded-top-4">
+                    <!-- [USER INPUTS]-->
+                    <!-- USERNAME INPUT FIELD -->
+                    <div class="mb-4">
+                        <!-- label -->
+                        <label for="usernameInput" class="form-label fw-semibold">Create a username:</label>
 
-                    <!-- input constraints -->
-                     <input
-                        type="text"
-                        class="form-control"
-                        id="usernameInput"
-                        minlength="4"
-                        maxlength="16"
-                        pattern="[a-zA-Z0-9]+"
-                        aria-describedby="usernameHelp"
-                        required
+                        <!-- input constraints -->
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="usernameInput"
+                            minlength="4"
+                            maxlength="16"
+                            pattern="[a-zA-Z0-9]+"
+                            aria-describedby="usernameHelp"
+                            required
+                            >
+                        
+                        <!-- accessibility text -->
+                        <div id="usernameHelp" class="form-text text-muted">
+                            Username must be between 4 and 16 characters and contain only letters and numbers.
+                        </div>
+                    </div>
+
+                    <!-- CONFIRM USERNAME INPUT FIELD -->
+                    <div class="mb-4">
+                        <!-- label -->
+                        <label for="confirmUsernameInput" class="form-label fw-semibold">Confirm your username:</label>
+
+                        <!-- input constraints -->
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="confirmUsernameInput"
+                            minlength="4"
+                            maxlength="16"
+                            pattern="[a-zA-Z0-9]+"
+                            required
+                            >
+                    </div>
+
+                    <!-- PASSWORD INPUT FIELD-->
+                    <div class="mb-4">
+                        <!-- label -->
+                        <label for="passwordInput" class="form-label fw-semibold">Create a password:</label>
+
+                        <!-- input constraints -->
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="passwordInput"
+                            minlength="8"
+                            maxlength="20"
+                            aria-describedby="passwordHelp"
+                            required
                         >
-                    
-                    <!-- accessibility text -->
-                    <div id="usernameHelp" class="form-text text-muted">
-                        Username must be between 4 and 16 characters and contain only letters and numbers.
+
+                        <!-- accessibility text -->
+                        <div id="passwordHelp" class="form-text text-muted">
+                            Password must be between 8 and 20 characters.
+                        </div>
+                    </div>
+
+                    <!-- CONFIRM PASSWORD INPUT FIELD-->
+                    <div class="mb-4">
+                        <!-- label -->
+                        <label for="confirmPasswordInput" class="form-label fw-semibold">Confirm your password:</label>
+
+                        <!-- input constraints -->
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="confirmPasswordInput"
+                            minlength="8"
+                            maxlength="20"
+                            required
+                        >
                     </div>
                 </div>
+            
 
-                <!-- CONFIRM USERNAME INPUT FIELD -->
-                <div class="mb-4">
-                    <!-- label -->
-                    <label for="confirmUsernameInput" class="form-label fw-semibold">Confirm your username:</label>
-
-                    <!-- input constraints -->
-                     <input
-                        type="text"
-                        class="form-control"
-                        id="confirmUsernameInput"
-                        minlength="4"
-                        maxlength="16"
-                        pattern="[a-zA-Z0-9]+"
-                        required
+                <div class="bg-primary text-center text-white p-4">Generate a Tools and Skills Word Cloud</div>
+                <!-- [WORD CLOUD INPUTS] -->
+                <div class="card p-5 bg-dark bg-opacity-10 border-0 rounded-bottom-4">
+                    <!-- JOB TITLE INPUT FIELD -->
+                    <div class="mb-4">
+                        <!-- label -->
+                        <label for="jobTitleInput" class="form-label fw-semibold">Job Title:</label>
+                        <!-- input constraints -->
+                        <!-- note: this field is left as not required since the user will need to input at least one from (Job Title, Job Industry)-->
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="jobTitleInput"
+                            placeholder="e.g. Frontend Engineer, Product Manager..."
+                            pattern="[a-zA-Z0-9 ]+"
                         >
-                </div>
-
-                <!-- PASSWORD INPUT FIELD-->
-                <div class="mb-4">
-                    <!-- label -->
-                     <label for="passwordInput" class="form-label fw-semibold">Create a password:</label>
-
-                    <!-- input constraints -->
-                    <input
-                        type="password"
-                        class="form-control"
-                        id="passwordInput"
-                        minlength="8"
-                        maxlength="20"
-                        aria-describedby="passwordHelp"
-                        required
-                    >
-
-                    <!-- accessibility text -->
-                     <div id="passwordHelp" class="form-text text-muted">
-                        Password must be between 8 and 20 characters.
-                     </div>
-                </div>
-
-                <!-- CONFIRM PASSWORD INPUT FIELD-->
-                <div class="mb-4">
-                    <!-- label -->
-                     <label for="confirmPasswordInput" class="form-label fw-semibold">Confirm your password:</label>
-
-                    <!-- input constraints -->
-                    <input
-                        type="password"
-                        class="form-control"
-                        id="confirmPasswordInput"
-                        minlength="8"
-                        maxlength="20"
-                        required
-                    >
-                </div>
-            </div>
-
-
-            <div class="bg-primary text-center text-white p-4">Generate a Tools and Skills Word Cloud</div>
-            <!-- [WORD CLOUD INPUTS] -->
-            <div class="card p-5 bg-dark bg-opacity-10 border-0 rounded-bottom-4">
-                <!-- JOB TITLE INPUT FIELD -->
-                <div class="mb-4">
-                    <!-- label -->
-                    <label for="jobTitleInput" class="form-label fw-semibold">Job Title:</label>
-                    <!-- input constraints -->
-                    <!-- note: this field is left as not required since the user will need to input at least one from (Job Title, Job Industry)-->
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="jobTitleInput"
-                        placeholder="e.g. Frontend Engineer, Product Manager..."
-                        pattern="[a-zA-Z0-9 ]+"
-                    >
-                </div>
-
-                <!-- JOB INDUSTRY MENU -->
-                <div class="mb-4">
-                    <label for="jobIndustrySelection" class="form-label fw-semibold">Job Industry:</label>
-                    <select
-                        class="form-select"
-                        id="jobIndustrySelection"
-                        aria-describedby="jobRequirementHelp"
-                        >
-                        <!-- value will be the ID backend expects -->
-                        <option value="" selected disabled>Job Industry:</option>
-                        <option value="placeholder1">Placeholder 1</option>
-                        <option value="placeholder2">Placeholder 2</option>
-                        <option value="placeholder3">Placeholder 3</option>
-    
-                    </select>
-                    <div id="jobRequirementHelp" class="form-text text-muted mt-2">
-                        Please provide a job title, job industry, or both to create your word cloud.
                     </div>
-                </div>
 
-                <!-- LOCATION INPUT -->
-                <div class="mb-4">
-                    <label for="locationInput" class="form-label fw-semibold">Location:</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="locationInput"
-                        pattern="[a-zA-Z0-9, \-]+"
-                        placeholder="e.g. Atlanta, GA"
-                    >
-                </div>
+                    <!-- JOB INDUSTRY MENU -->
+                    <div class="mb-4">
+                        <label for="jobIndustrySelection" class="form-label fw-semibold">Job Industry:</label>
+                        <select
+                            class="form-select"
+                            id="jobIndustrySelection"
+                            aria-describedby="jobRequirementHelp"
+                            >
+                            <!-- value will be the ID backend expects -->
+                            <option value="" selected disabled>Job Industry:</option>
+                            <option value="placeholder1">Placeholder 1</option>
+                            <option value="placeholder2">Placeholder 2</option>
+                            <option value="placeholder3">Placeholder 3</option>
+        
+                        </select>
+                        <div id="jobRequirementHelp" class="form-text text-muted mt-2">
+                            Please provide a job title, job industry, or both to create your word cloud.
+                        </div>
+                    </div>
 
-                <!-- DESIRED SALARY RANGE INPUT GROUP -->
-                <div class="mb-4">
-                    <label class="form-label fw-semibold">Desired Annual Salary Range:</label>
-                    <!-- input group (for side-by-side fields) -->
-                    <div class="row">
-                        <div class="col-12 col-md-6">
-                            <div class="input-group">
-                                <!-- minimum salary -->
-                                <span class="input-group-text">$</span>
-                                <input
-                                    type="number"
-                                    class="form-control"
-                                    id="minimumSalaryInput"
-                                    placeholder="e.g 30000"
-                                    pattern="[0-9]+"
-                                    aria-label="Minimum Salary"
-                                >
+                    <!-- LOCATION INPUT -->
+                    <div class="mb-4">
+                        <label for="locationInput" class="form-label fw-semibold">Location:</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="locationInput"
+                            pattern="[a-zA-Z0-9, \-]+"
+                            placeholder="e.g. Atlanta, GA"
+                        >
+                    </div>
 
-                                <!-- separator -->
-                                <span class="input-group-text">to</span>
+                    <!-- DESIRED SALARY RANGE INPUT GROUP -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Desired Annual Salary Range:</label>
+                        <!-- input group (for side-by-side fields) -->
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <div class="input-group">
+                                    <!-- minimum salary -->
+                                    <span class="input-group-text">$</span>
+                                    <input
+                                        type="number"
+                                        class="form-control"
+                                        id="minimumSalaryInput"
+                                        placeholder="e.g 30000"
+                                        pattern="[0-9]+"
+                                        aria-label="Minimum Salary"
+                                    >
 
-                                <!-- maximum salary -->
-                                <span class="input-group-text">$</span>
-                                <input
-                                    type="number"
-                                    class="form-control"
-                                    id="maximumSalaryInput"
-                                    placeholder="e.g. 250000"
-                                    pattern="[0-9]+"
-                                    aria-label="Maximum Salary"
-                                >
+                                    <!-- separator -->
+                                    <span class="input-group-text">to</span>
+
+                                    <!-- maximum salary -->
+                                    <span class="input-group-text">$</span>
+                                    <input
+                                        type="number"
+                                        class="form-control"
+                                        id="maximumSalaryInput"
+                                        placeholder="e.g. 250000"
+                                        pattern="[0-9]+"
+                                        aria-label="Maximum Salary"
+                                    >
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- KEYWORD AMOUNT MENU -->
-                <div class="mb-4">
-                    <label for="wordCountSelect" class="form-label fw-semibold">How many keywords would you like to see in the word cloud?</label>
-                    <div class="row">    
-                        <div class="col-12 col-md-3">
-                            <select class="form-select" id="wordCountSelect" required>
-                                <option value="" selected disabled>Select a number...</option>
+                    <!-- KEYWORD AMOUNT MENU -->
+                    <div class="mb-4">
+                        <label for="wordCountSelect" class="form-label fw-semibold">How many keywords would you like to see in the word cloud?</label>
+                        <div class="row">    
+                            <div class="col-12 col-md-3">
+                                <select class="form-select" id="wordCountSelect" required>
+                                    <option value="" selected disabled>Select a number...</option>
 
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                                <option value="30">30</option>
-                                <option value="40">40</option>
-                            </select>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="30">30</option>
+                                    <option value="40">40</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- WORD CLOUD SHAPE MENU -->
-                <div class="mb-4">
-                    <label for="wordCloudShapeSelect" class="form-label fw-semibold">Place select a shape for the word cloud:</label>
-                    <div class="row">
-                        <div class="col-12 col-md-3">
-                            <select class="form-select" id="wordCloudShapeSelect" required>
-                                <option value="" selected disabled>Select a shape...</option>
+                    <!-- WORD CLOUD SHAPE MENU -->
+                    <div class="mb-4">
+                        <label for="wordCloudShapeSelect" class="form-label fw-semibold">Place select a shape for the word cloud:</label>
+                        <div class="row">
+                            <div class="col-12 col-md-3">
+                                <select class="form-select" id="wordCloudShapeSelect" required>
+                                    <option value="" selected disabled>Select a shape...</option>
 
-                                <option value="placeholderShape1">Placeholder Shape 1</option>
-                                <option value="placeholderShape2">Placeholder Shape 2</option>
-                                <option value="placeholderShape3">Placeholder Shape 3</option>
-                            </select>
+                                    <option value="placeholderShape1">Placeholder Shape 1</option>
+                                    <option value="placeholderShape2">Placeholder Shape 2</option>
+                                    <option value="placeholderShape3">Placeholder Shape 3</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
+                
 
-                <!-- SUBMIT BUTTON -->
-                <div class="d-flex justify-content-center mt-5">
-                    <button
-                        type="submit"
-                        class="btn btn-secondary fw-semibold px-5 py-3 text-dark fs-5 rounded-4"
-                    >
-                    Sign Up and Generate Word Cloud
-                    </button>
-                </div>
-
-            </div>
+                    <!-- SUBMIT BUTTON -->
+                    <div class="d-flex justify-content-center mt-5">
+                        <button
+                            type="submit"
+                            class="btn btn-secondary fw-semibold px-5 py-3 text-dark fs-5 rounded-4"
+                        >
+                        Sign Up and Generate Word Cloud
+                        </button>
+                    </div>
+               </div>
+            </form>
 
 
         </main>
