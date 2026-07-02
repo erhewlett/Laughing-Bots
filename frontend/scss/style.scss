@@ -1,11 +1,22 @@
 // import colors file
-@import 'colors';
+@use 'colors' as c;
 
 // import bootstrap
-@import "../../node_modules/bootstrap/scss/bootstrap";
+@import "../../node_modules/bootstrap/scss/bootstrap" with {
+
+    $body-bg: c.$white, // white background
+    $primary: c.$blue,
+    $secondary: c.$pink,
+    $info: c.$light-blue,
+    
+    // set bootstrap 
+    $font-family-base: ('Cascadia Code, monospace')
+};
 
 // Home page
-@import 'pages/home';
+@use 'pages/home';
+
+// Registration Page
 
 // cascadia code font import
 
