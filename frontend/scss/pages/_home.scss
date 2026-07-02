@@ -1,15 +1,5 @@
-// cascadia code font import
-
-// @import url('https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap');
-
 // import colors file
-@use 'colors';
-
-
-
-
-// import bootstrap
-// @import "../node_modules/bootstrap/scss/bootstrap";
+@use '../colors';
 
 html, body {
 
@@ -38,6 +28,10 @@ nav {
     margin-right: 3em;
 }
 
+.navbar-brand {
+    color: colors.$platinum;
+}
+
 .nav-link {
     display: inline-block;
     flex-wrap: nowrap;
@@ -55,8 +49,9 @@ nav {
 }
 
 //The block holding the content inside itself.  Navbar sits outside of it
-.container {
-    max-width: 100%;
+.block-around-content {
+    // max-width: 100%;
+    flex-direction: column;
 }
 
 main {
@@ -85,8 +80,9 @@ main {
 
 }
 // An image of the group's app logo
-img {
-}
+// img {
+//     height: 9em;
+// }
 
 //The block around the login and sign up button
 .buttons-block{
@@ -101,30 +97,36 @@ img {
 //Login button (had to add .btn at the beginning to make it specific and add color to the buttons)
 .btn.loginBtn {
     background-color: colors.$pink;
+    color: colors.$off-white;
     width: 15em;
     height: 3em;
     transition: transform 0.3s ease-out, color 0.2s ease-in;
 
     &:hover {
-        transform: translateY(-5px);
-        color: colors.$sandy-pink;
+        transform: translateY(-3px);
+        color: colors.$platinum;
     }
 }
 
 //Sign Up button
 .btn.signUpBtn {
     background-color: colors.$pink;
+    color: colors.$off-white;
     width: 15em;
     height: 3em;
     transition: transform 0.3s ease-out, color 0.2s ease-in;
 
     &:hover {
-        transform: translateY(-5px);
-        color: colors.$sandy-pink;
+        transform: translateY(-3px);
+        color: colors.$platinum;
     }
 }
 
 //The block around the app overview
 .block-around-text {
     background-color: cadetblue;
+}
+
+footer {
+    background-color: colors.$dark-blue;
 }
