@@ -2,7 +2,7 @@
 @use 'colors' as c;
 
 // import bootstrap
-@import "../../node_modules/bootstrap/scss/bootstrap" with {
+@use "../../node_modules/bootstrap/scss/bootstrap" with (
 
     $body-bg: c.$white, // white background
     $primary: c.$blue,
@@ -11,7 +11,7 @@
     
     // set bootstrap 
     $font-family-base: ('Cascadia Code, monospace')
-};
+);
 
 // Home page
 @use 'pages/home';
