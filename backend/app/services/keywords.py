@@ -43,7 +43,17 @@ SKILL_ALIASES: dict[str, list[str]] = {
     "GraphQL": ["graphql"],
     "CI/CD": ["ci/cd", "cicd"],
     "Machine Learning": ["machine learning"],
-    "Cybersecurity": ["cybersecurity", "security", "infosec"],
+    # NOTE: no bare "security" - it matched phrases like "security clearance"
+    # and made Cybersecurity dominate every cloud (review #7).
+    "Cybersecurity": [
+        "cybersecurity",
+        "cyber security",
+        "infosec",
+        "information security",
+        "cloud security",
+        "network security",
+        "application security",
+    ],
     "Networking": ["networking", "tcp/ip"],
     "Agile": ["agile", "scrum"],
     "HTML": ["html"],
@@ -61,6 +71,17 @@ _PATTERNS: dict[str, re.Pattern] = {
     for skill, aliases in SKILL_ALIASES.items()
 }
 
+_STOP_WORD_RE = re.compile(
+    r"\b(?:" + "|".join(sorted(STOP_WORDS)) + r")\b", re.IGNORECASE
+)
+
+
+def remove_stop_words(text: str) -> str:
+    """Strip common stop words from job text before keyword extraction
+    (explicit functional requirement). Word boundaries keep multi-word skill
+    aliases like "machine learning" intact."""
+    return _STOP_WORD_RE.sub(" ", text)
+
 
 def _gather_text(job: dict) -> str:
     """Collect the searchable text from a JSearch job object."""
@@ -73,7 +94,7 @@ def _gather_text(job: dict) -> str:
     highlights = job.get("job_highlights") or {}
     for key in ("Qualifications", "Responsibilities"):
         parts += highlights.get(key) or []
-    return "\n".join(parts)
+    return remove_stop_words("\n".join(parts))
 
 
 def extract_skills(job: dict) -> dict[str, int]:

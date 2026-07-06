@@ -7,9 +7,10 @@ largest word doesn't swamp the rest.
 from __future__ import annotations
 
 import math
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -18,6 +19,14 @@ from app.schemas import SearchRequest, WordCloudResponse, WordCloudWord
 
 router = APIRouter(tags=["wordcloud"])
 
+MAX_POSTING_AGE_DAYS = 30  # requirement: only postings <= 30 days old
+
+
+def _escape_like(term: str) -> str:
+    """Escape LIKE wildcards in user input so '%'/'_' match literally
+    (review #5 - prevents wildcard-injection broadening the match)."""
+    return term.replace("\\", "\\\\").replace("%", r"\%").replace("_", r"\_")
+
 
 def _match_role(db: Session, req: SearchRequest) -> models.Role | None:
     """Find the best Role for the search, trying job_title then industry."""
@@ -25,17 +34,57 @@ def _match_role(db: Session, req: SearchRequest) -> models.Role | None:
         if not term or not term.strip():
             continue
         role = db.scalar(
-            select(models.Role).where(models.Role.role_name.ilike(f"%{term.strip()}%"))
+            select(models.Role).where(
+                models.Role.role_name.ilike(
+                    f"%{_escape_like(term.strip())}%", escape="\\"
+                )
+            )
         )
         if role:
             return role
     return None
 
 
+def _posting_filters(role_id: int, req: SearchRequest) -> list:
+    """WHERE clauses shared by the posting count and the frequency query."""
+    cutoff = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(
+        days=MAX_POSTING_AGE_DAYS
+    )
+    filters = [
+        models.JobPosting.role_id == role_id,
+        # review #3: enforce the 30-day rule at query time so the cloud stays
+        # compliant as the seeded data ages (dates are stored naive-UTC).
+        models.JobPosting.date_posted >= cutoff,
+    ]
+    if req.location and req.location.strip():
+        filters.append(
+            models.JobPosting.location.ilike(
+                f"%{_escape_like(req.location.strip())}%", escape="\\"
+            )
+        )
+    if req.min_salary:
+        # Keep postings paying at least min_salary; JSearch salaries are often
+        # null (verified), so unknown-salary postings are kept rather than
+        # silently starving the cloud.
+        filters.append(
+            or_(
+                models.JobPosting.salary_max >= req.min_salary,
+                models.JobPosting.salary_min >= req.min_salary,
+                and_(
+                    models.JobPosting.salary_min.is_(None),
+                    models.JobPosting.salary_max.is_(None),
+                ),
+            )
+        )
+    return filters
+
+
 @router.post("/wordcloud", response_model=WordCloudResponse)
 def generate_wordcloud(
     req: SearchRequest, db: Session = Depends(get_db)
 ) -> WordCloudResponse:
+    # TODO(history): once auth exists, persist a models.Search row here for
+    #   logged-in users (get_current_user_optional) to power GET /me/recent.
     role = _match_role(db, req)
     if role is None:
         raise HTTPException(
@@ -43,14 +92,15 @@ def generate_wordcloud(
             detail="No matching role found for that job title/industry.",
         )
 
+    filters = _posting_filters(role.role_id, req)
+
     posting_count = db.scalar(
-        select(func.count())
-        .select_from(models.JobPosting)
-        .where(models.JobPosting.role_id == role.role_id)
+        select(func.count()).select_from(models.JobPosting).where(*filters)
     )
 
-    # Document frequency per skill: # of distinct postings (for this role) that
-    # mention the skill. JobSkill has one row per (job, skill), so a count works.
+    # Document frequency per skill: # of distinct postings (matching all the
+    # search filters) that mention the skill. JobSkill has one row per
+    # (job, skill), so a count works.
     df_rows = db.execute(
         select(
             models.Skill.skill_name,
@@ -58,7 +108,7 @@ def generate_wordcloud(
         )
         .join(models.JobSkill, models.JobSkill.skill_id == models.Skill.skill_id)
         .join(models.JobPosting, models.JobPosting.job_id == models.JobSkill.job_id)
-        .where(models.JobPosting.role_id == role.role_id)
+        .where(*filters)
         .group_by(models.Skill.skill_name)
         .order_by(func.count(func.distinct(models.JobSkill.job_id)).desc())
         .limit(req.word_count)

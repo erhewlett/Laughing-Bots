@@ -15,17 +15,26 @@ from app import models  # noqa: F401
 async def lifespan(app: FastAPI):
     # Skeleton stage: create tables directly. Swap for Alembic migrations later.
     Base.metadata.create_all(bind=engine)
+    if settings.secret_is_default:
+        # review #2: loud warning now; MUST become `raise RuntimeError` when
+        # the auth milestone starts signing tokens with this key.
+        print(
+            "\n*** WARNING: SECRET_KEY is the built-in default. "
+            "Set a real one in backend/.env before implementing auth. ***\n"
+        )
     yield
 
 
 app = FastAPI(title="JobHopper API", version="0.1.0", lifespan=lifespan)
 
+# Only the methods/headers the API actually uses (review hardening) - origins
+# were already restricted to the configured frontend hosts.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PATCH"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 
@@ -35,8 +44,10 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-from app.routers import wordcloud
+from app.routers import auth, game, history, roadmap, wordcloud
 
-app.include_router(wordcloud.router)
-
-# Remaining routers (auth, game, roadmap) get wired here as they're built.
+app.include_router(wordcloud.router)   # implemented
+app.include_router(auth.router)        # scaffold (501): auth milestone
+app.include_router(game.router)        # scaffold (501): game milestone
+app.include_router(roadmap.router)     # scaffold (501): roadmap milestone
+app.include_router(history.router)     # scaffold (501): history milestone

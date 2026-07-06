@@ -4,7 +4,7 @@ Mirrors the team ERD (erd_jobhopper.drawio): User, Search, Role, JobPosting,
 Skill, JobSkill, RoleSkill, Question, AnswerOption, GameAttempt, Roadmap,
 RoadmapStep.
 """
-from datetime import date, datetime
+from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -32,7 +32,7 @@ class Search(Base):
     __tablename__ = "searches"
 
     search_id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), index=True)
     job_title: Mapped[str | None] = mapped_column(String(150))
     industry: Mapped[str | None] = mapped_column(String(100))
     location: Mapped[str | None] = mapped_column(String(100))
@@ -59,13 +59,16 @@ class JobPosting(Base):
     __tablename__ = "job_postings"
 
     job_id: Mapped[int] = mapped_column(primary_key=True)
-    role_id: Mapped[int | None] = mapped_column(ForeignKey("roles.role_id"))
+    # Provider's job id (JSearch job_id) - the dedup key that makes ingest
+    # idempotent (review #1). Unique index rejects re-inserts.
+    external_id: Mapped[str | None] = mapped_column(String(64), unique=True, index=True)
+    role_id: Mapped[int | None] = mapped_column(ForeignKey("roles.role_id"), index=True)
     title: Mapped[str | None] = mapped_column(String(150))
     company_name: Mapped[str | None] = mapped_column(String(150))
     location: Mapped[str | None] = mapped_column(String(100))
     salary_min: Mapped[int | None] = mapped_column(Integer)
     salary_max: Mapped[int | None] = mapped_column(Integer)
-    date_posted: Mapped[date | None] = mapped_column(DateTime)
+    date_posted: Mapped[datetime | None] = mapped_column(DateTime)
     source_url: Mapped[str | None] = mapped_column(String(500))
 
     role: Mapped["Role"] = relationship(back_populates="job_postings")
@@ -116,7 +119,7 @@ class Question(Base):
     __tablename__ = "questions"
 
     question_id: Mapped[int] = mapped_column(primary_key=True)
-    skill_id: Mapped[int] = mapped_column(ForeignKey("skills.skill_id"))
+    skill_id: Mapped[int] = mapped_column(ForeignKey("skills.skill_id"), index=True)
     question_text: Mapped[str] = mapped_column(Text)
     points: Mapped[int] = mapped_column(Integer, default=1)
 
@@ -128,7 +131,7 @@ class AnswerOption(Base):
     __tablename__ = "answer_options"
 
     option_id: Mapped[int] = mapped_column(primary_key=True)
-    question_id: Mapped[int] = mapped_column(ForeignKey("questions.question_id"))
+    question_id: Mapped[int] = mapped_column(ForeignKey("questions.question_id"), index=True)
     option_text: Mapped[str] = mapped_column(Text)
     is_correct: Mapped[bool] = mapped_column(Boolean, default=False)
 
@@ -139,8 +142,8 @@ class GameAttempt(Base):
     __tablename__ = "game_attempts"
 
     attempt_id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
-    skill_id: Mapped[int] = mapped_column(ForeignKey("skills.skill_id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), index=True)
+    skill_id: Mapped[int] = mapped_column(ForeignKey("skills.skill_id"), index=True)
     score: Mapped[int] = mapped_column(Integer, default=0)
     max_score: Mapped[int] = mapped_column(Integer, default=0)
     date_taken: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
@@ -153,7 +156,7 @@ class Roadmap(Base):
     __tablename__ = "roadmaps"
 
     roadmap_id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), index=True)
     role_id: Mapped[int | None] = mapped_column(ForeignKey("roles.role_id"))
     created_date: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
@@ -166,7 +169,7 @@ class RoadmapStep(Base):
     __tablename__ = "roadmap_steps"
 
     step_id: Mapped[int] = mapped_column(primary_key=True)
-    roadmap_id: Mapped[int] = mapped_column(ForeignKey("roadmaps.roadmap_id"))
+    roadmap_id: Mapped[int] = mapped_column(ForeignKey("roadmaps.roadmap_id"), index=True)
     skill_id: Mapped[int] = mapped_column(ForeignKey("skills.skill_id"))
     step_order: Mapped[int] = mapped_column(Integer, default=0)
     status: Mapped[str] = mapped_column(String(20), default="not_started")

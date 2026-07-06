@@ -7,6 +7,15 @@ class Settings(BaseSettings):
 
     database_url: str = "sqlite:///./jobhopper.db"
     secret_key: str = "change-me-to-a-long-random-string"
+
+    _DEFAULT_SECRET = "change-me-to-a-long-random-string"
+
+    @property
+    def secret_is_default(self) -> bool:
+        """True when no real SECRET_KEY was configured (review #2). main.py
+        warns at startup now; the auth milestone MUST upgrade this to a hard
+        failure before issuing tokens."""
+        return self.secret_key == self._DEFAULT_SECRET
     frontend_origins: str = "http://localhost:5500,http://127.0.0.1:5500"
 
     # JSearch (RapidAPI) - used to ingest real job postings into the seed DB.
