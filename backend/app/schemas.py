@@ -5,6 +5,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, model_validator
 
+from app.services.security import PASSWORD_MAX, PASSWORD_MIN
+
 
 class SearchRequest(BaseModel):
     """User's job-search parameters for generating a word cloud."""
@@ -42,18 +44,27 @@ class WordCloudResponse(BaseModel):
     words: list[WordCloudWord]
 
 
+class RoleOut(BaseModel):
+    role_id: int
+    role_name: str
+    posting_count: int
+
+
 # --------------------------------------------------------------------------
 # Auth (scaffold - endpoints return 501 until the auth milestone)
 # --------------------------------------------------------------------------
 
 class RegisterRequest(BaseModel):
     username: str = Field(min_length=1, max_length=16)  # full rules in services/security.py
-    password: str = Field(min_length=1)                 # never allow empty (requirement)
+    password: str = Field(min_length=PASSWORD_MIN, max_length=PASSWORD_MAX)
     email: str | None = None
     name: str | None = Field(default=None, max_length=100)
 
 
 class LoginRequest(BaseModel):
+    # Login only checks presence (requirement: username/password not empty).
+    # The 8-20 policy lives on register, not here, so a wrong-length attempt
+    # returns 401, not 422, and does not leak the policy.
     username: str = Field(min_length=1)
     password: str = Field(min_length=1)
 

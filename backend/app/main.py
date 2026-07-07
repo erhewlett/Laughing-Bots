@@ -44,9 +44,10 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-from app.routers import auth, game, history, roadmap, wordcloud
+from app.routers import auth, game, history, meta, roadmap, wordcloud
 
 app.include_router(wordcloud.router)   # implemented
+app.include_router(meta.router)        # implemented
 app.include_router(auth.router)        # scaffold (501): auth milestone
 app.include_router(game.router)        # scaffold (501): game milestone
 app.include_router(roadmap.router)     # scaffold (501): roadmap milestone

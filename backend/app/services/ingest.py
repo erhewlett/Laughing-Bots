@@ -20,6 +20,7 @@ from app.database import Base, SessionLocal, engine
 from app import models
 from app.services import jsearch
 from app.services.keywords import extract_skills
+from app.utils import utcnow_naive
 
 # Role display name -> JSearch search query. Keep the list short on the free tier.
 ROLE_QUERIES: dict[str, str] = {
@@ -28,10 +29,6 @@ ROLE_QUERIES: dict[str, str] = {
     "Frontend Developer": "frontend developer",
     "Data Analyst": "data analyst",
 }
-
-
-def _utcnow_naive() -> datetime:
-    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def _parse_dt(value: str | None) -> datetime | None:
@@ -138,7 +135,7 @@ def ingest_role(db: Session, role_name: str, query: str, *, num_pages: int = 1) 
             # date_posted="month", so "now" is the most conservative bound and
             # keeps the 30-day query filter meaningful for every row.
             date_posted=_parse_dt(job.get("job_posted_at_datetime_utc"))
-            or _utcnow_naive(),
+            or utcnow_naive(),
             source_url=job.get("job_apply_link"),
         )
         db.add(posting)

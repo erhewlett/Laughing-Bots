@@ -17,7 +17,7 @@ rows (dedup is on external_id).
 from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from pathlib import Path
 
 from sqlalchemy import delete, select
@@ -29,6 +29,7 @@ from app.services.ingest import (
     _get_or_create_skill,
     _rebuild_role_skill,
 )
+from app.utils import utcnow_naive
 
 FIXTURE = Path(__file__).parent / "seed_data" / "jobhopper_seed.json"
 
@@ -40,7 +41,17 @@ def seed() -> None:
 
     db = SessionLocal()
     try:
-        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        now = utcnow_naive()
+        # Preload existing postings by external_id in one query, so the loop is
+        # dict lookups instead of one SELECT per fixture row.
+        existing: dict[str, models.JobPosting] = {
+            p.external_id: p
+            for p in db.scalars(
+                select(models.JobPosting).where(
+                    models.JobPosting.external_id.is_not(None)
+                )
+            )
+        }
         skill_cache: dict[str, models.Skill] = {}
         touched_roles: set[int] = set()
         added = updated = 0
@@ -49,16 +60,12 @@ def seed() -> None:
             role = _get_or_create_role(db, p["role"])
             touched_roles.add(role.role_id)
 
-            posting = None
-            if p["external_id"]:
-                posting = db.scalar(
-                    select(models.JobPosting).where(
-                        models.JobPosting.external_id == p["external_id"]
-                    )
-                )
+            posting = existing.get(p["external_id"]) if p["external_id"] else None
             if posting is None:
                 posting = models.JobPosting(external_id=p["external_id"])
                 db.add(posting)
+                if p["external_id"]:
+                    existing[p["external_id"]] = posting
                 added += 1
             else:
                 updated += 1

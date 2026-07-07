@@ -9,6 +9,7 @@ Design decisions (proposed):
     sessions for a split frontend/backend team.
   - Username rules (from requirements doc): 4-16 chars, alphanumeric only,
     non-empty username AND password.
+  - Password length follows the frontend form: 8-20 characters.
 """
 from __future__ import annotations
 
@@ -24,6 +25,7 @@ from __future__ import annotations
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 USERNAME_MIN, USERNAME_MAX = 4, 16
+PASSWORD_MIN, PASSWORD_MAX = 8, 20
 
 
 def hash_password(plain: str) -> str:

@@ -7,7 +7,7 @@ largest word doesn't swamp the rest.
 from __future__ import annotations
 
 import math
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import and_, func, or_, select
@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app import models
 from app.schemas import SearchRequest, WordCloudResponse, WordCloudWord
+from app.utils import utcnow_naive
 
 router = APIRouter(tags=["wordcloud"])
 
@@ -77,9 +78,7 @@ def _match_role(db: Session, req: SearchRequest) -> models.Role | None:
 
 def _posting_filters(role_id: int, req: SearchRequest) -> list:
     """WHERE clauses shared by the posting count and the frequency query."""
-    cutoff = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(
-        days=MAX_POSTING_AGE_DAYS
-    )
+    cutoff = utcnow_naive() - timedelta(days=MAX_POSTING_AGE_DAYS)
     filters = [
         models.JobPosting.role_id == role_id,
         # review #3: enforce the 30-day rule at query time so the cloud stays
