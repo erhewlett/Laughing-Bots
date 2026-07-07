@@ -43,5 +43,9 @@ def client(db_session):
     app.dependency_overrides[get_db] = _get_test_db
     # Plain TestClient (no context manager) so the app lifespan does not run
     # create_all against the real engine or touch the real database file.
-    yield TestClient(app)
-    app.dependency_overrides.clear()
+    client = TestClient(app)
+    try:
+        yield client
+    finally:
+        client.close()
+        app.dependency_overrides.clear()

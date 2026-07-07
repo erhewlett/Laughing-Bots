@@ -5,7 +5,12 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, model_validator
 
-from app.services.security import PASSWORD_MAX, PASSWORD_MIN
+from app.services.security import (
+    PASSWORD_MAX,
+    PASSWORD_MIN,
+    USERNAME_MAX,
+    USERNAME_MIN,
+)
 
 
 class SearchRequest(BaseModel):
@@ -55,7 +60,11 @@ class RoleOut(BaseModel):
 # --------------------------------------------------------------------------
 
 class RegisterRequest(BaseModel):
-    username: str = Field(min_length=1, max_length=16)  # full rules in services/security.py
+    # 4-16 chars, letters and digits only (matches the frontend form and the
+    # rule in services/security.py). validate_username re-checks on the server.
+    username: str = Field(
+        min_length=USERNAME_MIN, max_length=USERNAME_MAX, pattern=r"^[A-Za-z0-9]+$"
+    )
     password: str = Field(min_length=PASSWORD_MIN, max_length=PASSWORD_MAX)
     email: str | None = None
     name: str | None = Field(default=None, max_length=100)
