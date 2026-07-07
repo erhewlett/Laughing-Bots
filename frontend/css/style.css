@@ -11960,4 +11960,45 @@ footer {
   background-color: #7E96C4;
 }
 
+.theAuthor {
+  margin-bottom: 1em;
+  background-color: green;
+}
+.theAuthor .authorOne {
+  border: 3px solid aqua;
+  height: 11em;
+}
+.theAuthor .faveOne {
+  border: 3px solid blueviolet;
+  height: 6em;
+}
+.theAuthor .authorTwo {
+  border: 3px solid aqua;
+  height: 11em;
+}
+.theAuthor .faveTwo {
+  border: 3px solid blueviolet;
+  height: 6em;
+}
+.theAuthor .authorThree {
+  border: 3px solid aqua;
+  height: 11em;
+}
+.theAuthor .faveThree {
+  border: 3px solid blueviolet;
+  height: 6em;
+}
+.theAuthor .authorFour {
+  border: 3px solid aqua;
+  height: 11em;
+}
+.theAuthor .faveFour {
+  border: 3px solid blueviolet;
+  height: 6em;
+}
+.theAuthor .bio {
+  border: 3px solid coral;
+  height: 5em;
+}
+
 /*# sourceMappingURL=style.css.map */
