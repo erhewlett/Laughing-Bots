@@ -2,7 +2,7 @@
 
 Docs: https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch
 
-Only the /search endpoint is used for ingestion. The API key is read from
+Only the /search-v2 endpoint is used for ingestion. The API key is read from
 settings (env / .env) and never hard-coded.
 """
 from __future__ import annotations
@@ -57,7 +57,10 @@ def search_jobs(
     except httpx.HTTPError as exc:  # network error, 4xx/5xx, timeout
         raise JSearchError(f"JSearch request failed: {exc}") from exc
 
-    payload = resp.json()
+    try:
+        payload = resp.json()
+    except ValueError as exc:  # malformed / non-JSON body
+        raise JSearchError("JSearch returned a non-JSON response") from exc
     if payload.get("status") != "OK":
         raise JSearchError(f"JSearch returned non-OK status: {payload.get('status')}")
 

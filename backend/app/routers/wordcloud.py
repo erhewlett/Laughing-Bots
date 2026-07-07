@@ -29,19 +29,49 @@ def _escape_like(term: str) -> str:
 
 
 def _match_role(db: Session, req: SearchRequest) -> models.Role | None:
-    """Find the best Role for the search, trying job_title then industry."""
+    """Resolve the search terms to a Role, most specific first.
+
+    For each term (job_title, then industry):
+      1. exact role-name match (case-insensitive)
+      2. partial role-name match, ordered so the result is deterministic
+      3. posting-title match, resolved to the role with the most matching
+         postings. This lets a real title like "Front End Software Engineer"
+         resolve to the "Frontend Developer" role instead of 404 (review #2).
+    """
     for term in (req.job_title, req.industry):
         if not term or not term.strip():
             continue
+        t = term.strip()
+        like = f"%{_escape_like(t)}%"
+
+        # 1. exact role name
         role = db.scalar(
-            select(models.Role).where(
-                models.Role.role_name.ilike(
-                    f"%{_escape_like(term.strip())}%", escape="\\"
-                )
-            )
+            select(models.Role).where(func.lower(models.Role.role_name) == t.lower())
         )
         if role:
             return role
+
+        # 2. partial role name (deterministic order for broad inputs)
+        role = db.scalar(
+            select(models.Role)
+            .where(models.Role.role_name.ilike(like, escape="\\"))
+            .order_by(models.Role.role_name)
+        )
+        if role:
+            return role
+
+        # 3. posting title -> role with the most matching postings
+        row = db.execute(
+            select(models.JobPosting.role_id, func.count().label("n"))
+            .where(
+                models.JobPosting.title.ilike(like, escape="\\"),
+                models.JobPosting.role_id.is_not(None),
+            )
+            .group_by(models.JobPosting.role_id)
+            .order_by(func.count().desc(), models.JobPosting.role_id)
+        ).first()
+        if row is not None:
+            return db.get(models.Role, row.role_id)
     return None
 
 
@@ -110,7 +140,11 @@ def generate_wordcloud(
         .join(models.JobPosting, models.JobPosting.job_id == models.JobSkill.job_id)
         .where(*filters)
         .group_by(models.Skill.skill_name)
-        .order_by(func.count(func.distinct(models.JobSkill.job_id)).desc())
+        # secondary sort by name so tied document-frequencies are deterministic
+        .order_by(
+            func.count(func.distinct(models.JobSkill.job_id)).desc(),
+            models.Skill.skill_name,
+        )
         .limit(req.word_count)
     ).all()
 

@@ -9,4 +9,4 @@ passlib[bcrypt]~=1.7.4
 python-multipart~=0.0.32
 httpx~=0.28.1
 # pyjwt~=2.10  # TODO(auth): uncomment when implementing services/security.py
-# pytest~=8.3  # TODO(tests): uncomment when implementing tests/
+pytest~=8.3

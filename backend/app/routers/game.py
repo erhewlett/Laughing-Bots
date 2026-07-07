@@ -8,6 +8,13 @@ Frontend contract:
   POST /game/{skill_name}/submit                 -> 200 GameResult
         body: {answers: [{question_id, option_id}], desired_salary?}
 
+skill_name uses a :path converter so skills that contain a slash (e.g. "CI/CD",
+which is in the word-cloud vocabulary) route correctly. The exact skill string
+from /wordcloud is passed straight through.
+
+NOTE: game scoring is under review with the team (may drop salary difficulty
+and weighting for a simple "X of N correct"). Bodies below are still stubs.
+
 Difficulty design (proposed - uses existing schema, no ERD change):
   Question.points doubles as difficulty (1=easy, 2=medium, 3=hard).
   desired_salary buckets:   <70k -> points<=1,  70-110k -> <=2,  >110k -> all.
@@ -24,7 +31,7 @@ from app.schemas import GameQuestions, GameResult, GameSubmission
 router = APIRouter(prefix="/game", tags=["game"])
 
 
-@router.get("/{skill_name}", response_model=GameQuestions)
+@router.get("/{skill_name:path}", response_model=GameQuestions)
 def get_game(skill_name: str, desired_salary: int | None = None):
     # TODO(game):
     #   1. skill = db Skill by name (case-insensitive) -> 404 if missing
@@ -37,8 +44,9 @@ def get_game(skill_name: str, desired_salary: int | None = None):
     raise HTTPException(501, "Not implemented yet - game milestone")
 
 
-@router.post("/{skill_name}/submit", response_model=GameResult)
+@router.post("/{skill_name:path}/submit", response_model=GameResult)
 def submit_game(skill_name: str, submission: GameSubmission):
+    # {skill_name:path} handles slash-containing skills like "CI/CD".
     # TODO(game):
     #   1. load submitted question_ids w/ options; validate they belong to skill
     #   2. score = sum(q.points for q where chosen option.is_correct)

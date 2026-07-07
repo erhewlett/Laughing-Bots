@@ -1,22 +1,47 @@
-"""Shared pytest fixtures.
+"""Shared pytest fixtures: a TestClient backed by a fresh in-memory DB per test.
 
-SCAFFOLD - add `pytest` to requirements (dev) when the testing rotation starts.
 Run with:  cd backend && ./venv/bin/python -m pytest
 """
-# TODO(tests):
-# import pytest
-# from fastapi.testclient import TestClient
-# from sqlalchemy import create_engine
-# from sqlalchemy.orm import sessionmaker
-# from app.database import Base, get_db
-# from app.main import app
-#
-# @pytest.fixture()
-# def client():
-#     """TestClient wired to a fresh in-memory SQLite DB per test."""
-#     engine = create_engine("sqlite://", connect_args={"check_same_thread": False})
-#     Base.metadata.create_all(bind=engine)
-#     TestSession = sessionmaker(bind=engine)
-#     app.dependency_overrides[get_db] = lambda: (yield TestSession())
-#     yield TestClient(app)
-#     app.dependency_overrides.clear()
+from __future__ import annotations
+
+import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import StaticPool
+
+from app.database import Base, get_db
+from app.main import app
+
+
+@pytest.fixture()
+def db_session():
+    # StaticPool + a single shared connection so the request thread that
+    # TestClient runs on sees the same in-memory database as the test body.
+    # Without StaticPool each connection gets its own empty DB and queries
+    # fail with "no such table".
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(bind=engine)
+    TestSession = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+    session: Session = TestSession()
+    try:
+        yield session
+    finally:
+        session.close()
+        engine.dispose()
+
+
+@pytest.fixture()
+def client(db_session):
+    def _get_test_db():
+        yield db_session
+
+    app.dependency_overrides[get_db] = _get_test_db
+    # Plain TestClient (no context manager) so the app lifespan does not run
+    # create_all against the real engine or touch the real database file.
+    yield TestClient(app)
+    app.dependency_overrides.clear()

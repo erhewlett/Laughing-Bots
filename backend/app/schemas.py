@@ -1,6 +1,8 @@
 """Pydantic request/response models for the API."""
 from __future__ import annotations
 
+from datetime import datetime
+
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -132,7 +134,7 @@ class RoadmapStepOut(BaseModel):
 class RoadmapOut(BaseModel):
     roadmap_id: int
     role: str
-    created_date: object  # datetime; keep loose until implementation
+    created_date: datetime
     steps: list[RoadmapStepOut]
 
 
@@ -148,7 +150,7 @@ class LastGame(BaseModel):
     skill: str
     score: int
     max_score: int
-    date_taken: object  # datetime
+    date_taken: datetime
 
 
 class RecentSearch(BaseModel):
@@ -158,7 +160,7 @@ class RecentSearch(BaseModel):
     location: str | None
     word_count: int | None
     shape: str | None
-    created_at: object  # datetime
+    created_at: datetime
 
     model_config = {"from_attributes": True}
 
