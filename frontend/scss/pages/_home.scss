@@ -74,15 +74,17 @@ main {
 
 //The block around the logo image
 .image-block {
-    background-color: colors.$dark-blue;
+    // background-color: colors.$dark-blue;
+    display: flex;
+    justify-content: center;
     
     height: 13em;
 
 }
-// An image of the group's app logo
-// img {
-//     height: 9em;
-// }
+// An image of the app's logo
+img {
+    max-height: 13em;
+}
 
 //The block around the login and sign up button
 .buttons-block{
@@ -124,7 +126,7 @@ main {
 
 //The block around the app overview
 .block-around-text {
-    background-color: cadetblue;
+    margin-bottom: 4em;
 }
 
 footer {
