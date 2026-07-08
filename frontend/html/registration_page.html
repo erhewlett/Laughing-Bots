@@ -135,25 +135,22 @@
                             class="form-control"
                             id="jobTitleInput"
                             placeholder="e.g. Frontend Engineer, Product Manager..."
-                            pattern="[a-zA-Z0-9 ]+"
+                            aria-describedby="jobRequirementHelp"
                         >
                     </div>
 
-                    <!-- JOB INDUSTRY MENU -->
+                    <!-- JOB INDUSTRY INPUT FIELD -->
                     <div class="mb-4">
-                        <label for="jobIndustrySelection" class="form-label fw-semibold">Job Industry:</label>
-                        <select
-                            class="form-select"
-                            id="jobIndustrySelection"
+                        <!-- label -->
+                        <label for="jobIndustryInput" class="form-label fw-semibold">Job Industry:</label>
+                        <!-- input constraints -->
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="jobIndustryInput"
+                            placeholder="e.g. Healthcare"
                             aria-describedby="jobRequirementHelp"
-                            >
-                            <!-- value will be the ID backend expects -->
-                            <option value="" selected disabled>Job Industry:</option>
-                            <option value="placeholder1">Placeholder 1</option>
-                            <option value="placeholder2">Placeholder 2</option>
-                            <option value="placeholder3">Placeholder 3</option>
-        
-                        </select>
+                        >
                         <div id="jobRequirementHelp" class="form-text text-muted mt-2">
                             Please provide a job title, job industry, or both to create your word cloud.
                         </div>
