@@ -163,14 +163,14 @@
                             type="text"
                             class="form-control"
                             id="locationInput"
-                            pattern="[a-zA-Z0-9, \-]+"
+                            pattern="[a-zA-Z0-9, \-.']+"
                             placeholder="e.g. Atlanta, GA"
                         >
                     </div>
 
                     <!-- DESIRED SALARY RANGE INPUT GROUP -->
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold">Desired Annual Salary Range:</label>
+                    <fieldset class="mb-4">
+                        <legend class="form-label fw-semibold" style="float: none; width: auto; font-size: 1rem; padding: 0;">Desired Annual Salary Range:</legend>
                         <!-- input group (for side-by-side fields) -->
                         <div class="row">
                             <div class="col-12 col-md-6">
@@ -202,7 +202,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </fieldset>
 
                     <!-- KEYWORD AMOUNT MENU -->
                     <div class="mb-4">
@@ -241,6 +241,7 @@
                     <!-- SUBMIT BUTTON -->
                     <div class="d-flex justify-content-center mt-5">
                         <button
+                            id="sign-up-btn"
                             type="submit"
                             class="btn btn-secondary fw-semibold px-5 py-3 text-dark fs-5 rounded-4"
                         >
