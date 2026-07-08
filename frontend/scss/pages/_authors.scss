@@ -1,0 +1,53 @@
+// import colors file
+@use '../colors';
+
+.theAuthor {
+    margin-bottom: 1em;
+    background-color: green;
+
+    .authorOne {
+    border: 3px solid aqua;
+    height: 11em;
+    }
+
+    .faveOne {
+        border: 3px solid blueviolet;
+        height: 6em;
+    }
+
+    .authorTwo {
+        border: 3px solid aqua;
+        height: 11em;
+    }
+
+    .faveTwo {
+        border: 3px solid blueviolet;
+        height: 6em;
+    }
+
+    .authorThree {
+        border: 3px solid aqua;
+        height: 11em;
+    }
+
+    .faveThree {
+        border: 3px solid blueviolet;
+        height: 6em;
+    }
+
+    .authorFour {
+        border: 3px solid aqua;
+        height: 11em;
+    }
+
+    .faveFour {
+        border: 3px solid blueviolet;
+        height: 6em;
+    }
+
+    .bio {
+        border: 3px solid coral;
+        height: 5em;
+    }
+}
+
