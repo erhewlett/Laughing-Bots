@@ -10,6 +10,8 @@ it does not reveal which usernames exist.
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app import models
@@ -28,6 +30,10 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)) -> models.User
 
     if security.get_user_by_username(db, req.username) is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, "Username is already taken.")
+    if req.email and db.scalar(
+        select(models.User).where(models.User.email == req.email)
+    ) is not None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Email is already registered.")
 
     user = models.User(
         username=req.username,
@@ -36,7 +42,14 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)) -> models.User
         name=req.name,
     )
     db.add(user)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        # Backstop for a race between the checks above and commit.
+        db.rollback()
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "Username or email is already in use."
+        )
     db.refresh(user)
     return user
 

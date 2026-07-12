@@ -26,7 +26,7 @@ USERNAME_MIN, USERNAME_MAX = 4, 16
 PASSWORD_MIN, PASSWORD_MAX = 8, 20
 TOKEN_TTL_HOURS = 24
 ALGORITHM = "HS256"
-_BCRYPT_MAX_BYTES = 72  # bcrypt hard limit on the input length
+PASSWORD_MAX_BYTES = 72  # bcrypt rejects inputs longer than this; validated at register
 
 # auto_error=False so we can return the same 401 for missing and invalid tokens.
 bearer = HTTPBearer(auto_error=False)
@@ -40,9 +40,9 @@ def _secret() -> str:
 
 
 def _pw_bytes(plain: str) -> bytes:
-    # Truncate to bcrypt's 72-byte limit (our passwords are 8-20 chars, so this
-    # only matters for pathological multi-byte input, but keep it consistent).
-    return plain.encode("utf-8")[:_BCRYPT_MAX_BYTES]
+    # No truncation: register rejects over-72-byte passwords (see RegisterRequest),
+    # so distinct passwords are never collapsed to the same 72-byte prefix.
+    return plain.encode("utf-8")
 
 
 def hash_password(plain: str) -> str:

@@ -120,8 +120,10 @@ class Question(Base):
 
     question_id: Mapped[int] = mapped_column(primary_key=True)
     skill_id: Mapped[int] = mapped_column(ForeignKey("skills.skill_id"), index=True)
+    # "easy" | "medium" | "hard": a quiz pulls 10 questions from one
+    # (skill_id, difficulty) bank. Indexed together for that lookup.
+    difficulty: Mapped[str] = mapped_column(String(10), index=True)
     question_text: Mapped[str] = mapped_column(Text)
-    points: Mapped[int] = mapped_column(Integer, default=1)
 
     skill: Mapped["Skill"] = relationship(back_populates="questions")
     options: Mapped[list["AnswerOption"]] = relationship(back_populates="question")

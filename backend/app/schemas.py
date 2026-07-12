@@ -2,11 +2,13 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from app.services.security import (
     PASSWORD_MAX,
+    PASSWORD_MAX_BYTES,
     PASSWORD_MIN,
     USERNAME_MAX,
     USERNAME_MIN,
@@ -69,6 +71,15 @@ class RegisterRequest(BaseModel):
     email: str | None = None
     name: str | None = Field(default=None, max_length=100)
 
+    @field_validator("password")
+    @classmethod
+    def password_within_bcrypt_limit(cls, v: str) -> str:
+        # A 20-char password can exceed bcrypt's 72-byte limit in UTF-8; reject
+        # rather than truncate (which would collapse distinct passwords).
+        if len(v.encode("utf-8")) > PASSWORD_MAX_BYTES:
+            raise ValueError("Password is too long.")
+        return v
+
 
 class LoginRequest(BaseModel):
     # Login only checks presence (requirement: username/password not empty).
@@ -94,8 +105,11 @@ class UserOut(BaseModel):
 
 
 # --------------------------------------------------------------------------
-# Game (scaffold)
+# Game
 # --------------------------------------------------------------------------
+
+Difficulty = Literal["easy", "medium", "hard"]
+
 
 class AnswerOptionOut(BaseModel):
     """An option as sent to the player - deliberately NO is_correct field."""
@@ -106,13 +120,12 @@ class AnswerOptionOut(BaseModel):
 class QuestionOut(BaseModel):
     question_id: int
     question_text: str
-    points: int
     options: list[AnswerOptionOut]
 
 
 class GameQuestions(BaseModel):
     skill: str
-    difficulty: str            # "easy" | "medium" | "hard" (derived from salary)
+    difficulty: Difficulty
     questions: list[QuestionOut]
 
 
@@ -122,16 +135,24 @@ class SubmittedAnswer(BaseModel):
 
 
 class GameSubmission(BaseModel):
+    difficulty: Difficulty
     answers: list[SubmittedAnswer]
-    desired_salary: int | None = Field(default=None, ge=0)
+
+
+class QuestionResult(BaseModel):
+    question_id: int
+    is_correct: bool
 
 
 class GameResult(BaseModel):
     skill: str
-    score: int
-    max_score: int
+    difficulty: Difficulty
+    score: int              # number correct
+    max_score: int          # number of questions (10 for a full quiz)
     correct_count: int
     total_questions: int
+    mastered: bool          # perfect score on a hard quiz
+    results: list[QuestionResult]
 
 
 # --------------------------------------------------------------------------

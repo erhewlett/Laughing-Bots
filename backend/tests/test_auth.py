@@ -56,6 +56,19 @@ def test_register_duplicate_username_conflicts(client):
     assert _register(client, username="dupe").status_code == 409
 
 
+def test_register_duplicate_email_conflicts(client):
+    assert _register(client, username="userone", email="dup@x.com").status_code == 201
+    # different username, same email -> controlled 409, not a 500
+    assert _register(client, username="usertwo", email="dup@x.com").status_code == 409
+
+
+def test_register_password_over_72_bytes_rejected(client):
+    # 19 four-byte characters = 76 bytes but only 19 chars (within max_length),
+    # so the byte-length check must reject it rather than truncate.
+    pw = chr(0x1D51E) * 19
+    assert _register(client, username="bigpw", password=pw).status_code == 422
+
+
 def test_register_persists_email_and_name(client, db_session):
     _register(client, username="withinfo", email="e@x.com", name="Elijah")
     user = db_session.scalar(
