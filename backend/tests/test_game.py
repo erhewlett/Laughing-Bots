@@ -101,6 +101,21 @@ def test_get_slash_skill_routes(client, db_session):
     assert r.status_code == 200 and r.json()["skill"] == "CI/CD"
 
 
+def test_list_quiz_skills(client, db_session):
+    _seed_questions(db_session, skill_name="Python", difficulty="easy", n=2)
+    _seed_questions(db_session, skill_name="Python", difficulty="hard", n=2)
+    _seed_questions(db_session, skill_name="SQL", difficulty="easy", n=1)
+    r = client.get("/game/skills")  # must route here, not to /{skill_name}
+    assert r.status_code == 200
+    by_skill = {row["skill"]: row["difficulties"] for row in r.json()}
+    assert by_skill["Python"] == ["easy", "hard"]
+    assert by_skill["SQL"] == ["easy"]
+
+
+def test_list_quiz_skills_empty(client, db_session):
+    assert client.get("/game/skills").json() == []
+
+
 # --- scoring + mastery -------------------------------------------------------
 
 def test_submit_scores_all_correct(client, db_session):
@@ -133,23 +148,46 @@ def test_perfect_easy_not_mastered(client, db_session):
 
 # --- validation --------------------------------------------------------------
 
+def _answers_for(client, skill, difficulty, count=None):
+    qs = client.get(f"/game/{skill}", params={"difficulty": difficulty}).json()["questions"]
+    qs = qs if count is None else qs[:count]
+    return [{"question_id": q["question_id"], "option_id": q["options"][0]["option_id"]} for q in qs]
+
+
+def test_submit_incomplete_quiz_422(client, db_session):
+    # bank has 10 but only 3 answered -> reject (no partial-quiz "mastery")
+    _seed_questions(db_session, difficulty="easy", n=10)
+    answers = _answers_for(client, "Python", "easy", count=3)
+    assert client.post("/game/Python/submit", json={"difficulty": "easy", "answers": answers}).status_code == 422
+
+
+def test_submit_duplicate_question_422(client, db_session):
+    _seed_questions(db_session, difficulty="easy", n=10)
+    a = _answers_for(client, "Python", "easy", count=1)[0]
+    assert client.post("/game/Python/submit", json={"difficulty": "easy", "answers": [a, a]}).status_code == 422
+
+
+def test_submit_option_not_on_question_422(client, db_session):
+    _seed_questions(db_session, difficulty="easy", n=10)
+    answers = _answers_for(client, "Python", "easy")
+    answers[0]["option_id"] = 999999  # option that is not on that question
+    assert client.post("/game/Python/submit", json={"difficulty": "easy", "answers": answers}).status_code == 422
+
+
 def test_submit_foreign_question_422(client, db_session):
-    _seed_questions(db_session)
-    r = client.post(
-        "/game/Python/submit",
-        json={"difficulty": "easy", "answers": [{"question_id": 99999, "option_id": 1}]},
-    )
-    assert r.status_code == 422
+    _seed_questions(db_session, skill_name="Python", difficulty="easy", n=10)
+    _seed_questions(db_session, skill_name="SQL", difficulty="easy", n=1)
+    answers = _answers_for(client, "Python", "easy", count=9)
+    answers += _answers_for(client, "SQL", "easy", count=1)  # 10 total, one foreign
+    assert client.post("/game/Python/submit", json={"difficulty": "easy", "answers": answers}).status_code == 422
 
 
 def test_submit_difficulty_mismatch_422(client, db_session):
-    _seed_questions(db_session, difficulty="easy", n=5)
-    # claim "hard" while submitting easy questions
-    assert _play(client, "Python", "easy", wrong=0).status_code == 200
-    r = client.get("/game/Python", params={"difficulty": "easy"}).json()
-    answers = [{"question_id": q["question_id"], "option_id": q["options"][0]["option_id"]} for q in r["questions"]]
-    mismatch = client.post("/game/Python/submit", json={"difficulty": "hard", "answers": answers})
-    assert mismatch.status_code == 422
+    _seed_questions(db_session, difficulty="easy", n=10)
+    _seed_questions(db_session, difficulty="hard", n=10)  # hard bank exists so size check passes
+    answers = _answers_for(client, "Python", "easy")  # 10 easy questions
+    # claim hard while submitting easy questions
+    assert client.post("/game/Python/submit", json={"difficulty": "hard", "answers": answers}).status_code == 422
 
 
 # --- save behavior -----------------------------------------------------------

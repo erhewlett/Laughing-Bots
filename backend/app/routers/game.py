@@ -27,12 +27,14 @@ from app.schemas import (
     GameSubmission,
     QuestionOut,
     QuestionResult,
+    SkillQuizzes,
 )
 from app.services import security
 
 router = APIRouter(prefix="/game", tags=["game"])
 
 QUIZ_SIZE = 10
+_DIFFICULTY_RANK = {"easy": 0, "medium": 1, "hard": 2}
 
 
 def _get_skill(db: Session, skill_name: str) -> models.Skill:
@@ -44,6 +46,31 @@ def _get_skill(db: Session, skill_name: str) -> models.Skill:
     if skill is None:
         raise HTTPException(status_code=404, detail=f"Unknown skill: {skill_name}")
     return skill
+
+
+@router.get("/skills", response_model=list[SkillQuizzes])
+def list_quiz_skills(db: Session = Depends(get_db)) -> list[SkillQuizzes]:
+    """Skills that have quiz questions, with the difficulties available for each.
+
+    Declared before the /{skill_name:path} route so "skills" is not captured as
+    a skill name. Lets the frontend make only playable word-cloud words clickable.
+    """
+    rows = db.execute(
+        select(models.Skill.skill_name, models.Question.difficulty)
+        .join(models.Question, models.Question.skill_id == models.Skill.skill_id)
+        .distinct()
+        .order_by(models.Skill.skill_name, models.Question.difficulty)
+    ).all()
+    grouped: dict[str, list[str]] = {}
+    for skill_name, difficulty in rows:
+        grouped.setdefault(skill_name, []).append(difficulty)
+    return [
+        SkillQuizzes(
+            skill=name,
+            difficulties=sorted(diffs, key=lambda d: _DIFFICULTY_RANK[d]),
+        )
+        for name, diffs in grouped.items()
+    ]
 
 
 @router.get("/{skill_name:path}", response_model=GameQuestions)
@@ -95,10 +122,39 @@ def submit_game(
     if not submission.answers:
         raise HTTPException(status_code=422, detail="No answers submitted.")
 
-    # One chosen option per question (keep the first if a question is repeated).
+    # One answer per question; reject duplicates rather than silently dropping.
     chosen: dict[int, int] = {}
     for a in submission.answers:
-        chosen.setdefault(a.question_id, a.option_id)
+        if a.question_id in chosen:
+            raise HTTPException(
+                status_code=422, detail="A question was answered more than once."
+            )
+        chosen[a.question_id] = a.option_id
+
+    # A submission must cover a full quiz for this bank. Without this, a client
+    # could submit one correct hard answer and score a "perfect" 1/1 quiz.
+    bank_size = (
+        db.scalar(
+            select(func.count())
+            .select_from(models.Question)
+            .where(
+                models.Question.skill_id == skill.skill_id,
+                models.Question.difficulty == submission.difficulty,
+            )
+        )
+        or 0
+    )
+    expected = min(QUIZ_SIZE, bank_size)
+    if expected == 0:
+        raise HTTPException(
+            status_code=422,
+            detail=f"No {submission.difficulty} questions for {skill.skill_name}.",
+        )
+    if len(chosen) != expected:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Submit all {expected} questions for this quiz.",
+        )
 
     questions = db.scalars(
         select(models.Question)
@@ -122,13 +178,22 @@ def submit_game(
     results: list[QuestionResult] = []
     score = 0
     for q in questions:
+        option_ids = {o.option_id for o in q.options}
+        if chosen[q.question_id] not in option_ids:
+            raise HTTPException(
+                status_code=422,
+                detail="An answer references an option that is not on its question.",
+            )
         correct_ids = {o.option_id for o in q.options if o.is_correct}
         is_correct = chosen[q.question_id] in correct_ids
         score += int(is_correct)
         results.append(QuestionResult(question_id=q.question_id, is_correct=is_correct))
 
     total = len(questions)
-    mastered = submission.difficulty == "hard" and score == total and total > 0
+    # Mastery requires a full 10-question hard quiz answered perfectly.
+    mastered = (
+        submission.difficulty == "hard" and score == total and total == QUIZ_SIZE
+    )
 
     # Save only for logged-in players; anonymous play stores nothing server-side.
     if user is not None:

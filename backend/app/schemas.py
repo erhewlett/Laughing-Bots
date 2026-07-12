@@ -111,6 +111,12 @@ class UserOut(BaseModel):
 Difficulty = Literal["easy", "medium", "hard"]
 
 
+class SkillQuizzes(BaseModel):
+    """A skill that has quiz questions, and which difficulties are available."""
+    skill: str
+    difficulties: list[Difficulty]
+
+
 class AnswerOptionOut(BaseModel):
     """An option as sent to the player - deliberately NO is_correct field."""
     option_id: int
@@ -199,6 +205,7 @@ class RecentSearch(BaseModel):
     job_title: str | None
     industry: str | None
     location: str | None
+    min_salary: int | None
     word_count: int | None
     shape: str | None
     created_at: datetime

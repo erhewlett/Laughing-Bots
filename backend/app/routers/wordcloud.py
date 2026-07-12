@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app import models
 from app.schemas import SearchRequest, WordCloudResponse, WordCloudWord
+from app.services import security
 from app.utils import utcnow_naive
 
 router = APIRouter(tags=["wordcloud"])
@@ -110,10 +111,10 @@ def _posting_filters(role_id: int, req: SearchRequest) -> list:
 
 @router.post("/wordcloud", response_model=WordCloudResponse)
 def generate_wordcloud(
-    req: SearchRequest, db: Session = Depends(get_db)
+    req: SearchRequest,
+    db: Session = Depends(get_db),
+    user: models.User | None = Depends(security.get_current_user_optional),
 ) -> WordCloudResponse:
-    # TODO(history): once auth exists, persist a models.Search row here for
-    #   logged-in users (get_current_user_optional) to power GET /me/recent.
     role = _match_role(db, req)
     if role is None:
         raise HTTPException(
@@ -164,6 +165,21 @@ def generate_wordcloud(
         )
         for name, df in df_rows
     ]
+
+    # Remember this search for logged-in users (powers GET /me/recent).
+    if user is not None:
+        db.add(
+            models.Search(
+                user_id=user.user_id,
+                job_title=req.job_title,
+                industry=req.industry,
+                location=req.location,
+                min_salary=req.min_salary,
+                word_count=req.word_count,
+                shape=req.shape,
+            )
+        )
+        db.commit()
 
     return WordCloudResponse(
         role=role.role_name,
