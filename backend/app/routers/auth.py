@@ -1,47 +1,58 @@
-"""Auth endpoints - register, login, current user.
+"""Auth endpoints: register, login, current user.
 
-SCAFFOLD - contract is final, bodies are TODO (return 501 so /docs shows the
-full planned API for the frontend team).
+  POST /auth/register  {username, password, email?, name?}  -> 201 UserOut
+  POST /auth/login     {username, password}                 -> 200 {access_token}
+  GET  /auth/me        (Bearer token)                       -> 200 UserOut
 
-Frontend contract:
-  POST /auth/register  {username, password, email?, name?}      -> 201 {user_id, username}
-  POST /auth/login     {username, password}                     -> 200 {access_token, token_type}
-  GET  /auth/me        (Bearer token)                           -> 200 {user_id, username, target_role, ...}
-
-Validation errors return 422 with a message the frontend can display
-(requirement: "display an error if username or password input is empty").
+Login returns one generic 401 for both unknown-username and wrong-password so
+it does not reveal which usernames exist.
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
+from app import models
+from app.database import get_db
 from app.schemas import LoginRequest, RegisterRequest, TokenResponse, UserOut
+from app.services import security
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/register", response_model=UserOut, status_code=201)
-def register(req: RegisterRequest):
-    # TODO(auth):
-    #   1. err = security.validate_username(req.username); 422 if err
-    #      (schema already enforces non-empty password)
-    #   2. reject if username already taken -> 409
-    #   3. user = models.User(username=..., password_hash=security.hash_password(...))
-    #   4. db.add / commit / refresh; return user
-    raise HTTPException(501, "Not implemented yet - auth milestone")
+@router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
+def register(req: RegisterRequest, db: Session = Depends(get_db)) -> models.User:
+    err = security.validate_username(req.username)
+    if err:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, err)
+
+    if security.get_user_by_username(db, req.username) is not None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Username is already taken.")
+
+    user = models.User(
+        username=req.username,
+        password_hash=security.hash_password(req.password),
+        email=req.email,
+        name=req.name,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(req: LoginRequest):
-    # TODO(auth):
-    #   1. look up user by username; verify_password against stored hash
-    #   2. identical 401 message for unknown-user vs wrong-password
-    #      (don't leak which usernames exist)
-    #   3. return {"access_token": create_access_token(user.user_id), "token_type": "bearer"}
-    raise HTTPException(501, "Not implemented yet - auth milestone")
+def login(req: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
+    user = security.get_user_by_username(db, req.username)
+    if user is None or not security.verify_password(req.password, user.password_hash):
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED,
+            "Invalid username or password.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return TokenResponse(access_token=security.create_access_token(user.user_id))
 
 
 @router.get("/me", response_model=UserOut)
-def me():
-    # TODO(auth): user = Depends(security.get_current_user); return user
-    raise HTTPException(501, "Not implemented yet - auth milestone")
+def me(user: models.User = Depends(security.get_current_user)) -> models.User:
+    return user

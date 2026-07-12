@@ -1,75 +1,119 @@
-"""Password hashing + token helpers, and the auth dependency.
+"""Password hashing (bcrypt), JWT access tokens, and the auth dependencies.
 
-SCAFFOLD - signatures and plan only. Implement in the Auth milestone.
-
-Design decisions (proposed):
-  - Passwords: bcrypt via passlib (already in requirements).
-  - Sessions: JWT bearer tokens (add `pyjwt` to requirements when implementing),
-    signed with settings.secret_key, ~24h expiry. Simpler than server-side
-    sessions for a split frontend/backend team.
-  - Username rules (from requirements doc): 4-16 chars, alphanumeric only,
-    non-empty username AND password.
-  - Password length follows the frontend form: 8-20 characters.
+Passwords are bcrypt-hashed; only the hash is stored (User.password_hash).
+Access tokens are signed JWTs (HS256, 24h). If SECRET_KEY is left at the
+default placeholder, a random per-process key is used instead so tokens are
+never signed with a publicly known value (they will not survive a restart;
+set SECRET_KEY in backend/.env for stable sessions).
 """
 from __future__ import annotations
 
-# TODO(auth): uncomment when implementing
-# from passlib.context import CryptContext
-# import jwt  # pyjwt - add to requirements.txt
-# from datetime import datetime, timedelta, timezone
-# from fastapi import Depends, HTTPException
-# from fastapi.security import OAuth2PasswordBearer
-# from app.config import settings
+import secrets
+from datetime import datetime, timedelta, timezone
 
-# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+import bcrypt
+import jwt
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app import models
+from app.config import settings
+from app.database import get_db
 
 USERNAME_MIN, USERNAME_MAX = 4, 16
 PASSWORD_MIN, PASSWORD_MAX = 8, 20
+TOKEN_TTL_HOURS = 24
+ALGORITHM = "HS256"
+_BCRYPT_MAX_BYTES = 72  # bcrypt hard limit on the input length
+
+# auto_error=False so we can return the same 401 for missing and invalid tokens.
+bearer = HTTPBearer(auto_error=False)
+
+# Used only when SECRET_KEY is the default placeholder (see module docstring).
+_EPHEMERAL_SECRET = secrets.token_hex(32)
+
+
+def _secret() -> str:
+    return _EPHEMERAL_SECRET if settings.secret_is_default else settings.secret_key
+
+
+def _pw_bytes(plain: str) -> bytes:
+    # Truncate to bcrypt's 72-byte limit (our passwords are 8-20 chars, so this
+    # only matters for pathological multi-byte input, but keep it consistent).
+    return plain.encode("utf-8")[:_BCRYPT_MAX_BYTES]
 
 
 def hash_password(plain: str) -> str:
-    """bcrypt-hash a password for storage in User.password_hash."""
-    # TODO(auth): return pwd_context.hash(plain)
-    raise NotImplementedError
+    return bcrypt.hashpw(_pw_bytes(plain), bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    """Constant-time check of a login attempt against the stored hash."""
-    # TODO(auth): return pwd_context.verify(plain, hashed)
-    raise NotImplementedError
+    try:
+        return bcrypt.checkpw(_pw_bytes(plain), hashed.encode("utf-8"))
+    except ValueError:
+        return False  # malformed stored hash
 
 
 def validate_username(username: str) -> str | None:
-    """Return an error message if the username violates the requirements,
-    else None.
+    """Return an error message if the username breaks the rules, else None.
 
-    Rules (functional requirements):
-      - not empty
-      - 4 to 16 characters
-      - no special characters (alphanumeric only)
+    Rules: not empty, 4 to 16 characters, letters and digits only. (The request
+    schema enforces the same rules; this is the server-side backstop.)
     """
-    # TODO(auth):
-    #   if not username or not username.strip(): return "Username is required."
-    #   if not (USERNAME_MIN <= len(username) <= USERNAME_MAX): return "..."
-    #   if not username.isalnum(): return "Username may not contain special characters."
-    raise NotImplementedError
+    if not username or not username.strip():
+        return "Username is required."
+    if not (USERNAME_MIN <= len(username) <= USERNAME_MAX):
+        return f"Username must be {USERNAME_MIN} to {USERNAME_MAX} characters."
+    if not username.isascii() or not username.isalnum():
+        return "Username may contain only letters and numbers."
+    return None
 
 
 def create_access_token(user_id: int) -> str:
-    """Issue a signed JWT: {"sub": user_id, "exp": now+24h}."""
-    # TODO(auth): jwt.encode({...}, settings.secret_key, algorithm="HS256")
-    # NOTE: refuse to start if settings.secret_key is still the default -
-    # see review finding #2.
-    raise NotImplementedError
+    payload = {
+        "sub": str(user_id),
+        "exp": datetime.now(timezone.utc) + timedelta(hours=TOKEN_TTL_HOURS),
+    }
+    return jwt.encode(payload, _secret(), algorithm=ALGORITHM)
 
 
-def get_current_user():  # -> models.User
-    """FastAPI dependency: decode bearer token -> load User or 401.
+def _user_from_token(token: str, db: Session) -> models.User | None:
+    try:
+        payload = jwt.decode(token, _secret(), algorithms=[ALGORITHM])
+    except jwt.PyJWTError:
+        return None
+    sub = payload.get("sub")
+    try:
+        user_id = int(sub)
+    except (TypeError, ValueError):
+        return None
+    return db.get(models.User, user_id)
 
-    Usage in routers:  user: models.User = Depends(get_current_user)
-    Also provide get_current_user_optional for endpoints that work both
-    logged-in and anonymous (e.g. /wordcloud saves a Search only if logged in).
-    """
-    # TODO(auth): decode token, db.get(models.User, sub), 401 on failure
-    raise NotImplementedError
+
+def get_current_user(
+    creds: HTTPAuthorizationCredentials | None = Depends(bearer),
+    db: Session = Depends(get_db),
+) -> models.User:
+    """Require a valid bearer token; 401 otherwise."""
+    user = _user_from_token(creds.credentials, db) if creds else None
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user
+
+
+def get_current_user_optional(
+    creds: HTTPAuthorizationCredentials | None = Depends(bearer),
+    db: Session = Depends(get_db),
+) -> models.User | None:
+    """Return the user if a valid token is present, else None (anonymous ok)."""
+    return _user_from_token(creds.credentials, db) if creds else None
+
+
+def get_user_by_username(db: Session, username: str) -> models.User | None:
+    return db.scalar(select(models.User).where(models.User.username == username))

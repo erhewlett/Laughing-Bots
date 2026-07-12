@@ -16,11 +16,12 @@ async def lifespan(app: FastAPI):
     # Skeleton stage: create tables directly. Swap for Alembic migrations later.
     Base.metadata.create_all(bind=engine)
     if settings.secret_is_default:
-        # review #2: loud warning now; MUST become `raise RuntimeError` when
-        # the auth milestone starts signing tokens with this key.
+        # Auth signs tokens with a random per-process key when SECRET_KEY is
+        # unset (see services/security.py). Tokens will not survive a restart.
         print(
-            "\n*** WARNING: SECRET_KEY is the built-in default. "
-            "Set a real one in backend/.env before implementing auth. ***\n"
+            "\n*** WARNING: SECRET_KEY is unset; login tokens use a random "
+            "per-process key and reset on restart. Set SECRET_KEY in "
+            "backend/.env for stable sessions. ***\n"
         )
     yield
 
