@@ -1,0 +1,11 @@
+// import colors file
+@use '../colors';
+
+// question box
+
+.question-box {
+    border: 3px solid #F7E4E0;  // border color is sandy pink
+    aspect-ratio: 4 / 3;    // keeps box a rectangle (4:3 aspect ratio)
+    width: 100%;
+    padding: 2rem
+}
