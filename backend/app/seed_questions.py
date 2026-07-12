@@ -16,7 +16,7 @@ from pathlib import Path
 
 from sqlalchemy import delete, select
 
-from app.database import Base, SessionLocal, engine
+from app.database import SessionLocal, engine, initialize_database
 from app import models
 from app.services.ingest import _get_or_create_skill
 
@@ -24,8 +24,28 @@ FIXTURE = Path(__file__).parent / "seed_data" / "questions_seed.json"
 
 
 def seed_questions() -> None:
-    Base.metadata.create_all(bind=engine)
+    initialize_database(engine)
     items = json.loads(FIXTURE.read_text())["questions"]
+
+    # Preflight the whole fixture before touching the DB, so a bad entry (a
+    # "meduim" typo, zero or multiple correct answers) is fixed in the fixture
+    # rather than seeding a broken or ambiguous quiz.
+    valid = {"easy", "medium", "hard"}
+    for i, item in enumerate(items):
+        if item.get("difficulty") not in valid:
+            raise ValueError(
+                f"Question {i} has invalid difficulty {item.get('difficulty')!r}; "
+                f"use one of {sorted(valid)}."
+            )
+        options = item.get("options") or []
+        if len(options) < 2:
+            raise ValueError(f"Question {i} needs at least 2 options.")
+        correct_count = sum(1 for o in options if o.get("correct"))
+        if correct_count != 1:
+            raise ValueError(
+                f"Question {i} must have exactly one correct option, "
+                f"found {correct_count}."
+            )
 
     db = SessionLocal()
     try:

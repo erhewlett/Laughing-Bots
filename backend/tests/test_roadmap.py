@@ -1,7 +1,9 @@
 """Tests for the roadmap endpoints."""
 from __future__ import annotations
 
-from sqlalchemy import select
+import pytest
+from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 
 from app import models
 
@@ -63,6 +65,37 @@ def test_create_role_without_skills_422(client, db_session):
     db_session.commit()
     h = {"Authorization": f"Bearer {_token(client)}"}
     assert _create(client, h, role_name="Empty Role").status_code == 422
+
+
+def test_create_replaces_previous_roadmap(client, db_session):
+    _seed_role(db_session)
+    _seed_role(db_session, role_name="Frontend Developer", demands={"React": 9.0})
+    h = {"Authorization": f"Bearer {_token(client)}"}
+    first = _create(client, h).json()
+    assert len(first["steps"]) == 3  # Python, SQL, AWS
+
+    assert _create(client, h, role_name="Frontend Developer").status_code == 201
+    # exactly one roadmap remains, and it is the new one
+    assert db_session.scalar(select(func.count()).select_from(models.Roadmap)) == 1
+    body = client.get("/roadmap", headers=h).json()
+    assert body["role"] == "Frontend Developer"
+    # the replaced roadmap's steps are gone; only the new single step remains
+    # (SQLite reuses ids, so assert on row counts and content, not old ids)
+    assert db_session.scalar(select(func.count()).select_from(models.RoadmapStep)) == 1
+    assert [s["skill"] for s in body["steps"]] == ["React"]
+
+
+def test_database_enforces_one_roadmap_per_user(client, db_session):
+    _seed_role(db_session)
+    h = {"Authorization": f"Bearer {_token(client)}"}
+    created = _create(client, h).json()
+    roadmap = db_session.get(models.Roadmap, created["roadmap_id"])
+    db_session.add(
+        models.Roadmap(user_id=roadmap.user_id, role_id=roadmap.role_id)
+    )
+    with pytest.raises(IntegrityError):
+        db_session.commit()
+    db_session.rollback()
 
 
 def test_get_returns_latest_roadmap(client, db_session):
