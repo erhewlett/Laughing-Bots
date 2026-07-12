@@ -1,2 +1,36 @@
+# Dependencies
+node_modules/
 frontend/node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+backend/venv/
+*.egg-info/
+
+# Build output
+frontend/css/style.css.map
 frontend/style.css.map
+
+# Environment / secrets
+.env
+*.env
+!.env.example
+
+# Databases (built locally)
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# IDE
+.idea/
+*.iml
+.vscode/

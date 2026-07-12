@@ -1,0 +1,93 @@
+{
+  "note": "Question bank for the Q&A game. Load with: python -m app.seed_questions. Each entry: skill (must match a Skill name from the word cloud, e.g. Python, SQL, AWS, React, JavaScript, TypeScript, Cybersecurity, Docker, Java, Node.js), difficulty (easy|medium|hard), question_text, and 3-4 options where exactly one has correct=true. A full quiz serves 10 questions from one (skill, difficulty) bank, so aim for at least 10 per skill+difficulty. This starter set is small; expand it.",
+  "questions": [
+    {
+      "skill": "Python",
+      "difficulty": "easy",
+      "question_text": "Which built-in type is immutable?",
+      "options": [
+        {"text": "tuple", "correct": true},
+        {"text": "list", "correct": false},
+        {"text": "dict", "correct": false},
+        {"text": "set", "correct": false}
+      ]
+    },
+    {
+      "skill": "Python",
+      "difficulty": "easy",
+      "question_text": "What does len([1, 2, 3]) return?",
+      "options": [
+        {"text": "3", "correct": true},
+        {"text": "2", "correct": false},
+        {"text": "6", "correct": false},
+        {"text": "None", "correct": false}
+      ]
+    },
+    {
+      "skill": "Python",
+      "difficulty": "easy",
+      "question_text": "Which keyword defines a function?",
+      "options": [
+        {"text": "def", "correct": true},
+        {"text": "func", "correct": false},
+        {"text": "function", "correct": false},
+        {"text": "lambda", "correct": false}
+      ]
+    },
+    {
+      "skill": "Python",
+      "difficulty": "medium",
+      "question_text": "What does a list comprehension [x*x for x in range(3)] produce?",
+      "options": [
+        {"text": "[0, 1, 4]", "correct": true},
+        {"text": "[1, 4, 9]", "correct": false},
+        {"text": "[0, 1, 2]", "correct": false},
+        {"text": "[1, 2, 3]", "correct": false}
+      ]
+    },
+    {
+      "skill": "Python",
+      "difficulty": "hard",
+      "question_text": "What is the time complexity of checking membership in a set?",
+      "options": [
+        {"text": "O(1) average", "correct": true},
+        {"text": "O(n)", "correct": false},
+        {"text": "O(log n)", "correct": false},
+        {"text": "O(n log n)", "correct": false}
+      ]
+    },
+    {
+      "skill": "Python",
+      "difficulty": "hard",
+      "question_text": "Which statement about the GIL is accurate?",
+      "options": [
+        {"text": "It allows only one thread to execute Python bytecode at a time", "correct": true},
+        {"text": "It makes all Python code run in parallel", "correct": false},
+        {"text": "It applies only to async code", "correct": false},
+        {"text": "It was removed in Python 3", "correct": false}
+      ]
+    },
+    {
+      "skill": "SQL",
+      "difficulty": "easy",
+      "question_text": "Which clause filters rows in a query?",
+      "options": [
+        {"text": "WHERE", "correct": true},
+        {"text": "ORDER BY", "correct": false},
+        {"text": "GROUP BY", "correct": false},
+        {"text": "SELECT", "correct": false}
+      ]
+    },
+    {
+      "skill": "SQL",
+      "difficulty": "easy",
+      "question_text": "Which statement removes all rows but keeps the table?",
+      "options": [
+        {"text": "DELETE FROM table", "correct": true},
+        {"text": "DROP TABLE table", "correct": false},
+        {"text": "REMOVE table", "correct": false},
+        {"text": "TRUNCATE DATABASE", "correct": false}
+      ]
+    }
+  ]
+}

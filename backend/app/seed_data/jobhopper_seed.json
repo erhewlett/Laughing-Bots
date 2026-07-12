@@ -1,0 +1,715 @@
+{
+  "note": "Shared job dataset for JobHopper. Load with: python -m app.seed  (no API key needed). date_posted is re-stamped to load time so the 30-day word-cloud window always includes these postings. To pull fresh live data instead, run: python -m app.services.ingest",
+  "source": "JSearch live ingest, 2026-07-06",
+  "postings": [
+    {
+      "external_id": "k9N4zv5TUyfDKRIAAAAAAA==",
+      "role": "Software Engineer",
+      "title": "Software Engineer Skill Level 2",
+      "company_name": "BTS",
+      "location": "Columbia, Maryland",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.linkedin.com/jobs/view/software-engineer-skill-level-2-at-bts-4437403153",
+      "skills": {}
+    },
+    {
+      "external_id": "DZ4lmcpF41OEI4X3AAAAAA==",
+      "role": "Software Engineer",
+      "title": "Sr. Lead Software Engineer, Full Stack - Shopping Tech",
+      "company_name": "Capital One",
+      "location": "McLean, Virginia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.capitalonecareers.com/job/mclean/sr-lead-software-engineer-full-stack-shopping-tech/1732/97178514720",
+      "skills": {
+        "Python": 2,
+        "Java": 2,
+        "JavaScript": 2,
+        "TypeScript": 2,
+        "SQL": 2,
+        "AWS": 3,
+        "Azure": 2,
+        "GCP": 2,
+        "Docker": 1,
+        "Kubernetes": 1,
+        "Agile": 1,
+        "HTML": 1,
+        "CSS": 1
+      }
+    },
+    {
+      "external_id": "vuJA7Ekcs-OWZu67AAAAAA==",
+      "role": "Software Engineer",
+      "title": "Principal Software Engineer",
+      "company_name": "Amgen",
+      "location": "Washington, District of Columbia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://careers.amgen.com/en/job/washington-d-c/principal-software-engineer/87/96262732256",
+      "skills": {
+        "Python": 3,
+        "JavaScript": 1,
+        "TypeScript": 5,
+        "Azure": 6,
+        "Docker": 2,
+        "Kubernetes": 2,
+        "Agile": 1,
+        "React": 5,
+        "Node.js": 3,
+        "REST": 1,
+        "CI/CD": 3,
+        "Cybersecurity": 1
+      }
+    },
+    {
+      "external_id": "7UlFf6mXgJf02R0ZAAAAAA==",
+      "role": "Software Engineer",
+      "title": "Modern Software Developer, Senior",
+      "company_name": "Booz Allen Hamilton",
+      "location": "Arlington, Virginia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.linkedin.com/jobs/view/modern-software-developer-senior-at-booz-allen-hamilton-4434754567",
+      "skills": {
+        "Python": 1,
+        "JavaScript": 1,
+        "TypeScript": 1,
+        "SQL": 1,
+        "AWS": 1,
+        "Agile": 2,
+        "React": 1,
+        "Node.js": 1,
+        "Cybersecurity": 1
+      }
+    },
+    {
+      "external_id": "-AyuYie6B025Z8HcAAAAAA==",
+      "role": "Software Engineer",
+      "title": "AI Software Engineer",
+      "company_name": "Leidos",
+      "location": "Alexandria, Virginia",
+      "salary_min": 87100,
+      "salary_max": 157450,
+      "source_url": "https://www.ziprecruiter.com/c/Leidos/Job/AI-Software-Engineer/-in-Alexandria,VA?jid=f1e5a7b0279f303f",
+      "skills": {
+        "Python": 1,
+        "AWS": 4,
+        "Agile": 2,
+        "CI/CD": 1,
+        "PostgreSQL": 1,
+        "Terraform": 1,
+        "Linux": 1,
+        "Machine Learning": 1
+      }
+    },
+    {
+      "external_id": "zukdfiR94kSnO4XkAAAAAA==",
+      "role": "Software Engineer",
+      "title": "Senior Software Engineer (Radar / RF)",
+      "company_name": "Envisioneering Inc",
+      "location": "Washington, District of Columbia",
+      "salary_min": 140000,
+      "salary_max": 160000,
+      "source_url": "https://www.linkedin.com/jobs/view/senior-software-engineer-radar-rf-at-envisioneering-inc-4435217740",
+      "skills": {
+        "Python": 5,
+        "CI/CD": 1,
+        "Linux": 3,
+        "C++": 1,
+        "Networking": 1
+      }
+    },
+    {
+      "external_id": "YyY9M8LSV0AHusmhAAAAAA==",
+      "role": "Software Engineer",
+      "title": "Sr. Software Engineer, AI Native",
+      "company_name": "Sony Engagement Platform Services, LLC",
+      "location": "Washington, District of Columbia",
+      "salary_min": 180000,
+      "salary_max": 205000,
+      "source_url": "https://www.indeed.com/viewjob?jk=6d6dbb89d7f07724",
+      "skills": {
+        "Python": 1,
+        "Java": 1,
+        "JavaScript": 1,
+        "TypeScript": 1,
+        "AWS": 1,
+        "Docker": 1,
+        "Kubernetes": 1,
+        "Agile": 2,
+        "HTML": 1,
+        "CSS": 1,
+        "React": 2,
+        "REST": 2,
+        "CI/CD": 1,
+        "Terraform": 1
+      }
+    },
+    {
+      "external_id": "RktpGQwfqaGb-DibAAAAAA==",
+      "role": "Software Engineer",
+      "title": "Sr Full Stack Software Engineer Jobs",
+      "company_name": "Anonymous Employer",
+      "location": "Washington, District of Columbia",
+      "salary_min": 135000,
+      "salary_max": 145000,
+      "source_url": "https://www.clearancejobs.com/jobs/9010308/sr-full-stack-software-engineer",
+      "skills": {
+        "Java": 2,
+        "JavaScript": 1,
+        "TypeScript": 1,
+        "SQL": 1,
+        "Agile": 2,
+        "React": 2,
+        "CI/CD": 2,
+        "PostgreSQL": 2
+      }
+    },
+    {
+      "external_id": "Pnluc2Xd-kNiCzxVAAAAAA==",
+      "role": "Software Engineer",
+      "title": "Lead Software Engineer  -  Active TS/SCI",
+      "company_name": "MDAEdge",
+      "location": "Greater Landover, Maryland",
+      "salary_min": 140000,
+      "salary_max": 165000,
+      "source_url": "https://www.linkedin.com/jobs/view/lead-software-engineer-active-ts-sci-at-mdaedge-4435379889",
+      "skills": {
+        "Java": 1,
+        "Docker": 1,
+        "Agile": 2,
+        "Linux": 3,
+        "C++": 1
+      }
+    },
+    {
+      "external_id": "-nvFlAItvJGIaWTmAAAAAA==",
+      "role": "Software Engineer",
+      "title": "Senior Software Engineer, Salesforce Platforms",
+      "company_name": "Marriott",
+      "location": "Bethesda, Maryland",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://careers.marriott.com/senior-software-engineer-salesforce-platforms/job/FC281C6050F8C63D989A15AB1940C6D2",
+      "skills": {
+        "Java": 1,
+        "JavaScript": 1,
+        "Agile": 3,
+        "CSS": 1,
+        "Git": 1
+      }
+    },
+    {
+      "external_id": "_IfkOA8uLTfckYDyAAAAAA==",
+      "role": "Cloud Security Engineer",
+      "title": "Senior AWS Cloud Engineer, Landing Zone Accelerator with Security Clearance",
+      "company_name": "D9Tech Resources LLC",
+      "location": "Arlington, Virginia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.linkedin.com/jobs/view/senior-aws-cloud-engineer-landing-zone-accelerator-with-security-clearance-at-d9tech-resources-llc-4429929988",
+      "skills": {
+        "TypeScript": 1,
+        "AWS": 10,
+        "Node.js": 1,
+        "CI/CD": 1,
+        "Networking": 2,
+        "Git": 1
+      }
+    },
+    {
+      "external_id": "-b6frandWRWj68mqAAAAAA==",
+      "role": "Cloud Security Engineer",
+      "title": "Cloud Security Engineer",
+      "company_name": "GDIT",
+      "location": "Falls Church, Virginia",
+      "salary_min": 111155,
+      "salary_max": 150385,
+      "source_url": "https://www.ziprecruiter.com/c/General-Dynamics-Information-Technology/Job/Cloud-Security-Engineer/-in-Falls-Church,VA?jid=b030e7ddfd7dd5ff",
+      "skills": {
+        "AWS": 2,
+        "Cybersecurity": 4
+      }
+    },
+    {
+      "external_id": "CIIYDjcui_0Y3eB4AAAAAA==",
+      "role": "Cloud Security Engineer",
+      "title": "Cloud Security Analyst",
+      "company_name": "Nightwing",
+      "location": "Arlington, Virginia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.linkedin.com/jobs/view/cloud-security-analyst-at-nightwing-4418062179",
+      "skills": {
+        "AWS": 2,
+        "Azure": 1,
+        "GCP": 1,
+        "Docker": 1,
+        "Kubernetes": 1,
+        "Cybersecurity": 16
+      }
+    },
+    {
+      "external_id": "SdOGdEt_--wN82kuAAAAAA==",
+      "role": "Cloud Security Engineer",
+      "title": "Cloud Security Engineer, Senior",
+      "company_name": "Booz Allen Hamilton",
+      "location": "Chantilly, Virginia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.linkedin.com/jobs/view/cloud-security-engineer-senior-at-booz-allen-hamilton-4434022515",
+      "skills": {
+        "Agile": 1,
+        "Cybersecurity": 5
+      }
+    },
+    {
+      "external_id": "KEyL2Za6XgIitgQnAAAAAA==",
+      "role": "Cloud Security Engineer",
+      "title": "Security Engineer, Infrastructure",
+      "company_name": "Scale AI",
+      "location": "Washington, District of Columbia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.linkedin.com/jobs/view/security-engineer-infrastructure-at-scale-ai-4403139792",
+      "skills": {
+        "TypeScript": 1,
+        "AWS": 2,
+        "Azure": 1,
+        "GCP": 1,
+        "Kubernetes": 1,
+        "Node.js": 1,
+        "Cybersecurity": 2,
+        "Terraform": 2
+      }
+    },
+    {
+      "external_id": "b0o6fSwSONuT9SU0AAAAAA==",
+      "role": "Cloud Security Engineer",
+      "title": "Security Engineer, WWPS Solutions Architecture",
+      "company_name": "Amazon Web Services (AWS)",
+      "location": "Herndon, Virginia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.linkedin.com/jobs/view/security-engineer-wwps-solutions-architecture-at-amazon-web-services-aws-4436126705",
+      "skills": {
+        "Python": 3,
+        "Java": 4,
+        "AWS": 12,
+        "Cybersecurity": 5,
+        "Linux": 1,
+        "C++": 3,
+        "Networking": 4,
+        "C#": 1
+      }
+    },
+    {
+      "external_id": "Cg6XBLIfc-_68GShAAAAAA==",
+      "role": "Cloud Security Engineer",
+      "title": "Identity & Cloud Engineer (Multi-Cloud Expertise)",
+      "company_name": "Guidehouse",
+      "location": "Rockville, Maryland",
+      "salary_min": 118000,
+      "salary_max": 196000,
+      "source_url": "https://www.ziprecruiter.com/c/Guidehouse/Job/Identity-&-Cloud-Engineer-(Multi-Cloud-Expertise)/-in-Rockville,MD?jid=adae9621bfebee2e",
+      "skills": {
+        "AWS": 3,
+        "Azure": 3,
+        "GCP": 3,
+        "Cybersecurity": 11
+      }
+    },
+    {
+      "external_id": "5tsngjmdLqhmNpv4AAAAAA==",
+      "role": "Cloud Security Engineer",
+      "title": "Cloud Security Engineer",
+      "company_name": "Stefanini",
+      "location": "Wyoming, Delaware",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.adzuna.com/details/5786018811",
+      "skills": {
+        "Python": 1,
+        "AWS": 2,
+        "Azure": 3,
+        "GCP": 3,
+        "Cybersecurity": 11,
+        "Terraform": 1,
+        "Networking": 1
+      }
+    },
+    {
+      "external_id": "ReDdhdXpHObtTRKmAAAAAA==",
+      "role": "Cloud Security Engineer",
+      "title": "Senior Security Engineer II, Cloud Security",
+      "company_name": "CoreWeave",
+      "location": "Livingston, New Jersey",
+      "salary_min": 165000,
+      "salary_max": 242000,
+      "source_url": "https://www.builtinnyc.com/job/senior-security-engineer-ii-cloud-security/9621121",
+      "skills": {
+        "Python": 1,
+        "AWS": 2,
+        "Azure": 2,
+        "GCP": 2,
+        "CI/CD": 1,
+        "Cybersecurity": 5,
+        "Terraform": 2
+      }
+    },
+    {
+      "external_id": "tbz5wx714nZrjSBEAAAAAA==",
+      "role": "Cloud Security Engineer",
+      "title": "Cloud Security Engineer",
+      "company_name": "BWXT",
+      "location": "Lynchburg, Virginia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://careers.bwxt.com/job/Lynchburg-Cloud-Security-Engineer-VA-24501/1359419000/",
+      "skills": {
+        "AWS": 2,
+        "Azure": 3,
+        "GCP": 2,
+        "CI/CD": 1,
+        "Cybersecurity": 11,
+        "Linux": 1,
+        "Networking": 1
+      }
+    },
+    {
+      "external_id": "9QIXhGsvIS7Lz_7nAAAAAA==",
+      "role": "Frontend Developer",
+      "title": "Next.js Front End Developer",
+      "company_name": "HeiTech Services",
+      "location": "Hyattsville, Maryland",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.ziprecruiter.com/c/HeiTech-Services/Job/Next.js-Front-End-Developer/-in-Hyattsville,MD?jid=73472a4c013812ca",
+      "skills": {
+        "JavaScript": 1,
+        "TypeScript": 1,
+        "React": 1
+      }
+    },
+    {
+      "external_id": "ZorH1YxhRx4--yp5AAAAAA==",
+      "role": "Frontend Developer",
+      "title": "DSCA Full Stack Front-End Developer Mid (Software Development Analyst) - 29232",
+      "company_name": "HII's Mission Technologies division",
+      "location": "Arlington, Virginia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://jobs.hii-tsd.com/job/Arlington%2C-VA-DSCA-Full-Stack-Front-End-Developer-Mid-%28Software-Development-Analyst%29-29232-Remo/1405724900/",
+      "skills": {
+        "Python": 1,
+        "JavaScript": 2,
+        "TypeScript": 2,
+        "Agile": 4,
+        "CSS": 1,
+        "React": 2,
+        "REST": 3,
+        "CI/CD": 1,
+        "Cybersecurity": 1,
+        "Machine Learning": 1,
+        "Git": 1,
+        "Flask": 1,
+        "Django": 1
+      }
+    },
+    {
+      "external_id": "bqawtYmn8eirvWe7AAAAAA==",
+      "role": "Frontend Developer",
+      "title": "Front End Web Developer",
+      "company_name": "Pyramid Consulting, Inc",
+      "location": "McLean, Virginia",
+      "salary_min": 60,
+      "salary_max": 65,
+      "source_url": "https://www.linkedin.com/jobs/view/front-end-web-developer-at-pyramid-consulting-inc-4435335015",
+      "skills": {
+        "Python": 1,
+        "JavaScript": 1,
+        "TypeScript": 1,
+        "AWS": 1,
+        "React": 2,
+        "CI/CD": 1
+      }
+    },
+    {
+      "external_id": "ApaN4YDl6W_0wDepAAAAAA==",
+      "role": "Frontend Developer",
+      "title": "Senior Front End Developer Jobs",
+      "company_name": "Anonymous Employer",
+      "location": "Washington, District of Columbia",
+      "salary_min": 135000,
+      "salary_max": 145000,
+      "source_url": "https://www.clearancejobs.com/jobs/9010318/senior-front-end-developer",
+      "skills": {
+        "JavaScript": 3,
+        "TypeScript": 3,
+        "AWS": 4,
+        "HTML": 3,
+        "CSS": 3,
+        "React": 4,
+        "Node.js": 4,
+        "CI/CD": 1,
+        "Git": 2
+      }
+    },
+    {
+      "external_id": "y7tCi8YOz_R4vervAAAAAA==",
+      "role": "Frontend Developer",
+      "title": "Senior Front End Developer with Security Clearance",
+      "company_name": "BOAB Ventures",
+      "location": "Washington, District of Columbia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.linkedin.com/jobs/view/senior-front-end-developer-with-security-clearance-at-boab-ventures-4436724826",
+      "skills": {
+        "JavaScript": 3,
+        "TypeScript": 3,
+        "AWS": 4,
+        "HTML": 3,
+        "CSS": 3,
+        "React": 4,
+        "Node.js": 4,
+        "CI/CD": 1,
+        "Git": 2
+      }
+    },
+    {
+      "external_id": "sl6gA5mso0_MS_2LAAAAAA==",
+      "role": "Frontend Developer",
+      "title": "Front-End Developer",
+      "company_name": "E-Infosol LLC",
+      "location": "Washington, District of Columbia",
+      "salary_min": 151000,
+      "salary_max": 159000,
+      "source_url": "https://www.indeed.com/viewjob?jk=444671469e7dd990",
+      "skills": {
+        "JavaScript": 3,
+        "TypeScript": 3,
+        "AWS": 6,
+        "HTML": 3,
+        "CSS": 3,
+        "React": 4,
+        "Node.js": 4,
+        "CI/CD": 1,
+        "Cybersecurity": 1,
+        "Git": 2
+      }
+    },
+    {
+      "external_id": "DTIRpELk7h4NnSxIAAAAAA==",
+      "role": "Frontend Developer",
+      "title": "Front-End Web Developer, B2B, Marketing Technology",
+      "company_name": "DoorDash",
+      "location": "Washington, District of Columbia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.linkedin.com/jobs/view/front-end-web-developer-b2b-marketing-technology-at-doordash-4430280099",
+      "skills": {
+        "JavaScript": 1,
+        "TypeScript": 1,
+        "CSS": 3,
+        "React": 1,
+        "CI/CD": 1,
+        "Git": 1
+      }
+    },
+    {
+      "external_id": "zfS3apoL4D0cLy-2AAAAAA==",
+      "role": "Frontend Developer",
+      "title": "Frontend Web Application Developers (Defense): DC",
+      "company_name": "Triumphant Nerd",
+      "location": "Washington, District of Columbia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.linkedin.com/jobs/view/frontend-web-application-developers-defense-dc-at-triumphant-nerd-4431853412",
+      "skills": {
+        "JavaScript": 1,
+        "TypeScript": 3,
+        "React": 2
+      }
+    },
+    {
+      "external_id": "23q7bKqoopi3UvCMAAAAAA==",
+      "role": "Frontend Developer",
+      "title": "Front-End UI Developer",
+      "company_name": "Experis/Manpower Group",
+      "location": "Washington, District of Columbia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.mediabistro.com/jobs/3540289961-front-end-ui-developer",
+      "skills": {
+        "Python": 1,
+        "JavaScript": 2,
+        "TypeScript": 2
+      }
+    },
+    {
+      "external_id": "_OZ556xTAxyMxQ5bAAAAAA==",
+      "role": "Frontend Developer",
+      "title": "Front End Software Engineer",
+      "company_name": "Booz Allen Hamilton",
+      "location": "McLean, Virginia",
+      "salary_min": 55200,
+      "salary_max": 126000,
+      "source_url": "https://www.indeed.com/viewjob?jk=f747e839e2cf7680",
+      "skills": {
+        "JavaScript": 1,
+        "TypeScript": 2,
+        "AWS": 1,
+        "Azure": 1,
+        "GCP": 2,
+        "Docker": 1,
+        "Kubernetes": 1,
+        "Agile": 2,
+        "React": 2,
+        "Git": 1
+      }
+    },
+    {
+      "external_id": "KIbwftmym3UgB85-AAAAAA==",
+      "role": "Data Analyst",
+      "title": "Data Visualization Analyst",
+      "company_name": "Westat",
+      "location": "Bethesda, Maryland",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.linkedin.com/jobs/view/data-visualization-analyst-at-westat-4435376357",
+      "skills": {
+        "Python": 4,
+        "SQL": 3,
+        "Machine Learning": 1,
+        "Git": 1
+      }
+    },
+    {
+      "external_id": "jOWN-ne_ICVV-SnrAAAAAA==",
+      "role": "Data Analyst",
+      "title": "Senior Data Analyst - Enterprise Marketing and Messaging Analytics | McLean, VA, USA",
+      "company_name": "Capital One Financial Corporation",
+      "location": "McLean, Virginia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.efinancialcareers.com/jobs-United_States-McLean-Senior_Data_Analyst_-_Enterprise_Marketing_and_Messaging_Analytics.id24480128",
+      "skills": {
+        "Python": 2,
+        "SQL": 3,
+        "AWS": 1,
+        "Agile": 1
+      }
+    },
+    {
+      "external_id": "gxVUrDdnyiza4_zaAAAAAA==",
+      "role": "Data Analyst",
+      "title": "Talent Management Data Analyst",
+      "company_name": "Guidehouse",
+      "location": "Washington, District of Columbia",
+      "salary_min": 98000,
+      "salary_max": 163000,
+      "source_url": "https://www.indeed.com/viewjob?jk=e6b8290015e8b334",
+      "skills": {
+        "Python": 1
+      }
+    },
+    {
+      "external_id": "j3qvxEsnZrNrSYkEAAAAAA==",
+      "role": "Data Analyst",
+      "title": "Data Analyst- Channel",
+      "company_name": "AvePoint",
+      "location": "Arlington, Virginia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.linkedin.com/jobs/view/data-analyst-channel-at-avepoint-4420712863",
+      "skills": {
+        "Python": 1,
+        "SQL": 1
+      }
+    },
+    {
+      "external_id": "1EKSxE_WptJylTIIAAAAAA==",
+      "role": "Data Analyst",
+      "title": "Urgent Need : Senior Data Analyst : McLean, VA - Hybrid ( Need Local Candidates Only ) : 12 Months",
+      "company_name": "Navtech, Inc.",
+      "location": "McLean, Virginia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.ziprecruiter.com/c/Navtech/Job/Urgent-Need-:-Senior-Data-Analyst-:-McLean,-VA-Hybrid-(-Need-Local-Candidates-Only-)-:-12-Months/-in-West-Mclean,VA?jid=e1b7a933028efed6",
+      "skills": {
+        "Python": 2,
+        "SQL": 1,
+        "AWS": 1,
+        "Agile": 1
+      }
+    },
+    {
+      "external_id": "AdqXvGpOV5dlFZp0AAAAAA==",
+      "role": "Data Analyst",
+      "title": "Junior Data Analyst & Developer \u2013 BI + Python (Conservation)",
+      "company_name": "The Nature Conservancy (All)",
+      "location": "Arlington, Virginia",
+      "salary_min": 79000,
+      "salary_max": 91000,
+      "source_url": "https://www.jobleads.com/us/job/junior-data-analyst-developer-bi-python-conservation--arlington--e278e2f36a8b0ce0158d6c353e256de4a",
+      "skills": {
+        "Python": 2
+      }
+    },
+    {
+      "external_id": "NGvQY2B8JEL2opBVAAAAAA==",
+      "role": "Data Analyst",
+      "title": "Data Visualization Analyst and Qlik Developer",
+      "company_name": "Booz Allen Hamilton",
+      "location": "McLean, Virginia",
+      "salary_min": 99000,
+      "salary_max": 225000,
+      "source_url": "https://www.indeed.com/viewjob?jk=1d439901a3ba2c03",
+      "skills": {
+        "Python": 1,
+        "SQL": 1,
+        "Machine Learning": 1
+      }
+    },
+    {
+      "external_id": "8eHDxZoyk4QMwya4AAAAAA==",
+      "role": "Data Analyst",
+      "title": "Lead Healthcare Data Analyst (Post-sale)",
+      "company_name": "HealthVerity",
+      "location": "Washington, District of Columbia",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://www.monster.com/job-openings/lead-healthcare-data-analyst-post-sale-washington-dc--3a460f6c-6321-4519-a708-0ac646f120fe",
+      "skills": {
+        "Python": 3,
+        "SQL": 3
+      }
+    },
+    {
+      "external_id": "SwiurrgEiT80fhehAAAAAA==",
+      "role": "Data Analyst",
+      "title": "Consumer Insights Data Analyst \u2014 Remote/Hybrid",
+      "company_name": "Ampcus Inc",
+      "location": "Washington, District of Columbia",
+      "salary_min": 70000,
+      "salary_max": 90000,
+      "source_url": "https://www.jobleads.com/us/job/consumer-insights-data-analyst-remote-hybrid--washington--e1d3519e3e007642ab90b42c85236e078",
+      "skills": {}
+    },
+    {
+      "external_id": "T0WFsCoQWB7oUDDTAAAAAA==",
+      "role": "Data Analyst",
+      "title": "Data Analyst (DOJ)",
+      "company_name": "Castellum LLC",
+      "location": "Gambrills, Maryland",
+      "salary_min": null,
+      "salary_max": null,
+      "source_url": "https://bebee.com/us/jobs/data-analyst-doj-castellum-llc-gambrills--lensa-7428_e00824e3bed26f918d0a0e2b2dc52b8e42d250d86f5836df81f5502ab26aa218",
+      "skills": {
+        "Python": 1,
+        "SQL": 1
+      }
+    }
+  ]
+}

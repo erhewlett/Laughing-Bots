@@ -1,0 +1,12 @@
+# Pinned (~=) so all four teammates resolve the same dependency set
+# (review #10). Bump deliberately, not accidentally.
+fastapi~=0.139.0
+uvicorn[standard]~=0.50.2
+SQLAlchemy~=2.0.51
+pydantic~=2.13.4
+pydantic-settings~=2.14.2
+bcrypt~=5.0
+python-multipart~=0.0.32
+httpx~=0.28.1
+pyjwt~=2.10
+pytest~=8.3
