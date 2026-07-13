@@ -82,6 +82,59 @@ def test_seed_questions_rejects_multiple_correct_options(tmp_path, monkeypatch):
         )
 
 
+def _q(skill="Python", difficulty="easy", text="?", options=None):
+    if options is None:
+        options = [{"text": "a", "correct": True}, {"text": "b", "correct": False}]
+    return {
+        "skill": skill,
+        "difficulty": difficulty,
+        "question_text": text,
+        "options": options,
+    }
+
+
+def test_seed_questions_rejects_empty_text(tmp_path, monkeypatch):
+    with pytest.raises(ValueError):
+        _run_question_seed(tmp_path, monkeypatch, [_q(text="   ")])
+
+
+def test_seed_questions_rejects_duplicate_option_text(tmp_path, monkeypatch):
+    with pytest.raises(ValueError):
+        _run_question_seed(
+            tmp_path,
+            monkeypatch,
+            [_q(options=[{"text": "a", "correct": True}, {"text": "a", "correct": False}])],
+        )
+
+
+def test_seed_questions_rejects_duplicate_question_in_bank(tmp_path, monkeypatch):
+    with pytest.raises(ValueError):
+        _run_question_seed(
+            tmp_path,
+            monkeypatch,
+            [_q(text="Same one?"), _q(text="Same one?")],
+        )
+
+
+def test_seed_error_names_the_offending_question(tmp_path, monkeypatch):
+    # error text should locate the bad row by skill/difficulty, not just index
+    with pytest.raises(ValueError, match="SQL"):
+        _run_question_seed(
+            tmp_path,
+            monkeypatch,
+            [_q(), _q(skill="SQL", difficulty="wrong")],
+        )
+
+
+def test_seed_allows_same_text_across_different_banks(tmp_path, monkeypatch):
+    # a shared stem in easy vs hard (or across skills) is not a duplicate
+    _run_question_seed(
+        tmp_path,
+        monkeypatch,
+        [_q(text="What is it?"), _q(difficulty="hard", text="What is it?")],
+    )
+
+
 def _count(Session):
     with Session() as s:
         total = s.scalar(select(func.count()).select_from(models.JobPosting))

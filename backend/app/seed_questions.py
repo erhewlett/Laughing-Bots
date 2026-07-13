@@ -22,30 +22,69 @@ from app.services.ingest import _get_or_create_skill
 
 FIXTURE = Path(__file__).parent / "seed_data" / "questions_seed.json"
 
+VALID_DIFFICULTIES = {"easy", "medium", "hard"}
+
+
+def _where(item: dict, i: int) -> str:
+    """A human-locatable label for an entry, for validation errors.
+
+    In a bank of hundreds, "question 487" is useless; the skill, difficulty,
+    and a snippet of the text let the author find the row at a glance.
+    """
+    skill = item.get("skill", "?")
+    difficulty = item.get("difficulty", "?")
+    text = (item.get("question_text") or "").strip()
+    snippet = text[:60] + "..." if len(text) > 60 else text
+    return f"question {i} [{skill} / {difficulty}] {snippet!r}"
+
+
+def validate_questions(items: list[dict]) -> None:
+    """Reject a broken bank before touching the DB, naming the exact entry.
+
+    Catches invalid difficulty, empty text, too few options, blank or
+    duplicate option text, an answer set without exactly one correct option,
+    and the same question repeated within a (skill, difficulty) bank.
+    """
+    seen: dict[tuple[str, str, str], int] = {}
+    for i, item in enumerate(items):
+        where = _where(item, i)
+        if item.get("difficulty") not in VALID_DIFFICULTIES:
+            raise ValueError(
+                f"{where} has invalid difficulty {item.get('difficulty')!r}; "
+                f"use one of {sorted(VALID_DIFFICULTIES)}."
+            )
+        text = (item.get("question_text") or "").strip()
+        if not text:
+            raise ValueError(f"{where} has empty question_text.")
+
+        options = item.get("options") or []
+        if len(options) < 2:
+            raise ValueError(f"{where} needs at least 2 options.")
+        option_texts = [(o.get("text") or "").strip() for o in options]
+        if any(not t for t in option_texts):
+            raise ValueError(f"{where} has an option with empty text.")
+        if len({t.lower() for t in option_texts}) != len(option_texts):
+            raise ValueError(f"{where} has duplicate option text.")
+        correct_count = sum(1 for o in options if o.get("correct"))
+        if correct_count != 1:
+            raise ValueError(
+                f"{where} must have exactly one correct option, "
+                f"found {correct_count}."
+            )
+
+        key = (item["skill"].strip().lower(), item["difficulty"], text.lower())
+        if key in seen:
+            raise ValueError(f"{where} duplicates question {seen[key]} in the same bank.")
+        seen[key] = i
+
 
 def seed_questions() -> None:
     initialize_database(engine)
     items = json.loads(FIXTURE.read_text())["questions"]
 
-    # Preflight the whole fixture before touching the DB, so a bad entry (a
-    # "meduim" typo, zero or multiple correct answers) is fixed in the fixture
-    # rather than seeding a broken or ambiguous quiz.
-    valid = {"easy", "medium", "hard"}
-    for i, item in enumerate(items):
-        if item.get("difficulty") not in valid:
-            raise ValueError(
-                f"Question {i} has invalid difficulty {item.get('difficulty')!r}; "
-                f"use one of {sorted(valid)}."
-            )
-        options = item.get("options") or []
-        if len(options) < 2:
-            raise ValueError(f"Question {i} needs at least 2 options.")
-        correct_count = sum(1 for o in options if o.get("correct"))
-        if correct_count != 1:
-            raise ValueError(
-                f"Question {i} must have exactly one correct option, "
-                f"found {correct_count}."
-            )
+    # Preflight the whole fixture before touching the DB, so a bad entry is
+    # fixed in the fixture rather than seeding a broken or ambiguous quiz.
+    validate_questions(items)
 
     db = SessionLocal()
     try:

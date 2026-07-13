@@ -94,6 +94,15 @@ def initialize_database(bind=engine) -> None:
                 "ON quiz_sessions (created_at)"
             )
         )
+        # Replace the standalone difficulty index with the composite bank index
+        # (skill_id, difficulty) that the game's question lookup filters on.
+        connection.execute(text("DROP INDEX IF EXISTS ix_questions_difficulty"))
+        connection.execute(
+            text(
+                "CREATE INDEX IF NOT EXISTS ix_questions_skill_difficulty "
+                "ON questions (skill_id, difficulty)"
+            )
+        )
 
 
 def get_db() -> Generator[Session, None, None]:
