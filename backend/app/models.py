@@ -126,12 +126,14 @@ class RoleSkill(Base):
 
 class Question(Base):
     __tablename__ = "questions"
+    # A quiz pulls its questions from one (skill_id, difficulty) bank, so the
+    # hot lookup filters on both columns. A composite index serves that query
+    # directly (and covers skill_id-only lookups via its leftmost prefix).
+    __table_args__ = (Index("ix_questions_skill_difficulty", "skill_id", "difficulty"),)
 
     question_id: Mapped[int] = mapped_column(primary_key=True)
-    skill_id: Mapped[int] = mapped_column(ForeignKey("skills.skill_id"), index=True)
-    # "easy" | "medium" | "hard": a quiz pulls 10 questions from one
-    # (skill_id, difficulty) bank. Indexed together for that lookup.
-    difficulty: Mapped[str] = mapped_column(String(10), index=True)
+    skill_id: Mapped[int] = mapped_column(ForeignKey("skills.skill_id"))
+    difficulty: Mapped[str] = mapped_column(String(10))  # "easy" | "medium" | "hard"
     question_text: Mapped[str] = mapped_column(Text)
 
     skill: Mapped["Skill"] = relationship(back_populates="questions")

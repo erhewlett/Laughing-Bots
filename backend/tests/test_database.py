@@ -85,3 +85,17 @@ def test_initialize_database_upgrades_existing_sqlite_schema(tmp_path):
         pass
     else:
         raise AssertionError("roadmaps.user_id unique index was not created")
+
+
+def test_questions_bank_index_is_composite(tmp_path):
+    engine = create_engine(f"sqlite:///{tmp_path / 'idx.db'}")
+    initialize_database(engine)
+    with engine.connect() as connection:
+        names = {
+            row[1]
+            for row in connection.execute(text("PRAGMA index_list('questions')")).all()
+        }
+    # the bank lookup filters on (skill_id, difficulty): one composite index,
+    # not a standalone difficulty index
+    assert "ix_questions_skill_difficulty" in names
+    assert "ix_questions_difficulty" not in names
