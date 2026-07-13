@@ -17,9 +17,18 @@ cd backend
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+A pre-seeded `backend/jobhopper.db` ships with the repo, so the server runs
+right after install. It upgrades its own schema on startup, so an older local
+copy still works after you pull. To rebuild it from scratch, delete it and run
+the seed loaders:
+
+```bash
+rm -f jobhopper.db jobhopper.db-wal jobhopper.db-shm
 python -m app.seed             # load the shared job postings
 python -m app.seed_questions   # load the quiz question bank
-uvicorn app.main:app --reload
 ```
 
 API docs are available at `http://localhost:8000/docs`.
