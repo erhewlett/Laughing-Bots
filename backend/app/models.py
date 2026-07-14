@@ -6,7 +6,16 @@ RoadmapStep.
 """
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -117,12 +126,14 @@ class RoleSkill(Base):
 
 class Question(Base):
     __tablename__ = "questions"
+    # A quiz pulls its questions from one (skill_id, difficulty) bank, so the
+    # hot lookup filters on both columns. A composite index serves that query
+    # directly (and covers skill_id-only lookups via its leftmost prefix).
+    __table_args__ = (Index("ix_questions_skill_difficulty", "skill_id", "difficulty"),)
 
     question_id: Mapped[int] = mapped_column(primary_key=True)
-    skill_id: Mapped[int] = mapped_column(ForeignKey("skills.skill_id"), index=True)
-    # "easy" | "medium" | "hard": a quiz pulls 10 questions from one
-    # (skill_id, difficulty) bank. Indexed together for that lookup.
-    difficulty: Mapped[str] = mapped_column(String(10), index=True)
+    skill_id: Mapped[int] = mapped_column(ForeignKey("skills.skill_id"))
+    difficulty: Mapped[str] = mapped_column(String(10))  # "easy" | "medium" | "hard"
     question_text: Mapped[str] = mapped_column(Text)
 
     skill: Mapped["Skill"] = relationship(back_populates="questions")
@@ -146,6 +157,7 @@ class GameAttempt(Base):
     attempt_id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), index=True)
     skill_id: Mapped[int] = mapped_column(ForeignKey("skills.skill_id"), index=True)
+    difficulty: Mapped[str | None] = mapped_column(String(10))
     score: Mapped[int] = mapped_column(Integer, default=0)
     max_score: Mapped[int] = mapped_column(Integer, default=0)
     date_taken: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
@@ -154,11 +166,34 @@ class GameAttempt(Base):
     skill: Mapped["Skill"] = relationship(back_populates="game_attempts")
 
 
+class QuizSession(Base):
+    """A served quiz: which questions went out, to whom, at what difficulty.
+
+    Binds a submission to exactly the questions that were served, blocks
+    replaying a completed quiz, and lets consecutive quizzes for the same
+    user/skill/difficulty avoid repeating questions.
+    """
+
+    __tablename__ = "quiz_sessions"
+
+    session_id: Mapped[int] = mapped_column(primary_key=True)
+    # Null for anonymous players.
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.user_id"), index=True)
+    skill_id: Mapped[int] = mapped_column(ForeignKey("skills.skill_id"), index=True)
+    difficulty: Mapped[str] = mapped_column(String(10))
+    question_ids: Mapped[str] = mapped_column(Text)  # JSON-encoded list of ids
+    completed: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), index=True
+    )
+
+
 class Roadmap(Base):
     __tablename__ = "roadmaps"
+    __table_args__ = (Index("uq_roadmaps_user_id", "user_id", unique=True),)
 
     roadmap_id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
     role_id: Mapped[int | None] = mapped_column(ForeignKey("roles.role_id"))
     created_date: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 

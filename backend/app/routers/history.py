@@ -37,6 +37,7 @@ def recent_activity(
     last_game = (
         LastGame(
             skill=attempt.skill.skill_name,
+            difficulty=attempt.difficulty,
             score=attempt.score,
             max_score=attempt.max_score,
             date_taken=attempt.date_taken,

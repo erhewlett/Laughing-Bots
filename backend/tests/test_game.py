@@ -6,9 +6,13 @@ save behavior.
 """
 from __future__ import annotations
 
+from datetime import timedelta
+
 from sqlalchemy import func, select
 
 from app import models
+from app.routers.game import _claim_quiz
+from app.utils import utcnow_naive
 
 
 def _seed_questions(db, *, skill_name="Python", difficulty="easy", n=10, correct_index=0):
@@ -36,16 +40,32 @@ def _seed_questions(db, *, skill_name="Python", difficulty="easy", n=10, correct
     return skill
 
 
+def _fetch_quiz(client, skill, difficulty, *, headers=None):
+    return client.get(
+        f"/game/{skill}", params={"difficulty": difficulty}, headers=headers or {}
+    ).json()
+
+
 def _play(client, skill, difficulty, *, headers=None, wrong=0):
-    """Fetch a quiz and submit; make `wrong` of the answers incorrect."""
-    qs = client.get(f"/game/{skill}", params={"difficulty": difficulty}).json()["questions"]
+    """Fetch a quiz and submit it; make `wrong` of the answers incorrect.
+
+    Options come back shuffled, so the correct one is found by its seeded
+    text ("opt0" when correct_index=0), not by position.
+    """
+    quiz = _fetch_quiz(client, skill, difficulty, headers=headers)
     answers = []
-    for i, q in enumerate(qs):
-        opt = q["options"][1] if i < wrong else q["options"][0]  # option[0] is correct
+    for i, q in enumerate(quiz["questions"]):
+        correct = next(o for o in q["options"] if o["option_text"] == "opt0")
+        incorrect = next(o for o in q["options"] if o["option_text"] != "opt0")
+        opt = incorrect if i < wrong else correct
         answers.append({"question_id": q["question_id"], "option_id": opt["option_id"]})
     return client.post(
         f"/game/{skill}/submit",
-        json={"difficulty": difficulty, "answers": answers},
+        json={
+            "quiz_id": quiz["quiz_id"],
+            "difficulty": difficulty,
+            "answers": answers,
+        },
         headers=headers or {},
     )
 
@@ -59,14 +79,61 @@ def _token(client, username="player"):
 
 # --- serving questions -------------------------------------------------------
 
+def test_options_are_shuffled(client, db_session):
+    # One question, four options: over 20 fetches the first option must vary,
+    # otherwise the correct answer's position leaks to the player.
+    _seed_questions(db_session, n=1)
+    first_option_ids = set()
+    for _ in range(20):
+        q = client.get("/game/Python", params={"difficulty": "easy"}).json()["questions"][0]
+        first_option_ids.add(q["options"][0]["option_id"])
+    assert len(first_option_ids) > 1
+
+
 def test_get_returns_questions_without_answers(client, db_session):
     _seed_questions(db_session, n=10)
     r = client.get("/game/Python", params={"difficulty": "easy"})
     assert r.status_code == 200
     body = r.json()
     assert body["skill"] == "Python" and body["difficulty"] == "easy"
+    assert "quiz_id" in body
     assert len(body["questions"]) == 10
     assert "is_correct" not in str(body)  # answers never leak to the client
+
+
+def test_get_prunes_all_expired_quiz_sessions(client, db_session):
+    skill = _seed_questions(db_session, n=1)
+    old_time = utcnow_naive() - timedelta(hours=25)
+    recent_time = utcnow_naive() - timedelta(hours=1)
+    old_open = models.QuizSession(
+        skill_id=skill.skill_id,
+        difficulty="easy",
+        question_ids="[]",
+        completed=False,
+        created_at=old_time,
+    )
+    old_completed = models.QuizSession(
+        skill_id=skill.skill_id,
+        difficulty="easy",
+        question_ids="[]",
+        completed=True,
+        created_at=old_time,
+    )
+    recent_completed = models.QuizSession(
+        skill_id=skill.skill_id,
+        difficulty="easy",
+        question_ids="[]",
+        completed=True,
+        created_at=recent_time,
+    )
+    db_session.add_all([old_open, old_completed, recent_completed])
+    db_session.commit()
+    old_ids = {old_open.session_id, old_completed.session_id}
+
+    assert client.get("/game/Python", params={"difficulty": "easy"}).status_code == 200
+    remaining = set(db_session.scalars(select(models.QuizSession.session_id)))
+    assert remaining.isdisjoint(old_ids)
+    assert recent_completed.session_id in remaining
 
 
 def test_get_caps_at_ten(client, db_session):
@@ -116,6 +183,23 @@ def test_list_quiz_skills_empty(client, db_session):
     assert client.get("/game/skills").json() == []
 
 
+def test_skills_ignores_unknown_difficulty(client, db_session):
+    _seed_questions(db_session, skill_name="Python", difficulty="easy", n=2)
+    # a stray bad difficulty inserted directly, as if a seed typo slipped in
+    bad = models.Skill(skill_name="Rust")
+    db_session.add(bad)
+    db_session.flush()
+    db_session.add(
+        models.Question(skill_id=bad.skill_id, difficulty="meduim", question_text="?")
+    )
+    db_session.commit()
+    r = client.get("/game/skills")
+    assert r.status_code == 200  # must not 500 on the bad value
+    by_skill = {row["skill"]: row["difficulties"] for row in r.json()}
+    assert by_skill["Python"] == ["easy"]
+    assert "Rust" not in by_skill  # skill with only an invalid difficulty is dropped
+
+
 # --- scoring + mastery -------------------------------------------------------
 
 def test_submit_scores_all_correct(client, db_session):
@@ -148,46 +232,125 @@ def test_perfect_easy_not_mastered(client, db_session):
 
 # --- validation --------------------------------------------------------------
 
-def _answers_for(client, skill, difficulty, count=None):
-    qs = client.get(f"/game/{skill}", params={"difficulty": difficulty}).json()["questions"]
-    qs = qs if count is None else qs[:count]
-    return [{"question_id": q["question_id"], "option_id": q["options"][0]["option_id"]} for q in qs]
+def _quiz_answers(client, skill, difficulty, count=None):
+    """Fetch a quiz; return (quiz_id, answers picking each question's first option)."""
+    quiz = _fetch_quiz(client, skill, difficulty)
+    qs = quiz["questions"] if count is None else quiz["questions"][:count]
+    answers = [
+        {"question_id": q["question_id"], "option_id": q["options"][0]["option_id"]}
+        for q in qs
+    ]
+    return quiz["quiz_id"], answers
 
 
 def test_submit_incomplete_quiz_422(client, db_session):
-    # bank has 10 but only 3 answered -> reject (no partial-quiz "mastery")
+    # quiz served 10 but only 3 answered -> reject (no partial-quiz "mastery")
     _seed_questions(db_session, difficulty="easy", n=10)
-    answers = _answers_for(client, "Python", "easy", count=3)
-    assert client.post("/game/Python/submit", json={"difficulty": "easy", "answers": answers}).status_code == 422
+    quiz_id, answers = _quiz_answers(client, "Python", "easy", count=3)
+    r = client.post(
+        "/game/Python/submit",
+        json={"quiz_id": quiz_id, "difficulty": "easy", "answers": answers},
+    )
+    assert r.status_code == 422
 
 
 def test_submit_duplicate_question_422(client, db_session):
     _seed_questions(db_session, difficulty="easy", n=10)
-    a = _answers_for(client, "Python", "easy", count=1)[0]
-    assert client.post("/game/Python/submit", json={"difficulty": "easy", "answers": [a, a]}).status_code == 422
+    quiz_id, answers = _quiz_answers(client, "Python", "easy", count=1)
+    r = client.post(
+        "/game/Python/submit",
+        json={"quiz_id": quiz_id, "difficulty": "easy", "answers": [answers[0], answers[0]]},
+    )
+    assert r.status_code == 422
 
 
 def test_submit_option_not_on_question_422(client, db_session):
     _seed_questions(db_session, difficulty="easy", n=10)
-    answers = _answers_for(client, "Python", "easy")
+    quiz_id, answers = _quiz_answers(client, "Python", "easy")
     answers[0]["option_id"] = 999999  # option that is not on that question
-    assert client.post("/game/Python/submit", json={"difficulty": "easy", "answers": answers}).status_code == 422
+    r = client.post(
+        "/game/Python/submit",
+        json={"quiz_id": quiz_id, "difficulty": "easy", "answers": answers},
+    )
+    assert r.status_code == 422
 
 
 def test_submit_foreign_question_422(client, db_session):
     _seed_questions(db_session, skill_name="Python", difficulty="easy", n=10)
     _seed_questions(db_session, skill_name="SQL", difficulty="easy", n=1)
-    answers = _answers_for(client, "Python", "easy", count=9)
-    answers += _answers_for(client, "SQL", "easy", count=1)  # 10 total, one foreign
-    assert client.post("/game/Python/submit", json={"difficulty": "easy", "answers": answers}).status_code == 422
+    quiz_id, answers = _quiz_answers(client, "Python", "easy", count=9)
+    _, foreign = _quiz_answers(client, "SQL", "easy", count=1)
+    answers += foreign  # 10 total, one from another skill's quiz
+    r = client.post(
+        "/game/Python/submit",
+        json={"quiz_id": quiz_id, "difficulty": "easy", "answers": answers},
+    )
+    assert r.status_code == 422
 
 
 def test_submit_difficulty_mismatch_422(client, db_session):
     _seed_questions(db_session, difficulty="easy", n=10)
-    _seed_questions(db_session, difficulty="hard", n=10)  # hard bank exists so size check passes
-    answers = _answers_for(client, "Python", "easy")  # 10 easy questions
-    # claim hard while submitting easy questions
-    assert client.post("/game/Python/submit", json={"difficulty": "hard", "answers": answers}).status_code == 422
+    quiz_id, answers = _quiz_answers(client, "Python", "easy")
+    # claim hard while holding an easy quiz
+    r = client.post(
+        "/game/Python/submit",
+        json={"quiz_id": quiz_id, "difficulty": "hard", "answers": answers},
+    )
+    assert r.status_code == 422
+
+
+def test_submit_unknown_quiz_404(client, db_session):
+    _seed_questions(db_session, difficulty="easy", n=10)
+    _, answers = _quiz_answers(client, "Python", "easy")
+    r = client.post(
+        "/game/Python/submit",
+        json={"quiz_id": 999999, "difficulty": "easy", "answers": answers},
+    )
+    assert r.status_code == 404
+
+
+def test_quiz_cannot_be_submitted_twice(client, db_session):
+    _seed_questions(db_session, difficulty="easy", n=10)
+    quiz_id, answers = _quiz_answers(client, "Python", "easy")
+    payload = {"quiz_id": quiz_id, "difficulty": "easy", "answers": answers}
+    assert client.post("/game/Python/submit", json=payload).status_code == 200
+    assert client.post("/game/Python/submit", json=payload).status_code == 409
+
+
+def test_quiz_claim_is_atomic(client, db_session):
+    _seed_questions(db_session, difficulty="easy", n=1)
+    quiz_id, _ = _quiz_answers(client, "Python", "easy")
+    assert _claim_quiz(db_session, quiz_id) is True
+    assert _claim_quiz(db_session, quiz_id) is False
+
+
+def test_consecutive_quizzes_avoid_repeats_for_user(client, db_session):
+    # bank of 20: a logged-in player's second quiz shares zero questions
+    _seed_questions(db_session, difficulty="easy", n=20)
+    h = {"Authorization": f"Bearer {_token(client)}"}
+    q1 = _fetch_quiz(client, "Python", "easy", headers=h)
+    q2 = _fetch_quiz(client, "Python", "easy", headers=h)
+    ids1 = {q["question_id"] for q in q1["questions"]}
+    ids2 = {q["question_id"] for q in q2["questions"]}
+    assert len(ids1) == 10 and len(ids2) == 10
+    assert ids1.isdisjoint(ids2)
+
+
+def test_other_users_quiz_403(client, db_session):
+    _seed_questions(db_session, difficulty="easy", n=10)
+    ha = {"Authorization": f"Bearer {_token(client, 'alice')}"}
+    quiz = _fetch_quiz(client, "Python", "easy", headers=ha)
+    answers = [
+        {"question_id": q["question_id"], "option_id": q["options"][0]["option_id"]}
+        for q in quiz["questions"]
+    ]
+    hb = {"Authorization": f"Bearer {_token(client, 'bobby')}"}
+    r = client.post(
+        "/game/Python/submit",
+        json={"quiz_id": quiz["quiz_id"], "difficulty": "easy", "answers": answers},
+        headers=hb,
+    )
+    assert r.status_code == 403
 
 
 # --- save behavior -----------------------------------------------------------
@@ -205,3 +368,4 @@ def test_logged_in_submit_saves_attempt(client, db_session):
     attempts = db_session.scalars(select(models.GameAttempt)).all()
     assert len(attempts) == 1
     assert attempts[0].score == 10 and attempts[0].max_score == 10
+    assert attempts[0].difficulty == "easy"

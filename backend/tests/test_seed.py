@@ -1,12 +1,138 @@
 """Seed loader tests: re-running must refresh dates and never duplicate rows."""
 from __future__ import annotations
 
+import json
 from datetime import datetime, timedelta, timezone
 
+import pytest
 from sqlalchemy import create_engine, func, select
 from sqlalchemy.orm import sessionmaker
 
 from app import models
+
+
+def _run_question_seed(tmp_path, monkeypatch, questions):
+    import app.seed_questions as sq
+
+    fixture = tmp_path / "questions.json"
+    fixture.write_text(json.dumps({"questions": questions}))
+    engine = create_engine(
+        f"sqlite:///{tmp_path / 'q.db'}", connect_args={"check_same_thread": False}
+    )
+    monkeypatch.setattr(sq, "engine", engine)
+    monkeypatch.setattr(sq, "SessionLocal", sessionmaker(bind=engine))
+    monkeypatch.setattr(sq, "FIXTURE", fixture)
+    sq.seed_questions()
+
+
+def test_seed_questions_rejects_invalid_difficulty(tmp_path, monkeypatch):
+    with pytest.raises(ValueError):
+        _run_question_seed(
+            tmp_path,
+            monkeypatch,
+            [
+                {
+                    "skill": "Python",
+                    "difficulty": "meduim",  # typo
+                    "question_text": "?",
+                    "options": [
+                        {"text": "a", "correct": True},
+                        {"text": "b", "correct": False},
+                    ],
+                }
+            ],
+        )
+
+
+def test_seed_questions_rejects_zero_correct_options(tmp_path, monkeypatch):
+    with pytest.raises(ValueError):
+        _run_question_seed(
+            tmp_path,
+            monkeypatch,
+            [
+                {
+                    "skill": "Python",
+                    "difficulty": "easy",
+                    "question_text": "?",
+                    "options": [
+                        {"text": "a", "correct": False},
+                        {"text": "b", "correct": False},
+                    ],
+                }
+            ],
+        )
+
+
+def test_seed_questions_rejects_multiple_correct_options(tmp_path, monkeypatch):
+    with pytest.raises(ValueError):
+        _run_question_seed(
+            tmp_path,
+            monkeypatch,
+            [
+                {
+                    "skill": "Python",
+                    "difficulty": "easy",
+                    "question_text": "?",
+                    "options": [
+                        {"text": "a", "correct": True},
+                        {"text": "b", "correct": True},
+                    ],
+                }
+            ],
+        )
+
+
+def _q(skill="Python", difficulty="easy", text="?", options=None):
+    if options is None:
+        options = [{"text": "a", "correct": True}, {"text": "b", "correct": False}]
+    return {
+        "skill": skill,
+        "difficulty": difficulty,
+        "question_text": text,
+        "options": options,
+    }
+
+
+def test_seed_questions_rejects_empty_text(tmp_path, monkeypatch):
+    with pytest.raises(ValueError):
+        _run_question_seed(tmp_path, monkeypatch, [_q(text="   ")])
+
+
+def test_seed_questions_rejects_duplicate_option_text(tmp_path, monkeypatch):
+    with pytest.raises(ValueError):
+        _run_question_seed(
+            tmp_path,
+            monkeypatch,
+            [_q(options=[{"text": "a", "correct": True}, {"text": "a", "correct": False}])],
+        )
+
+
+def test_seed_questions_rejects_duplicate_question_in_bank(tmp_path, monkeypatch):
+    with pytest.raises(ValueError):
+        _run_question_seed(
+            tmp_path,
+            monkeypatch,
+            [_q(text="Same one?"), _q(text="Same one?")],
+        )
+
+
+def test_seed_error_names_the_offending_question(tmp_path, monkeypatch):
+    # error text should locate the bad row by skill/difficulty, not just index
+    with pytest.raises(ValueError, match="SQL"):
+        _run_question_seed(
+            tmp_path,
+            monkeypatch,
+            [_q(), _q(skill="SQL", difficulty="wrong")],
+        )
+
+
+def test_seed_allows_same_text_across_different_banks(tmp_path, monkeypatch):
+    # a shared stem in easy vs hard (or across skills) is not a duplicate
+    _run_question_seed(
+        tmp_path,
+        monkeypatch,
+        [_q(text="What is it?"), _q(difficulty="hard", text="What is it?")],
+    )
 
 
 def _count(Session):
