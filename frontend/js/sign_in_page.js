@@ -52,22 +52,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 // convert response from the backend server to Javascript object (JSON format) and store in variable errorData
                 const errorData = await response.json();
 
+                // store error message div in variable errorMessageDiv
+                const errorMessageDiv = document.getElementById('error-message');
+
+                // define message variable that will hold the error message
+                let message = "Error"
+
                 // handle 422 error (FastAPI validation errors are arrays)
                 if (Array.isArray(errorData.detail)) {
                     // grab the first error message from the array and show it in an alert
                     const firstError = errorData.detail[0].msg || "Invalid input";
-                    alert(`Validation error: ${firstError}`);
+                    message = `Validation error: ${firstError}`;
                 } else {
 
                 // show error detail if it exists, otherwise show 'Invalid credentials' message
-                alert(`Login failed: ${errorData.detail || 'Invalid credentials'}`);
+                message = `Login failed: ${errorData.detail || 'Invalid credentials'}`;
                 }
+
+                // display error UI to user
+                errorMessageDiv.textContent = message;      // updates text
+                errorMessageDiv.style.display = 'block';    // makes error message div visible
             }
         // catch any event in which the request could not make it to the backend server (e.g., server is down, network issues, etc.)
         // note: there is no response to parse in this case, as the request never made it to the backend server
         } catch (error) {
             console.error('Error during login:', error);
-            alert('An error occurred during login. Please try again later.');
+
+            // display error UI to user
+            const errorMessageDiv = document.getElementById('error-message');
+            errorMessageDiv.textContent = 'An error occured during sign in. Please try again later.';
+            errorMessageDiv.style.display = 'block';
         }
     });
 });
