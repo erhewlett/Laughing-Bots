@@ -1,93 +1,2075 @@
-{
-  "note": "Question bank for the Q&A game. Load with: python -m app.seed_questions. Each entry: skill (must match a Skill name from the word cloud, e.g. Python, SQL, AWS, React, JavaScript, TypeScript, Cybersecurity, Docker, Java, Node.js), difficulty (easy|medium|hard), question_text, and 3-4 options where exactly one has correct=true. A full quiz serves 10 questions from one (skill, difficulty) bank, so aim for at least 10 per skill+difficulty. This starter set is small; expand it.",
-  "questions": [
-    {
-      "skill": "Python",
-      "difficulty": "easy",
-      "question_text": "Which built-in type is immutable?",
-      "options": [
-        {"text": "tuple", "correct": true},
-        {"text": "list", "correct": false},
-        {"text": "dict", "correct": false},
-        {"text": "set", "correct": false}
-      ]
-    },
-    {
-      "skill": "Python",
-      "difficulty": "easy",
-      "question_text": "What does len([1, 2, 3]) return?",
-      "options": [
-        {"text": "3", "correct": true},
-        {"text": "2", "correct": false},
-        {"text": "6", "correct": false},
-        {"text": "None", "correct": false}
-      ]
-    },
-    {
-      "skill": "Python",
-      "difficulty": "easy",
-      "question_text": "Which keyword defines a function?",
-      "options": [
-        {"text": "def", "correct": true},
-        {"text": "func", "correct": false},
-        {"text": "function", "correct": false},
-        {"text": "lambda", "correct": false}
-      ]
-    },
-    {
-      "skill": "Python",
-      "difficulty": "medium",
-      "question_text": "What does a list comprehension [x*x for x in range(3)] produce?",
-      "options": [
-        {"text": "[0, 1, 4]", "correct": true},
-        {"text": "[1, 4, 9]", "correct": false},
-        {"text": "[0, 1, 2]", "correct": false},
-        {"text": "[1, 2, 3]", "correct": false}
-      ]
-    },
-    {
-      "skill": "Python",
-      "difficulty": "hard",
-      "question_text": "What is the time complexity of checking membership in a set?",
-      "options": [
-        {"text": "O(1) average", "correct": true},
-        {"text": "O(n)", "correct": false},
-        {"text": "O(log n)", "correct": false},
-        {"text": "O(n log n)", "correct": false}
-      ]
-    },
-    {
-      "skill": "Python",
-      "difficulty": "hard",
-      "question_text": "Which statement about the GIL is accurate?",
-      "options": [
-        {"text": "It allows only one thread to execute Python bytecode at a time", "correct": true},
-        {"text": "It makes all Python code run in parallel", "correct": false},
-        {"text": "It applies only to async code", "correct": false},
-        {"text": "It was removed in Python 3", "correct": false}
-      ]
-    },
-    {
-      "skill": "SQL",
-      "difficulty": "easy",
-      "question_text": "Which clause filters rows in a query?",
-      "options": [
-        {"text": "WHERE", "correct": true},
-        {"text": "ORDER BY", "correct": false},
-        {"text": "GROUP BY", "correct": false},
-        {"text": "SELECT", "correct": false}
-      ]
-    },
-    {
-      "skill": "SQL",
-      "difficulty": "easy",
-      "question_text": "Which statement removes all rows but keeps the table?",
-      "options": [
-        {"text": "DELETE FROM table", "correct": true},
-        {"text": "DROP TABLE table", "correct": false},
-        {"text": "REMOVE table", "correct": false},
-        {"text": "TRUNCATE DATABASE", "correct": false}
-      ]
-    }
-  ]
+﻿{
+    "note":  "Question bank for the Q\u0026A game. Load with: python -m app.seed_questions. Each entry: skill (must match a Skill name from the word cloud, e.g. Python, SQL, AWS, React, JavaScript, TypeScript, Cybersecurity, Docker, Java, Node.js), difficulty (easy|medium|hard), question_text, and 3-4 options where exactly one has correct=true. A full quiz serves 10 questions from one (skill, difficulty) bank, so aim for at least 10 per skill+difficulty. This starter set is small; expand it.",
+    "questions":  [
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "easy",
+                          "question_text":  "Which built-in type is immutable?",
+                          "options":  [
+                                          {
+                                              "text":  "tuple",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "list",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "dict",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "set",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "easy",
+                          "question_text":  "What does len([1, 2, 3]) return?",
+                          "options":  [
+                                          {
+                                              "text":  "3",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "2",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "6",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "None",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "easy",
+                          "question_text":  "Which keyword defines a function?",
+                          "options":  [
+                                          {
+                                              "text":  "def",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "func",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "function",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "lambda",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "medium",
+                          "question_text":  "What does a list comprehension [x*x for x in range(3)] produce?",
+                          "options":  [
+                                          {
+                                              "text":  "[0, 1, 4]",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "[1, 4, 9]",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "[0, 1, 2]",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "[1, 2, 3]",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "hard",
+                          "question_text":  "What is the time complexity of checking membership in a set?",
+                          "options":  [
+                                          {
+                                              "text":  "O(1) average",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "O(n)",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "O(log n)",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "O(n log n)",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "hard",
+                          "question_text":  "Which statement about the GIL is accurate?",
+                          "options":  [
+                                          {
+                                              "text":  "It allows only one thread to execute Python bytecode at a time",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "It makes all Python code run in parallel",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It applies only to async code",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It was removed in Python 3",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "easy",
+                          "question_text":  "Which clause filters rows in a query?",
+                          "options":  [
+                                          {
+                                              "text":  "WHERE",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "ORDER BY",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "GROUP BY",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "SELECT",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "easy",
+                          "question_text":  "Which statement removes all rows but keeps the table?",
+                          "options":  [
+                                          {
+                                              "text":  "DELETE FROM table",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "DROP TABLE table",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "REMOVE table",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "TRUNCATE DATABASE",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "easy",
+                          "question_text":  "Which clause is used to sort query results?",
+                          "options":  [
+                                          {
+                                              "text":  "ORDER BY",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "SORT BY",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "GROUP BY",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "HAVING",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "easy",
+                          "question_text":  "Which operator is used for pattern matching in a WHERE clause?",
+                          "options":  [
+                                          {
+                                              "text":  "LIKE",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "MATCH",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "REGEX",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "IN",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "easy",
+                          "question_text":  "What does the % wildcard mean when used with LIKE?",
+                          "options":  [
+                                          {
+                                              "text":  "Matches zero or more characters",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Matches exactly one character",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Matches a number only",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Matches the start of the string only",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "easy",
+                          "question_text":  "Which constraint ensures a column cannot contain duplicate values?",
+                          "options":  [
+                                          {
+                                              "text":  "UNIQUE",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "CHECK",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "DEFAULT",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "FOREIGN KEY",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "easy",
+                          "question_text":  "Which constraint ensures a column can never be left empty?",
+                          "options":  [
+                                          {
+                                              "text":  "NOT NULL",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "UNIQUE",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "PRIMARY",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "AUTOINCREMENT",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "easy",
+                          "question_text":  "Which statement updates existing rows in a table?",
+                          "options":  [
+                                          {
+                                              "text":  "UPDATE",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "ALTER",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "MODIFY",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "SET",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "easy",
+                          "question_text":  "Which type of JOIN returns only rows that match in both tables?",
+                          "options":  [
+                                          {
+                                              "text":  "INNER JOIN",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "LEFT JOIN",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "FULL OUTER JOIN",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "CROSS JOIN",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "easy",
+                          "question_text":  "Which command grants a user permission to access data (a DCL command)?",
+                          "options":  [
+                                          {
+                                              "text":  "GRANT",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "ALLOW",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "ACCESS",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "PERMIT",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "medium",
+                          "question_text":  "Which JOIN returns all rows from the left table, plus matched rows from the right (NULL where no match)?",
+                          "options":  [
+                                          {
+                                              "text":  "LEFT JOIN",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "INNER JOIN",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "RIGHT JOIN",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "CROSS JOIN",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "medium",
+                          "question_text":  "Which clause filters groups AFTER aggregation, unlike WHERE which filters before?",
+                          "options":  [
+                                          {
+                                              "text":  "HAVING",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "WHERE",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "FILTER",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "QUALIFY",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "medium",
+                          "question_text":  "What does COUNT(DISTINCT column) do?",
+                          "options":  [
+                                          {
+                                              "text":  "Counts unique non-null values in that column",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Counts all rows including duplicates",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Counts null values only",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Removes duplicate rows from the result set",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "medium",
+                          "question_text":  "A query that is nested inside another query is called a:",
+                          "options":  [
+                                          {
+                                              "text":  "subquery",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "trigger",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "view",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "cursor",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "medium",
+                          "question_text":  "Which SQL feature lets you name a temporary result set for use within a single query?",
+                          "options":  [
+                                          {
+                                              "text":  "Common Table Expression (WITH clause)",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Stored procedure",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Materialized view",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Index",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "medium",
+                          "question_text":  "What is the main purpose of a FOREIGN KEY constraint?",
+                          "options":  [
+                                          {
+                                              "text":  "It enforces a valid reference to a row in another table",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "It speeds up SELECT queries",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It prevents duplicate values in a column",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It auto-generates primary key values",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "medium",
+                          "question_text":  "Which aggregate function would you use to find the average value of a numeric column?",
+                          "options":  [
+                                          {
+                                              "text":  "AVG()",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "SUM()",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "MEAN()",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "MEDIAN()",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "medium",
+                          "question_text":  "What does an index primarily improve?",
+                          "options":  [
+                                          {
+                                              "text":  "Read/lookup performance on queries filtering that column",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Write speed for INSERT statements",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Data type enforcement",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Storage compression",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "medium",
+                          "question_text":  "In a GROUP BY query, which columns must appear in the SELECT list (outside of aggregate functions)?",
+                          "options":  [
+                                          {
+                                              "text":  "Only the columns listed in GROUP BY",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Any column from the table",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Only primary key columns",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "No columns are required in SELECT",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "medium",
+                          "question_text":  "What does the EXISTS operator check in a subquery?",
+                          "options":  [
+                                          {
+                                              "text":  "Whether the subquery returns at least one row",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Whether a specific value exists in a column",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Whether a table has any rows at all",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Whether a column allows NULL values",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "hard",
+                          "question_text":  "You need the 2nd highest salary without ties skewing the result. Which function correctly handles duplicate salary values by NOT skipping a rank number after a tie?",
+                          "options":  [
+                                          {
+                                              "text":  "DENSE_RANK()",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "RANK()",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "ROW_NUMBER()",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "NTILE()",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "hard",
+                          "question_text":  "Two employees tie for 1st place salary. Using RANK(), what rank does the next (3rd) employee receive?",
+                          "options":  [
+                                          {
+                                              "text":  "3",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "2",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "1",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It errors on ties",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "hard",
+                          "question_text":  "You LEFT JOIN orders to customers, then add a WHERE filter on a customers column that excludes NULLs. What happens to the unmatched (NULL) rows from the left table?",
+                          "options":  [
+                                          {
+                                              "text":  "They get filtered out, so the query behaves like an INNER JOIN",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "They are kept exactly as with a plain LEFT JOIN",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "The query throws an error",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Only the matched rows from the right table are removed",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "hard",
+                          "question_text":  "Why does COUNT(*) sometimes return a different number than COUNT(some_column)?",
+                          "options":  [
+                                          {
+                                              "text":  "COUNT(column) skips NULL values in that column, COUNT(*) counts every row",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "COUNT(*) is slower so it returns an estimate",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "COUNT(column) counts distinct values by default",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "There is no difference, they always match",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "hard",
+                          "question_text":  "Which technique lets a table reference itself, commonly used for an employee/manager hierarchy in one table?",
+                          "options":  [
+                                          {
+                                              "text":  "Self join",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Cross join",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Natural join",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Union",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "hard",
+                          "question_text":  "What is the standard pattern for removing duplicate rows while keeping exactly one copy of each?",
+                          "options":  [
+                                          {
+                                              "text":  "Use ROW_NUMBER() partitioned by the duplicate-defining columns, then delete rows where the row number is greater than 1",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Run DELETE with a LIMIT clause repeatedly",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "TRUNCATE the table and re-insert unique rows manually",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Add a UNIQUE constraint after the data is already loaded",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "hard",
+                          "question_text":  "Which statement about TRUNCATE vs DELETE is accurate?",
+                          "options":  [
+                                          {
+                                              "text":  "TRUNCATE removes all rows and generally cannot be filtered with a WHERE clause, while DELETE can target specific rows",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "DELETE always removes the entire table structure, TRUNCATE does not",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "TRUNCATE is slower than DELETE for removing all rows",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "They are functionally identical in every database",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "hard",
+                          "question_text":  "A correlated subquery is generally slower on large tables than a JOIN because:",
+                          "options":  [
+                                          {
+                                              "text":  "It re-runs once per row of the outer query instead of once total",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "It always creates a temporary table on disk",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It cannot use indexes at all",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It only works on the primary key column",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "hard",
+                          "question_text":  "Wrapping an indexed column in a function in the WHERE clause, like WHERE LEFT(name, 1) = \u0027A\u0027, typically causes what problem?",
+                          "options":  [
+                                          {
+                                              "text":  "It prevents the database from using the index on that column, forcing a full scan",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "It automatically creates a new index",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It converts the query into a CROSS JOIN",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It has no performance effect in any database",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "SQL",
+                          "difficulty":  "hard",
+                          "question_text":  "Which SQL feature allows a query to reference itself, needed for traversing hierarchical data like an org chart of unknown depth?",
+                          "options":  [
+                                          {
+                                              "text":  "A recursive CTE",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "A materialized view",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "A stored procedure",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "A UNION ALL",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "easy",
+                          "question_text":  "Which keyword is used to create an anonymous, one-line function in Python?",
+                          "options":  [
+                                          {
+                                              "text":  "lambda",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "def",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "func",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "anon",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "easy",
+                          "question_text":  "What does the `in` keyword check when used with a list, like `3 in my_list`?",
+                          "options":  [
+                                          {
+                                              "text":  "Whether the value is an element of the list",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Whether the list is empty",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Whether the list is sorted",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Whether the value is the first element",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "easy",
+                          "question_text":  "Which built-in function converts the string \"42\" into the integer 42?",
+                          "options":  [
+                                          {
+                                              "text":  "int(\"42\")",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "str(\"42\")",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "float(\"42\")",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "num(\"42\")",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "easy",
+                          "question_text":  "Which character starts a single-line comment in Python?",
+                          "options":  [
+                                          {
+                                              "text":  "#",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "//",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "--",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "/*",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "easy",
+                          "question_text":  "Which keyword is used to bring code from another module into your current file?",
+                          "options":  [
+                                          {
+                                              "text":  "import",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "include",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "require",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "using",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "easy",
+                          "question_text":  "What does the value `None` represent in Python?",
+                          "options":  [
+                                          {
+                                              "text":  "The absence of a value",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "The number zero",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "An empty string",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "A boolean false",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "easy",
+                          "question_text":  "Which keyword starts a loop that keeps running as long as a condition is true?",
+                          "options":  [
+                                          {
+                                              "text":  "while",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "for",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "loop",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "repeat",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "medium",
+                          "question_text":  "What distinguishes a generator function from a regular function in Python?",
+                          "options":  [
+                                          {
+                                              "text":  "It contains at least one `yield` statement and produces values lazily",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "It must return a list",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It cannot accept arguments",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It runs on a separate thread automatically",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "medium",
+                          "question_text":  "What does a decorator do in Python?",
+                          "options":  [
+                                          {
+                                              "text":  "Wraps a function to add or modify its behavior without changing its source code",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Converts a function into a class automatically",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Deletes a function after it is called once",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Compiles the function to machine code for speed",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "medium",
+                          "question_text":  "What is the purpose of the `__init__` method in a Python class?",
+                          "options":  [
+                                          {
+                                              "text":  "It initializes a newly created instance\u0027s attributes",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "It creates the class object itself",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It deletes an instance when it goes out of scope",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It defines class-level constants only",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "medium",
+                          "question_text":  "What is the main benefit of using a `with` statement when working with a file or other resource?",
+                          "options":  [
+                                          {
+                                              "text":  "It guarantees the resource is properly closed/cleaned up via `__enter__`/`__exit__`, even if an exception occurs",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "It makes the code run in a separate process",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It automatically retries the operation on failure",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It converts the resource into a generator",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "medium",
+                          "question_text":  "What is the key difference between a `@staticmethod` and a `@classmethod`?",
+                          "options":  [
+                                          {
+                                              "text":  "A classmethod receives the class (`cls`) as its first argument, while a staticmethod receives neither `self` nor `cls`",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "A staticmethod can modify instance state while a classmethod cannot",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "A classmethod can only be called on an instance, never on the class",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "There is no functional difference between them",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "medium",
+                          "question_text":  "What does using `*args` in a function definition allow?",
+                          "options":  [
+                                          {
+                                              "text":  "The function to accept any number of positional arguments, collected into a tuple",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "The function to accept only keyword arguments",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "The function to modify the caller\u0027s variables directly",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "The function to run asynchronously",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "medium",
+                          "question_text":  "What does `**kwargs` in a function signature collect?",
+                          "options":  [
+                                          {
+                                              "text":  "Any extra keyword arguments into a dictionary",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Any extra positional arguments into a list",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Only arguments with default values",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "The function\u0027s return values",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "medium",
+                          "question_text":  "What does `isinstance(obj, MyClass)` check?",
+                          "options":  [
+                                          {
+                                              "text":  "Whether `obj` is an instance of `MyClass` or one of its subclasses",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Whether `obj` has the exact same memory address as `MyClass`",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Whether `obj` was created before `MyClass` was defined",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Whether `MyClass` is a subclass of `obj`\u0027s type",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "medium",
+                          "question_text":  "What is the key difference between a shallow copy and a deep copy of a nested list?",
+                          "options":  [
+                                          {
+                                              "text":  "A shallow copy duplicates the outer container but still references the same nested objects, while a deep copy recursively duplicates everything",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "A shallow copy is always slower than a deep copy",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "A deep copy only works on strings and numbers",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "There is no difference; both produce fully independent objects",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "hard",
+                          "question_text":  "Why is using a mutable object like `[]` as a default argument value considered a common Python bug?",
+                          "options":  [
+                                          {
+                                              "text":  "The default value is created once when the function is defined and shared across all calls, so mutations persist between calls",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Python raises a SyntaxError for mutable default arguments",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Mutable defaults are automatically deep-copied on every call, causing a performance hit",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Mutable default arguments cannot be used with keyword arguments",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "hard",
+                          "question_text":  "What is a metaclass in Python?",
+                          "options":  [
+                                          {
+                                              "text":  "A class whose instances are themselves classes, controlling how those classes are created",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "A class that cannot be instantiated under any circumstances",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "A built-in decorator for enforcing type hints",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "A synonym for an abstract base class",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "hard",
+                          "question_text":  "What is the primary purpose of defining `__slots__` on a class?",
+                          "options":  [
+                                          {
+                                              "text":  "To restrict instance attributes to a fixed set, saving memory by avoiding a per-instance `__dict__`",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "To make all methods on the class private",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "To automatically generate `__init__` and `__repr__` methods",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "To allow the class to be pickled across processes",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "hard",
+                          "question_text":  "In a class hierarchy with multiple inheritance, what determines the order in which base classes are searched for a method (Method Resolution Order)?",
+                          "options":  [
+                                          {
+                                              "text":  "The C3 linearization algorithm, which Python uses to produce a consistent, monotonic ordering of base classes",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Alphabetical order of the base class names",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "The order the methods were defined chronologically at runtime",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Whichever base class was imported last",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "hard",
+                          "question_text":  "What does `yield from` do inside a generator function?",
+                          "options":  [
+                                          {
+                                              "text":  "Delegates iteration to a sub-generator or iterable, yielding all of its values and forwarding sent/thrown values",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Immediately returns the entire sub-iterable as a single list",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Pauses the generator until an external thread resumes it",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Converts the generator into a coroutine automatically",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "hard",
+                          "question_text":  "In a nested function, what does the `nonlocal` keyword do?",
+                          "options":  [
+                                          {
+                                              "text":  "Allows the inner function to rebind a variable defined in the nearest enclosing (non-global) scope, rather than creating a new local variable",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Makes a variable accessible from any module without importing it",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Forces a variable to be treated as a global variable",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Prevents the inner function from being called as a closure",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "hard",
+                          "question_text":  "What does the walrus operator `:=` allow you to do?",
+                          "options":  [
+                                          {
+                                              "text":  "Assign a value to a variable as part of a larger expression, such as inside a `while` or `if` condition",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Compare two values for approximate equality",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Chain multiple decorators onto a single function",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Define a type alias for use in type hints",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Python",
+                          "difficulty":  "hard",
+                          "question_text":  "What is the key difference between `__new__` and `__init__` in Python\u0027s object creation process?",
+                          "options":  [
+                                          {
+                                              "text":  "`__new__` creates and returns the new instance (allocating memory), while `__init__` initializes the already-created instance\u0027s attributes",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "`__init__` is called before `__new__` in every object creation",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "`__new__` is only used for exception classes",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "They are interchangeable aliases for the same operation",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "easy",
+                          "question_text":  "Which keyword is used to define a class in Java?",
+                          "options":  [
+                                          {
+                                              "text":  "class",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "struct",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "object",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "define",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "easy",
+                          "question_text":  "Which keyword makes a variable\u0027s value unable to be reassigned after initialization?",
+                          "options":  [
+                                          {
+                                              "text":  "final",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "const",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "static",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "fixed",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "easy",
+                          "question_text":  "What is the correct signature for the main entry point of a standalone Java application?",
+                          "options":  [
+                                          {
+                                              "text":  "public static void main(String[] args)",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "public void main(String[] args)",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "static int main(String args)",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "public static main(String[] args)",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "easy",
+                          "question_text":  "Which keyword allows a class to inherit from another class?",
+                          "options":  [
+                                          {
+                                              "text":  "extends",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "implements",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "inherits",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "super",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "easy",
+                          "question_text":  "Which primitive data type is used to store a true or false value?",
+                          "options":  [
+                                          {
+                                              "text":  "boolean",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "bit",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "bool",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "flag",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "easy",
+                          "question_text":  "Which operator is used to test whether two primitive values are equal?",
+                          "options":  [
+                                          {
+                                              "text":  "==",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "=",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "equals()",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "===",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "easy",
+                          "question_text":  "Which keyword is used to create a new instance of a class?",
+                          "options":  [
+                                          {
+                                              "text":  "new",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "create",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "instance",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "alloc",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "easy",
+                          "question_text":  "Which keyword does a class use to indicate it provides the methods declared by an interface?",
+                          "options":  [
+                                          {
+                                              "text":  "implements",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "extends",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "interface",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "provides",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "easy",
+                          "question_text":  "What is the default value of an uninitialized `int` instance field in Java?",
+                          "options":  [
+                                          {
+                                              "text":  "0",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "null",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "-1",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "undefined",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "easy",
+                          "question_text":  "Which access modifier restricts a member so it is accessible only within its own class?",
+                          "options":  [
+                                          {
+                                              "text":  "private",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "public",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "protected",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "default (package-private)",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "medium",
+                          "question_text":  "When comparing two `String` objects, what is the difference between `==` and `.equals()`?",
+                          "options":  [
+                                          {
+                                              "text":  "`==` compares object references, while `.equals()` compares the actual character content",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "`==` compares content while `.equals()` compares references",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "They behave identically for all String objects",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "`.equals()` only works on primitive types",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "medium",
+                          "question_text":  "What does declaring a field as `static` mean?",
+                          "options":  [
+                                          {
+                                              "text":  "The field belongs to the class itself and is shared across all instances",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "The field can never be changed once set",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "The field is only accessible from the main method",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "The field is automatically thread-safe",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "medium",
+                          "question_text":  "What is method overloading in Java?",
+                          "options":  [
+                                          {
+                                              "text":  "Defining multiple methods in the same class with the same name but different parameter lists",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Redefining a parent class method in a subclass with the same signature",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Calling a method recursively too many times",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Declaring a method with no return type",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "medium",
+                          "question_text":  "What is the `super` keyword used for in a subclass?",
+                          "options":  [
+                                          {
+                                              "text":  "To call a constructor or method of the immediate parent class",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "To create a new instance of the subclass itself",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "To mark a method as final so it cannot be overridden",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "To access static members of an unrelated class",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "medium",
+                          "question_text":  "What is an interface in Java primarily used for?",
+                          "options":  [
+                                          {
+                                              "text":  "Defining a contract of methods (and constants) that implementing classes must provide",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Storing shared mutable instance state between unrelated classes",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Preventing a class from being subclassed",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Automatically generating getters and setters",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "medium",
+                          "question_text":  "What advantage does `ArrayList` have over a plain array in Java?",
+                          "options":  [
+                                          {
+                                              "text":  "It can grow or shrink dynamically as elements are added or removed",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "It has faster raw indexed access than arrays in all cases",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It can store primitive types directly without boxing",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It is always synchronized and thread-safe by default",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "medium",
+                          "question_text":  "What is autoboxing in Java?",
+                          "options":  [
+                                          {
+                                              "text":  "The automatic conversion between a primitive type and its corresponding wrapper class, e.g., `int` to `Integer`",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Automatically wrapping a class in a try-catch block",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "The compiler automatically making all fields private",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Converting an array into a List without a loop",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "medium",
+                          "question_text":  "What exception is thrown when dividing an `int` by zero in Java?",
+                          "options":  [
+                                          {
+                                              "text":  "ArithmeticException",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "NullPointerException",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "NumberFormatException",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "IllegalStateException",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "medium",
+                          "question_text":  "What is the main benefit of using try-with-resources?",
+                          "options":  [
+                                          {
+                                              "text":  "Resources implementing `AutoCloseable` are automatically closed when the block exits, even on exception",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "It allows a try block to run without ever throwing exceptions",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It removes the need for a catch block entirely",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It makes the enclosed code run asynchronously",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "medium",
+                          "question_text":  "What does the `this` keyword refer to inside an instance method?",
+                          "options":  [
+                                          {
+                                              "text":  "The current object instance the method was called on",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "The parent class of the current object",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "The static class definition itself",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "The most recently created object of any type",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "hard",
+                          "question_text":  "What is the key difference between checked and unchecked exceptions in Java?",
+                          "options":  [
+                                          {
+                                              "text":  "Checked exceptions must be declared with `throws` or caught at compile time, while unchecked (RuntimeException) exceptions are not enforced by the compiler",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Unchecked exceptions can only be thrown from static methods",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Checked exceptions can never be caught, only logged",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "There is no real distinction; the compiler treats them identically",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "hard",
+                          "question_text":  "Why would you choose `ConcurrentHashMap` over a plain `HashMap` in a multi-threaded application?",
+                          "options":  [
+                                          {
+                                              "text":  "It allows safe concurrent reads and writes without requiring external synchronization on the whole map",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "It uses less memory per entry than HashMap",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It preserves insertion order unlike HashMap",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It automatically persists data to disk",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "hard",
+                          "question_text":  "What is type erasure in the context of Java generics?",
+                          "options":  [
+                                          {
+                                              "text":  "Generic type parameters are removed by the compiler and replaced with their bounds (or Object) at runtime, so type info isn\u0027t available then",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Generic types are converted into reflection-based dynamic types at runtime",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Generics automatically throw a compile error if used with primitives",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "The JVM stores full generic type metadata for every object at runtime",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "hard",
+                          "question_text":  "Why is `String` immutable in Java, and what is one practical benefit of this design?",
+                          "options":  [
+                                          {
+                                              "text":  "Immutability lets Strings be safely shared across threads and enables caching of hash codes and string pool reuse",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Immutability makes String concatenation faster than using StringBuilder in loops",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Immutability is required so Strings can be used as array indices",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Immutability was a JVM limitation that has since been removed in modern Java",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "hard",
+                          "question_text":  "What distinguishes `final`, `finally`, and `finalize` in Java?",
+                          "options":  [
+                                          {
+                                              "text":  "`final` prevents modification/overriding/inheritance, `finally` is a block that always runs after try/catch, and `finalize` was a deprecated method invoked before garbage collection",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "They are three interchangeable keywords used for exception handling",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "`finally` and `finalize` are the same keyword with different capitalization conventions",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "`final` is only used for classes, never for variables or methods",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "hard",
+                          "question_text":  "Even with default methods in interfaces since Java 8, what is a key structural difference between an abstract class and an interface?",
+                          "options":  [
+                                          {
+                                              "text":  "An abstract class can hold instance state (fields) and a class can extend only one abstract class, while a class can implement multiple interfaces",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Interfaces can have constructors but abstract classes cannot",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Abstract classes cannot declare any abstract methods at all",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Interfaces can only be implemented by exactly one class",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "hard",
+                          "question_text":  "Why is double-checked locking for a singleton unsafe if the instance field is not declared `volatile`?",
+                          "options":  [
+                                          {
+                                              "text":  "Without `volatile`, instruction reordering can let another thread see a partially constructed object",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "Without `volatile`, the JVM refuses to compile the class",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "The `synchronized` keyword becomes a no-op without `volatile`",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It causes a compile-time deadlock warning",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "hard",
+                          "question_text":  "What problem arises if a custom class overrides `equals()` but not `hashCode()`, and the objects are stored in a `HashSet`?",
+                          "options":  [
+                                          {
+                                              "text":  "Objects considered equal by `equals()` can end up in different hash buckets, breaking lookups and allowing duplicates",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "The program fails to compile because equals requires hashCode to be overridden simultaneously",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "HashSet automatically generates a correct hashCode implementation at runtime instead",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "It causes a StackOverflowError during insertion",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "hard",
+                          "question_text":  "What commonly causes a deadlock between two Java threads using `synchronized` blocks?",
+                          "options":  [
+                                          {
+                                              "text":  "Two threads each hold one lock and wait indefinitely to acquire the lock the other thread already holds (circular wait)",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "One thread finishes before the other thread starts",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "A single thread acquires the same lock twice in a row",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "The garbage collector pauses both threads simultaneously",
+                                              "correct":  false
+                                          }
+                                      ]
+                      },
+                      {
+                          "skill":  "Java",
+                          "difficulty":  "hard",
+                          "question_text":  "In the JVM memory model, what is the key difference between stack and heap memory?",
+                          "options":  [
+                                          {
+                                              "text":  "The stack holds method call frames and local primitive/reference variables with automatic cleanup, while the heap holds objects with lifetimes managed by the garbage collector",
+                                              "correct":  true
+                                          },
+                                          {
+                                              "text":  "The heap is thread-local while the stack is shared across all threads",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "The stack has no size limit while the heap has a small fixed size",
+                                              "correct":  false
+                                          },
+                                          {
+                                              "text":  "Objects are only stored on the stack if they are marked `static`",
+                                              "correct":  false
+                                          }
+                                      ]
+                      }
+                  ]
 }
