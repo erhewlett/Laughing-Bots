@@ -70,7 +70,26 @@ class RegisterRequest(BaseModel):
     password: str = Field(min_length=PASSWORD_MIN, max_length=PASSWORD_MAX)
     email: str | None = None
     name: str | None = Field(default=None, max_length=100)
+    target_role: str | None = Field(default=None, max_length=100)
+    target_industry: str | None = Field(default=None, max_length=100)
+    target_location: str | None = Field(default=None, max_length=100)
+    target_min_salary: int | None = Field(
 
+        default=None,
+        ge=30000,
+        le=500000,
+        multiple_of=10000
+    )
+
+    target_max_salary: int | None = Field(
+
+        default=None,
+        ge=30000,
+        le=500000,
+        multiple_of=10000
+
+    )
+    
     @field_validator("password")
     @classmethod
     def password_within_bcrypt_limit(cls, v: str) -> str:
@@ -79,6 +98,27 @@ class RegisterRequest(BaseModel):
         if len(v.encode("utf-8")) > PASSWORD_MAX_BYTES:
             raise ValueError("Password is too long.")
         return v
+    
+    def password_no_spaces(cls, v: str) -> str:
+        if any(char.isspace() for char in v):
+            raise ValueError("Password cannot contain spaces.")
+        return v
+    
+    @model_validator(mode="after")
+
+    def validate_salary_range(self):
+
+        if (
+            self.target_min_salary is not None
+            and self.target_max_salary is not None
+            and self.target_max_salary < self.target_min_salary
+        ):
+
+            raise ValueError(
+                "Maximum salary cannot be lower than minimum salary."
+            )
+
+        return self
 
 
 class LoginRequest(BaseModel):
