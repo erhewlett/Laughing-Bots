@@ -58,7 +58,7 @@ class RoleOut(BaseModel):
 
 
 # --------------------------------------------------------------------------
-# Auth (scaffold - endpoints return 501 until the auth milestone)
+# Auth
 # --------------------------------------------------------------------------
 
 class RegisterRequest(BaseModel):
@@ -170,6 +170,7 @@ class QuestionOut(BaseModel):
 
 
 class GameQuestions(BaseModel):
+    quiz_id: int               # echo back on submit; binds the submission
     skill: str
     difficulty: Difficulty
     questions: list[QuestionOut]
@@ -181,6 +182,7 @@ class SubmittedAnswer(BaseModel):
 
 
 class GameSubmission(BaseModel):
+    quiz_id: int
     difficulty: Difficulty
     answers: list[SubmittedAnswer]
 
@@ -202,7 +204,7 @@ class GameResult(BaseModel):
 
 
 # --------------------------------------------------------------------------
-# Roadmap (scaffold)
+# Roadmap
 # --------------------------------------------------------------------------
 
 class RoadmapCreate(BaseModel):
@@ -230,11 +232,12 @@ class StepStatusUpdate(BaseModel):
 
 
 # --------------------------------------------------------------------------
-# History (scaffold)
+# History
 # --------------------------------------------------------------------------
 
 class LastGame(BaseModel):
     skill: str
+    difficulty: str | None
     score: int
     max_score: int
     date_taken: datetime

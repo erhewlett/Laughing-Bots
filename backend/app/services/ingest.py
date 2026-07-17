@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
-from app.database import Base, SessionLocal, engine
+from app.database import SessionLocal, initialize_database
 from app import models
 from app.services import jsearch
 from app.services.keywords import extract_skills
@@ -159,7 +159,7 @@ def ingest_role(db: Session, role_name: str, query: str, *, num_pages: int = 1) 
 
 
 def main() -> None:
-    Base.metadata.create_all(bind=engine)
+    initialize_database()
     db = SessionLocal()
     try:
         for role_name, query in ROLE_QUERIES.items():

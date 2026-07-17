@@ -99,8 +99,20 @@ def test_recent_searches_capped_at_five(client, db_session):
 def test_last_game_populated_after_play(client, db_session):
     _seed_easy_questions(db_session)
     h = {"Authorization": f"Bearer {_token(client)}"}
-    qs = client.get("/game/Python", params={"difficulty": "easy"}).json()["questions"]
-    ans = [{"question_id": q["question_id"], "option_id": q["options"][0]["option_id"]} for q in qs]
-    client.post("/game/Python/submit", json={"difficulty": "easy", "answers": ans}, headers=h)
+    quiz = client.get("/game/Python", params={"difficulty": "easy"}, headers=h).json()
+    # options are shuffled; the seeded correct option's text is "o0"
+    ans = [
+        {
+            "question_id": q["question_id"],
+            "option_id": next(o for o in q["options"] if o["option_text"] == "o0")["option_id"],
+        }
+        for q in quiz["questions"]
+    ]
+    client.post(
+        "/game/Python/submit",
+        json={"quiz_id": quiz["quiz_id"], "difficulty": "easy", "answers": ans},
+        headers=h,
+    )
     last = client.get("/me/recent", headers=h).json()["last_game"]
     assert last is not None and last["skill"] == "Python" and last["score"] == 3
+    assert last["difficulty"] == "easy"

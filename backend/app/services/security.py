@@ -53,7 +53,13 @@ def verify_password(plain: str, hashed: str) -> bool:
     try:
         return bcrypt.checkpw(_pw_bytes(plain), hashed.encode("utf-8"))
     except ValueError:
-        return False  # malformed stored hash
+        return False  # malformed stored hash or over-long input
+
+
+# Login verifies against this when the username does not exist, so both
+# failure kinds cost one bcrypt check and response timing cannot reveal
+# which usernames are registered. Computed once at import.
+DUMMY_PASSWORD_HASH = hash_password("timing-equalization-dummy-value")
 
 
 def validate_username(username: str) -> str | None:

@@ -62,7 +62,14 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)) -> models.User
 @router.post("/login", response_model=TokenResponse)
 def login(req: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
     user = security.get_user_by_username(db, req.username)
-    if user is None or not security.verify_password(req.password, user.password_hash):
+    # Always run exactly one bcrypt verify (against a dummy hash when the
+    # username is unknown) so both failure kinds take the same time and
+    # response timing cannot be used to enumerate usernames.
+    stored_hash = (
+        user.password_hash if user is not None else security.DUMMY_PASSWORD_HASH
+    )
+    password_ok = security.verify_password(req.password, stored_hash)
+    if user is None or not password_ok:
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,
             "Invalid username or password.",

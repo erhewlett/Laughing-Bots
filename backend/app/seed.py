@@ -22,7 +22,7 @@ from pathlib import Path
 
 from sqlalchemy import delete, select
 
-from app.database import Base, SessionLocal, engine
+from app.database import SessionLocal, engine, initialize_database
 from app import models
 from app.services.ingest import (
     _get_or_create_role,
@@ -35,7 +35,7 @@ FIXTURE = Path(__file__).parent / "seed_data" / "jobhopper_seed.json"
 
 
 def seed() -> None:
-    Base.metadata.create_all(bind=engine)
+    initialize_database(engine)
     data = json.loads(FIXTURE.read_text())
     postings = data["postings"]
 

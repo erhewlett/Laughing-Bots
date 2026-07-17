@@ -12,9 +12,7 @@ class Settings(BaseSettings):
 
     @property
     def secret_is_default(self) -> bool:
-        """True when no real SECRET_KEY was configured (review #2). main.py
-        warns at startup now; the auth milestone MUST upgrade this to a hard
-        failure before issuing tokens."""
+        """True when tokens should use the per-process development secret."""
         return self.secret_key == self._DEFAULT_SECRET
     frontend_origins: str = "http://localhost:5500,http://127.0.0.1:5500"
 

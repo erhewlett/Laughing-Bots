@@ -5,16 +5,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.database import Base, engine
+from app.database import initialize_database
 
-# Import models so they register with Base.metadata before create_all runs.
+# Import models so they register before database initialization runs.
 from app import models  # noqa: F401
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Skeleton stage: create tables directly. Swap for Alembic migrations later.
-    Base.metadata.create_all(bind=engine)
+    initialize_database()
     if settings.secret_is_default:
         # Auth signs tokens with a random per-process key when SECRET_KEY is
         # unset (see services/security.py). Tokens will not survive a restart.
@@ -47,9 +46,9 @@ def health() -> dict[str, str]:
 
 from app.routers import auth, game, history, meta, roadmap, wordcloud
 
-app.include_router(wordcloud.router)   # implemented
-app.include_router(meta.router)        # implemented
-app.include_router(auth.router)        # scaffold (501): auth milestone
-app.include_router(game.router)        # scaffold (501): game milestone
-app.include_router(roadmap.router)     # scaffold (501): roadmap milestone
-app.include_router(history.router)     # scaffold (501): history milestone
+app.include_router(wordcloud.router)
+app.include_router(meta.router)
+app.include_router(auth.router)
+app.include_router(game.router)
+app.include_router(roadmap.router)
+app.include_router(history.router)
