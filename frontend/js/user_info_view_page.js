@@ -43,15 +43,27 @@ async function initDashboard() {
             renderWordCloudHistory(historyData.recent_searches);
         } else {
             console.error("Failed to fetch dashboard data");
-            alert("Failed to fetch dashboard data");
+            showErrorMessage("Error: Failed to fetch dashboard data");
         }
     } catch (error) {
         console.error("Initialization error:", error);
-        alert(`Initialization error: ${error}`);
+        showErrorMessage(`Initialization error: ${error}`);
     }
 }
 
 // UI functions
+
+// error message handling
+function showErrorMessage(message) {
+    const errorDiv = document.getElementById('user-info-error-message');
+    const errorText = document.getElementById('user-info-error-text');
+
+    if (errorDiv && errorText) {
+        errorText.innerText = message;
+        errorDiv.style.display = 'block';
+
+    }
+}
 
 // add username data to user welcome message (for personalization)
 function updateWelcomeMessage(user) {
@@ -129,7 +141,7 @@ async function handleRerunSearch(searchData) {
         // redirect user to word cloud view page
         window.location.href = '../html/word_cloud_view_page.html';
     } else {
-        alert("Failed to regenerate word cloud. Please try again.");
+        showErrorMessage("Failed to regenerate word cloud. Please try again.");
     }
 }
 
