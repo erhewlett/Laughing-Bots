@@ -79,22 +79,6 @@ class RegisterRequest(BaseModel):
         if len(v.encode("utf-8")) > PASSWORD_MAX_BYTES:
             raise ValueError("Password is too long.")
         return v
-    
-    @model_validator(mode="after")
-
-    def validate_salary_range(self):
-
-        if (
-            self.target_min_salary is not None
-            and self.target_max_salary is not None
-            and self.target_max_salary < self.target_min_salary
-        ):
-
-            raise ValueError(
-                "Maximum salary cannot be lower than minimum salary."
-            )
-
-        return self
 
 
 class LoginRequest(BaseModel):
