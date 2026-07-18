@@ -86,6 +86,8 @@ def test_word_count_respected(client, db_session):
     r = client.post("/wordcloud", json={"job_title": "Data Analyst", "word_count": 5})
     assert r.status_code == 200
     assert len(r.json()["words"]) == 5
+    # the requested word_count is echoed back so the render page can use it
+    assert r.json()["word_count"] == 5
 
 
 def test_shape_echoed(client, db_session):
