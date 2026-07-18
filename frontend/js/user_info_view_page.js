@@ -11,6 +11,15 @@ async function initDashboard() {
         return;
     }
 
+    // logic for "Generate New Word Cloud!" button
+    const generateBtn = document.getElementById('generate-new-word-cloud-btn');
+    if (generateBtn) {
+        generateBtn.onclick = () => {
+            // send user to word cloud creation page
+            window.location.href = '../html/word_cloud_creation_page.html';
+        };
+    }
+
     try {
         const [userResponse, historyResponse] = await Promise.all([
             // fetch user information
@@ -70,7 +79,7 @@ function renderWordCloudHistory(searches) {
         const row = document.getElementById(`recent-word-cloud-row-${i+1}`);
 
         // store current iteration's date cell in variable, dateCell
-        const dateCell = document.getElementById(`recent-word-cloud-date-${i+1}`);
+        const roleCell = document.getElementById(`recent-word-cloud-role-${i+1}`);
 
         // store current iteration's button in variable, btn
         const btn = document.getElementById(`rerun-word-cloud-btn-${i+1}`);
@@ -78,7 +87,7 @@ function renderWordCloudHistory(searches) {
         // check that data exists for current index in the array
         if (searches && searches[i]) {
             row.style.display = 'table-row';
-            dateCell.innerText = new Date(searches[i].created_at).toLocaleDateString();
+            roleCell.innerText = searches[i].job_title;
             // TODO: implement word cloud regeneration (with word_cloud_view_page)
             btn.onclick = () => handleRerunSearch(searches[i]);
         } else {
