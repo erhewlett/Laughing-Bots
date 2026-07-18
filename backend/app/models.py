@@ -30,10 +30,8 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(16), unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255))
     target_role: Mapped[str | None] = mapped_column(String(100))
-    target_industry: Mapped[str | None] = mapped_column(String(100))
     target_location: Mapped[str | None] = mapped_column(String(100))
-    target_min_salary: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    target_max_salary: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
 
     searches: Mapped[list["Search"]] = relationship(back_populates="user")
     roadmaps: Mapped[list["Roadmap"]] = relationship(back_populates="user")

@@ -70,25 +70,6 @@ class RegisterRequest(BaseModel):
     password: str = Field(min_length=PASSWORD_MIN, max_length=PASSWORD_MAX)
     email: str | None = None
     name: str | None = Field(default=None, max_length=100)
-    target_role: str | None = Field(default=None, max_length=100)
-    target_industry: str | None = Field(default=None, max_length=100)
-    target_location: str | None = Field(default=None, max_length=100)
-    target_min_salary: int | None = Field(
-
-        default=None,
-        ge=30000,
-        le=500000,
-        multiple_of=10000
-    )
-
-    target_max_salary: int | None = Field(
-
-        default=None,
-        ge=30000,
-        le=500000,
-        multiple_of=10000
-
-    )
     
     @field_validator("password")
     @classmethod
@@ -97,11 +78,6 @@ class RegisterRequest(BaseModel):
         # rather than truncate (which would collapse distinct passwords).
         if len(v.encode("utf-8")) > PASSWORD_MAX_BYTES:
             raise ValueError("Password is too long.")
-        return v
-    
-    def password_no_spaces(cls, v: str) -> str:
-        if any(char.isspace() for char in v):
-            raise ValueError("Password cannot contain spaces.")
         return v
     
     @model_validator(mode="after")

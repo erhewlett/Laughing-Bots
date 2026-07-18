@@ -13,7 +13,6 @@ const jobTitleField = document.querySelector('#jobTitleInput');
 const jobIndustryField = document.querySelector('#jobIndustryInput');
 const locationField = document.querySelector('#locationInput');
 const minSalaryField = document.querySelector('#minimumSalaryInput');
-const maxSalaryField = document.querySelector('#maximumSalaryInput');
 const theWordCount = document.querySelector('#wordCountSelect');
 const cloudShape = document.querySelector('#wordCloudShapeSelect');
 
@@ -123,8 +122,7 @@ registrationForm.addEventListener("submit", async (e)=> {
         jobTitleField, 
         jobIndustryField,
         locationField,
-        minSalaryField,
-        maxSalaryField
+        minSalaryField
     );
 
     if (!isValid) {
@@ -138,10 +136,6 @@ registrationForm.addEventListener("submit", async (e)=> {
                 ? Number(minSalaryField.value)
                 : null;
 
-    const maxSalary = maxSalaryField.value !== ""
-                ? Number(maxSalaryField.value)
-                : null;
-
     // Check to ensure a user is not entering anything but a valid number
     if (
         minSalary !== null &&
@@ -151,27 +145,15 @@ registrationForm.addEventListener("submit", async (e)=> {
         return;
     }
 
-    if (
-        maxSalary !== null &&
-        !Number.isFinite(maxSalary)
-    ) {
-        alert("Maximum salary must be a valid number.");
-        return;
-    }
-
     // setting up data to go into the backend database
     const userData = {
         username: userNameField.value.trim(),
         password: passwordField.value,
-        // email: emailInput.value.trim() || null,
-        name: nameInput || null,
-        target_role: jobTitleField.value.trim() || null,
-        target_industry: jobIndustryField.value.trim() || null,
-        target_location: locationField.value.trim() || null,
-        target_min_salary: minSalary,
-        target_max_salary: maxSalary
+        email: emailInput.value.trim() || null,
+        name: nameInput || null
 
     };
+
     // Try running this to ensure there are no errors when the button is pressed
     try {
 
@@ -180,15 +162,11 @@ registrationForm.addEventListener("submit", async (e)=> {
             submitButton.disabled = true;
         }
 
-        const response = await fetch("http://127.0.0.1:8000/auth/register", {
+        const response = await fetch("http://localhost:8000/auth/register", {
 
             method: "POST",
 
-            headers: {
-
-                "Content-Type": "application/json"
-
-            },
+            headers: { "Content-Type": "application/json" },
 
             body: JSON.stringify(userData)
 
@@ -270,7 +248,7 @@ registrationForm.addEventListener("submit", async (e)=> {
 });
 
 //the funciton for verifiying all inputs within the registration form are valid inputs
-function verifying_registration(firstName, lastName, userName, confirmUserName, passWord, confirmPassword, jobTitle, jobIndustry, location, minSalary, maxSalary) {
+function verifying_registration(firstName, lastName, userName, confirmUserName, passWord, confirmPassword, jobTitle, jobIndustry, location, minSalary) {
     // assigning variables to the arguments and clearing empty space
     const firstNameVal = firstName.value.trim();
     const lastNameVal = lastName.value.trim();
@@ -570,10 +548,8 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
     function salaryFeedback(reason) {
         if (reason) {
             minSalary.classList.add("is-invalid");
-            maxSalary.classList.add("is-invalid");
 
             minSalary.classList.remove("is-valid");
-            maxSalary.classList.remove("is-valid");
 
             salaryError.classList.add("invalid-feedback");
             salaryError.classList.remove("valid-feedback");
@@ -598,69 +574,40 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
                     salaryError.textContent =
                         "Salary must increase in increments of $10,000.";
                     break;
-
-                case "invalidRange":
-                    salaryError.textContent =
-                        "Maximum salary cannot be lower than minimum salary.";
-                    break;
             }
 
             return;
         }
 
         minSalary.classList.remove("is-invalid");
-        maxSalary.classList.remove("is-invalid");
 
         salaryError.classList.remove("invalid-feedback");
         salaryError.textContent = "";
 
-        // If both are not empty then it is invalid, and if they are both empty then it is valid
-        
-        if (
-            minSalary.value !== "" &&
-            maxSalary.value !== ""
-        ) {
-            minSalary.classList.add("is-valid");
-            maxSalary.classList.add("is-valid");
-        } else {
-            minSalary.classList.remove("is-valid");
-            maxSalary.classList.remove("is-valid");
-        }
     }
 
     function validateSalaryRange() {
 
         const minSalaryValue = minSalary.value;
 
-        const maxSalaryValue = maxSalary.value;
+        // Salary is optional, so being empty is allowed
 
-        // Salary is optional, so both empty is allowed
-
-        if (minSalaryValue === "" && maxSalaryValue === "") {
+        if (minSalaryValue === "") {
 
             return "";
 
         }
 
-        // Require both values if one was entered
-
-        if (minSalaryValue === "" || maxSalaryValue === "") {
-
-            return "incomplete";
-
-        }
-
         const minimumSalary = Number(minSalaryValue);
 
-        const maximumSalary = Number(maxSalaryValue);
 
-        if (minimumSalary < 30000 || maximumSalary < 30000) {
+        if (minimumSalary < 30000) {
 
             return "belowMinimum";
 
         }
 
-        if (minimumSalary > 500000 || maximumSalary > 500000) {
+        if (minimumSalary > 500000) {
 
             return "aboveMaximum";
 
@@ -668,19 +615,11 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
 
         if (
 
-            minimumSalary % 10000 !== 0 ||
-
-            maximumSalary % 10000 !== 0
+            minimumSalary % 10000 !== 0
 
         ) {
 
             return "wrongIncrement";
-
-        }
-
-        if (maximumSalary < minimumSalary) {
-
-            return "invalidRange";
 
         }
 
@@ -690,11 +629,11 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
 
     // Rules to check in order for the form to validate properly
     function notValidFirstName() {
-        if (userNameVal.length === 0)
+        if (firstNameVal.length === 0)
             return "empty";
-        if (userNameVal.length < 4)
+        if (firstNameVal.length < 4)
             return "tooShort";
-        if (userNameVal.length > 16)
+        if (firstNameVal.length > 16)
             return "tooLong";
         if (emailPattern.test(firstNameVal))
             return "isEmail";
@@ -702,11 +641,11 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
     }
 
     function notValidLastName() {
-        if (userNameVal.length === 0)
+        if (lastNameVal.length === 0)
             return "empty";
-        if (userNameVal.length < 4)
+        if (lastNameVal.length < 4)
             return "tooShort";
-        if (userNameVal.length > 16)
+        if (lastNameVal.length > 16)
             return "tooLong";
         if (emailPattern.test(lastNameVal))
             return "isEmail";
