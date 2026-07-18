@@ -41,7 +41,17 @@ async function initDashboard() {
             updateWelcomeMessage(userData);
             renderGameHistory(historyData.last_game);
             renderWordCloudHistory(historyData.recent_searches);
-        } else {
+        } else if (userResponse.status === 401 || historyResponse.status === 401) {
+            // session expired
+            localStorage.removeItem('token');
+            showErrorMessage("Session Expired. Please sign out and sign back in.")
+
+            // automatically redirect to sign in page after 7 seconds
+            setTimeout(() => {
+                window.location.href = '../html/sign_in_page.html';
+            }, 7000);
+        }
+        else {
             console.error("Failed to fetch dashboard data");
             showErrorMessage("Error: Failed to fetch dashboard data");
         }
@@ -52,6 +62,17 @@ async function initDashboard() {
 }
 
 // UI functions
+
+// handle sign out logic
+function handleSignOut() {
+    // clear session data
+    localStorage.removeItem('token');
+    localStorage.removeItem('word_cloud_results');
+    localStorage.removeItem('word_cloud_parameters');
+
+    // replace and redirect to landing page
+    window.location.replace('../html/main.html');
+}
 
 // error message handling
 function showErrorMessage(message) {
@@ -113,7 +134,7 @@ async function handleRerunSearch(searchData) {
     // save user's search history parameters
     const wordCloudParameters = {
         job_title: searchData.job_title,
-        industry: searchData.industry,
+        industry: "", // TEMP: to be removed after upcoming updates to backend
         location: searchData.location,
         min_salary: searchData.min_salary,
 
@@ -134,8 +155,10 @@ async function handleRerunSearch(searchData) {
     if (response.ok) {
         const resultData = await response.json();
 
-        // save weighted keyword results and word cloud parameters to local storage
+        // contains: role, shape, word_count, posting_count, and weighted keywords
         localStorage.setItem('word_cloud_results', JSON.stringify(resultData));
+
+        // store word cloud parameters for history and context
         localStorage.setItem('word_cloud_parameters', JSON.stringify(wordCloudParameters));
 
         // redirect user to word cloud view page
@@ -145,4 +168,14 @@ async function handleRerunSearch(searchData) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', initDashboard);
+document.addEventListener('DOMContentLoaded', () => {
+    initDashboard();
+
+    const signOutLink = document.getElementById('sign-out-link');
+    if (signOutLink) {
+        signOutLink.onclick = (e) => {
+            e.preventDefault();
+            handleSignOut();
+        };
+    }
+});
