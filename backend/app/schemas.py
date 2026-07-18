@@ -47,6 +47,7 @@ class WordCloudWord(BaseModel):
 class WordCloudResponse(BaseModel):
     role: str                 # the matched role the cloud was built from
     shape: str                # echoes the requested shape
+    word_count: int           # echoes the requested max word count (drives rendering)
     posting_count: int        # postings the cloud was computed over
     words: list[WordCloudWord]
 

@@ -184,6 +184,7 @@ def generate_wordcloud(
     return WordCloudResponse(
         role=role.role_name,
         shape=req.shape,
+        word_count=req.word_count,
         posting_count=posting_count or 0,
         words=words,
     )
