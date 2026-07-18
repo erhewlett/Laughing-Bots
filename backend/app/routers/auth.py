@@ -40,11 +40,6 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)) -> models.User
         password_hash=security.hash_password(req.password),
         email=req.email,
         name=req.name,
-        target_role=req.target_role,
-        target_industry=req.target_industry,
-        target_location=req.target_location,
-        target_min_salary=req.target_min_salary,
-        target_max_salary=req.target_max_salary,
     )
     db.add(user)
     try:
