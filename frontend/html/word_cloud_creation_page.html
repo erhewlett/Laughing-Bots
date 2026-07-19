@@ -45,8 +45,8 @@
                 </div>
 
                 <div class="col-6 ms-auto">
-                    <div class="bg-secondary text-dark p-4 text-center rounded-4">
-                        Welcome {USER}!
+                    <div id="word-cloud-creation-welcome-message" class="bg-secondary text-dark p-4 text-center rounded-4">
+                        Welcome, Guest!
                     </div>
                 </div>
 
@@ -63,6 +63,7 @@
                             <!-- input constraints -->
                             <!-- note: this field is left as not required since the user will need to input at least one from (Job Title, Job Industry)-->
                             <input
+                                required
                                 type="text"
                                 class="form-control"
                                 id="jobTitleInput"
@@ -159,6 +160,9 @@
                 Created by the Laughing Bots
             </div>
         </footer>
+        
+        <!-- script -->
+        <script type="module" src="../js/word_cloud_inputs.js"></script>
 
     </body>
 
