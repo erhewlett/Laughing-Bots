@@ -11,6 +11,15 @@ async function initDashboard() {
         return;
     }
 
+    // logic for "Generate New Word Cloud!" button
+    const generateBtn = document.getElementById('generate-new-word-cloud-btn');
+    if (generateBtn) {
+        generateBtn.onclick = () => {
+            // send user to word cloud creation page
+            window.location.href = '../html/word_cloud_creation_page.html';
+        };
+    }
+
     try {
         const [userResponse, historyResponse] = await Promise.all([
             // fetch user information
@@ -32,17 +41,50 @@ async function initDashboard() {
             updateWelcomeMessage(userData);
             renderGameHistory(historyData.last_game);
             renderWordCloudHistory(historyData.recent_searches);
-        } else {
+        } else if (userResponse.status === 401 || historyResponse.status === 401) {
+            // session expired
+            localStorage.removeItem('token');
+            showErrorMessage("Session Expired. Please sign out and sign back in.")
+
+            // automatically redirect to sign in page after 7 seconds
+            setTimeout(() => {
+                window.location.href = '../html/sign_in_page.html';
+            }, 7000);
+        }
+        else {
             console.error("Failed to fetch dashboard data");
-            alert("Failed to fetch dashboard data");
+            showErrorMessage("Error: Failed to fetch dashboard data");
         }
     } catch (error) {
         console.error("Initialization error:", error);
-        alert(`Initialization error: ${error}`);
+        showErrorMessage(`Initialization error: ${error}`);
     }
 }
 
 // UI functions
+
+// handle sign out logic
+function handleSignOut() {
+    // clear session data
+    localStorage.removeItem('token');
+    localStorage.removeItem('word_cloud_results');
+    localStorage.removeItem('word_cloud_parameters');
+
+    // replace and redirect to landing page
+    window.location.replace('../html/main.html');
+}
+
+// error message handling
+function showErrorMessage(message) {
+    const errorDiv = document.getElementById('user-info-error-message');
+    const errorText = document.getElementById('user-info-error-text');
+
+    if (errorDiv && errorText) {
+        errorText.innerText = message;
+        errorDiv.style.display = 'block';
+
+    }
+}
 
 // add username data to user welcome message (for personalization)
 function updateWelcomeMessage(user) {
@@ -70,7 +112,7 @@ function renderWordCloudHistory(searches) {
         const row = document.getElementById(`recent-word-cloud-row-${i+1}`);
 
         // store current iteration's date cell in variable, dateCell
-        const dateCell = document.getElementById(`recent-word-cloud-date-${i+1}`);
+        const roleCell = document.getElementById(`recent-word-cloud-role-${i+1}`);
 
         // store current iteration's button in variable, btn
         const btn = document.getElementById(`rerun-word-cloud-btn-${i+1}`);
@@ -78,7 +120,7 @@ function renderWordCloudHistory(searches) {
         // check that data exists for current index in the array
         if (searches && searches[i]) {
             row.style.display = 'table-row';
-            dateCell.innerText = new Date(searches[i].created_at).toLocaleDateString();
+            roleCell.innerText = searches[i].job_title;
             // TODO: implement word cloud regeneration (with word_cloud_view_page)
             btn.onclick = () => handleRerunSearch(searches[i]);
         } else {
@@ -92,7 +134,7 @@ async function handleRerunSearch(searchData) {
     // save user's search history parameters
     const wordCloudParameters = {
         job_title: searchData.job_title,
-        industry: searchData.industry,
+        industry: "", // TEMP: to be removed after upcoming updates to backend
         location: searchData.location,
         min_salary: searchData.min_salary,
 
@@ -113,15 +155,27 @@ async function handleRerunSearch(searchData) {
     if (response.ok) {
         const resultData = await response.json();
 
-        // save weighted keyword results and word cloud parameters to local storage
+        // contains: role, shape, word_count, posting_count, and weighted keywords
         localStorage.setItem('word_cloud_results', JSON.stringify(resultData));
+
+        // store word cloud parameters for history and context
         localStorage.setItem('word_cloud_parameters', JSON.stringify(wordCloudParameters));
 
         // redirect user to word cloud view page
         window.location.href = '../html/word_cloud_view_page.html';
     } else {
-        alert("Failed to regenerate word cloud. Please try again.");
+        showErrorMessage("Failed to regenerate word cloud. Please try again.");
     }
 }
 
-document.addEventListener('DOMContentLoaded', initDashboard);
+document.addEventListener('DOMContentLoaded', () => {
+    initDashboard();
+
+    const signOutLink = document.getElementById('sign-out-link');
+    if (signOutLink) {
+        signOutLink.onclick = (e) => {
+            e.preventDefault();
+            handleSignOut();
+        };
+    }
+});
