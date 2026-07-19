@@ -32,6 +32,7 @@ class User(Base):
     target_role: Mapped[str | None] = mapped_column(String(100))
     target_location: Mapped[str | None] = mapped_column(String(100))
 
+
     searches: Mapped[list["Search"]] = relationship(back_populates="user")
     roadmaps: Mapped[list["Roadmap"]] = relationship(back_populates="user")
     game_attempts: Mapped[list["GameAttempt"]] = relationship(back_populates="user")
