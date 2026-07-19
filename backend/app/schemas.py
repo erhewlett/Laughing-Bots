@@ -71,7 +71,7 @@ class RegisterRequest(BaseModel):
     password: str = Field(min_length=PASSWORD_MIN, max_length=PASSWORD_MAX)
     email: str | None = None
     name: str | None = Field(default=None, max_length=100)
-
+    
     @field_validator("password")
     @classmethod
     def password_within_bcrypt_limit(cls, v: str) -> str:
