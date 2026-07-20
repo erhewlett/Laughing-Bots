@@ -45,8 +45,8 @@
                 </div>
 
                 <div class="col-6 ms-auto">
-                    <div class="bg-secondary text-dark p-4 text-center rounded-4">
-                        Welcome {USER}!
+                    <div id="word-cloud-creation-welcome-message" class="bg-secondary text-dark p-4 text-center rounded-4">
+                        Welcome, Guest!
                     </div>
                 </div>
 
@@ -63,29 +63,13 @@
                             <!-- input constraints -->
                             <!-- note: this field is left as not required since the user will need to input at least one from (Job Title, Job Industry)-->
                             <input
+                                required
                                 type="text"
                                 class="form-control"
                                 id="jobTitleInput"
                                 placeholder="e.g. Frontend Engineer, Product Manager..."
                                 aria-describedby="jobRequirementHelp"
                             >
-                        </div>
-
-                        <!-- JOB INDUSTRY MENU -->
-                        <div class="mb-4">
-                            <!-- label -->
-                            <label for="jobIndustryInput" class="form-label fw-semibold">Job Industry:</label>
-                            <!-- input constraints -->
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="jobIndustryInput"
-                                placeholder="e.g. Healthcare"
-                                aria-describedby="jobRequirementHelp"
-                            >
-                            <div id="jobRequirementHelp" class="form-text text-muted mt-2">
-                                Please provide a job title, job industry, or both to create your word cloud.
-                            </div>
                         </div>
 
                         <!-- LOCATION INPUT -->
@@ -176,6 +160,9 @@
                 Created by the Laughing Bots
             </div>
         </footer>
+        
+        <!-- script -->
+        <script type="module" src="../js/word_cloud_inputs.js"></script>
 
     </body>
 
