@@ -1151,7 +1151,6 @@
         }
       ]
     },
-
     {
       "skill": "Python",
       "difficulty": "hard",
@@ -2072,7 +2071,6 @@
         }
       ]
     },
-    
     {
       "skill": "JavaScript",
       "difficulty": "easy",
@@ -4511,7 +4509,6 @@
         }
       ]
     },
-
     {
       "skill": "C#",
       "difficulty": "medium",
@@ -10051,6 +10048,305 @@
         },
         {
           "text": "COPY automatically extracts tar archives while ADD does not",
+          "correct": false
+        }
+      ]
+    },
+    {
+      "skill": "Docker",
+      "difficulty": "medium",
+      "question_text": "What is the purpose of the EXPOSE instruction in a Dockerfile?",
+      "options": [
+        {
+          "text": "It documents which ports the container listens on but does not publish them to the host",
+          "correct": true
+        },
+        {
+          "text": "It automatically maps the port to the same port on the host",
+          "correct": false
+        },
+        {
+          "text": "It opens the port in the host's firewall",
+          "correct": false
+        },
+        {
+          "text": "It is required before the container's process can bind to that port",
+          "correct": false
+        }
+      ]
+    },
+    {
+      "skill": "Docker",
+      "difficulty": "medium",
+      "question_text": "What does 'docker system prune' remove by default?",
+      "options": [
+        {
+          "text": "Stopped containers, dangling images, unused networks, and build cache",
+          "correct": true
+        },
+        {
+          "text": "All images, including those used by running containers",
+          "correct": false
+        },
+        {
+          "text": "Only the containers that are currently running",
+          "correct": false
+        },
+        {
+          "text": "The Docker daemon's configuration files",
+          "correct": false
+        }
+      ]
+    },
+    {
+      "skill": "Docker",
+      "difficulty": "medium",
+      "question_text": "What does the '-p 8080:80' flag do in 'docker run'?",
+      "options": [
+        {
+          "text": "Publishes the container's port 80 to port 8080 on the host",
+          "correct": true
+        },
+        {
+          "text": "Publishes the host's port 80 to port 8080 inside the container",
+          "correct": false
+        },
+        {
+          "text": "Limits the container to 8080 MB of memory",
+          "correct": false
+        },
+        {
+          "text": "Restricts the container to 80 percent of one CPU",
+          "correct": false
+        }
+      ]
+    },
+    {
+      "skill": "Docker",
+      "difficulty": "hard",
+      "question_text": "Why can a process running as PID 1 in a container fail to shut down gracefully on 'docker stop'?",
+      "options": [
+        {
+          "text": "PID 1 has no default signal handlers, so SIGTERM is ignored unless the process explicitly handles it",
+          "correct": true
+        },
+        {
+          "text": "docker stop only sends SIGKILL, which cannot be caught",
+          "correct": false
+        },
+        {
+          "text": "Containers ignore all signals by design",
+          "correct": false
+        },
+        {
+          "text": "The host kernel blocks signals from reaching containerized processes",
+          "correct": false
+        }
+      ]
+    },
+    {
+      "skill": "Docker",
+      "difficulty": "hard",
+      "question_text": "Why is it best practice to COPY dependency manifests and install packages before COPYing the rest of the source?",
+      "options": [
+        {
+          "text": "Changing any copied file invalidates that layer and every layer after it, so copying source last keeps the dependency-install layer cached",
+          "correct": true
+        },
+        {
+          "text": "COPY may only appear once before a RUN instruction",
+          "correct": false
+        },
+        {
+          "text": "Dependencies installed after the source copy are discarded from the image",
+          "correct": false
+        },
+        {
+          "text": "It is the only way to keep source files out of the final image",
+          "correct": false
+        }
+      ]
+    },
+    {
+      "skill": "Docker",
+      "difficulty": "hard",
+      "question_text": "What is a key difference between ARG and ENV in a Dockerfile?",
+      "options": [
+        {
+          "text": "ARG values exist only during the build and are absent from the running container, while ENV persists into the container's environment",
+          "correct": true
+        },
+        {
+          "text": "ENV values exist only at build time while ARG persists at runtime",
+          "correct": false
+        },
+        {
+          "text": "ARG and ENV are interchangeable aliases for the same directive",
+          "correct": false
+        },
+        {
+          "text": "ARG can only hold numeric values",
+          "correct": false
+        }
+      ]
+    },
+    {
+      "skill": "Docker",
+      "difficulty": "hard",
+      "question_text": "When you mount a fresh named volume onto a container directory that already contains files from the image, what happens on first use?",
+      "options": [
+        {
+          "text": "The image's existing files in that directory are copied into the empty named volume",
+          "correct": true
+        },
+        {
+          "text": "The container fails to start because the mount target is not empty",
+          "correct": false
+        },
+        {
+          "text": "The image's files in that directory are permanently deleted",
+          "correct": false
+        },
+        {
+          "text": "The volume is ignored and the image's files are used instead",
+          "correct": false
+        }
+      ]
+    },
+    {
+      "skill": "Docker",
+      "difficulty": "hard",
+      "question_text": "What does a user-defined bridge network provide that the default bridge network does not?",
+      "options": [
+        {
+          "text": "Automatic DNS resolution between containers by name",
+          "correct": true
+        },
+        {
+          "text": "Encrypted traffic between containers by default",
+          "correct": false
+        },
+        {
+          "text": "Direct, unshared access to the host's network stack",
+          "correct": false
+        },
+        {
+          "text": "A shared process namespace across all attached containers",
+          "correct": false
+        }
+      ]
+    },
+    {
+      "skill": "Docker",
+      "difficulty": "hard",
+      "question_text": "Where are filesystem changes made by a running container stored?",
+      "options": [
+        {
+          "text": "In a thin writable layer on top of the image's read-only layers, discarded when the container is removed",
+          "correct": true
+        },
+        {
+          "text": "Directly back into the image's layers",
+          "correct": false
+        },
+        {
+          "text": "In a named volume that Docker creates automatically for every container",
+          "correct": false
+        },
+        {
+          "text": "In the host's /tmp directory, where they persist permanently",
+          "correct": false
+        }
+      ]
+    },
+    {
+      "skill": "Docker",
+      "difficulty": "hard",
+      "question_text": "What does a Dockerfile HEALTHCHECK instruction do?",
+      "options": [
+        {
+          "text": "Periodically runs a command and marks the container healthy or unhealthy without stopping it",
+          "correct": true
+        },
+        {
+          "text": "Automatically restarts the container whenever the check fails",
+          "correct": false
+        },
+        {
+          "text": "Blocks the container from starting until a port is open",
+          "correct": false
+        },
+        {
+          "text": "Fails the image build if the check does not pass",
+          "correct": false
+        }
+      ]
+    },
+    {
+      "skill": "Docker",
+      "difficulty": "hard",
+      "question_text": "How does the 'unless-stopped' restart policy differ from 'always'?",
+      "options": [
+        {
+          "text": "unless-stopped will not restart a container that was manually stopped, even after the daemon restarts, whereas always will",
+          "correct": true
+        },
+        {
+          "text": "always restarts only on non-zero exit while unless-stopped restarts on any exit",
+          "correct": false
+        },
+        {
+          "text": "unless-stopped never restarts the container under any condition",
+          "correct": false
+        },
+        {
+          "text": "They behave identically",
+          "correct": false
+        }
+      ]
+    },
+    {
+      "skill": "Docker",
+      "difficulty": "hard",
+      "question_text": "In a multi-stage build, what does 'COPY --from=builder /app/bin /app/bin' do?",
+      "options": [
+        {
+          "text": "Copies files from an earlier build stage named 'builder' into the current stage",
+          "correct": true
+        },
+        {
+          "text": "Copies files from a separately running container named 'builder'",
+          "correct": false
+        },
+        {
+          "text": "Pulls files from a remote image named 'builder' over the network at runtime",
+          "correct": false
+        },
+        {
+          "text": "Mounts the builder stage into the current stage as a volume",
+          "correct": false
+        }
+      ]
+    },
+    {
+      "skill": "Docker",
+      "difficulty": "hard",
+      "question_text": "What is the difference between 'docker attach' and 'docker exec -it'?",
+      "options": [
+        {
+          "text": "attach connects to the container's existing main process (PID 1) streams, while exec starts a new additional process inside the container",
+          "correct": true
+        },
+        {
+          "text": "exec connects to PID 1 while attach starts a new process",
+          "correct": false
+        },
+        {
+          "text": "attach works only on stopped containers",
+          "correct": false
+        },
+        {
+          "text": "exec can only run non-interactive commands",
           "correct": false
         }
       ]
