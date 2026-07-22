@@ -1,0 +1,57 @@
+// import colors file
+@use '../colors';
+
+// JobHopper in navbar
+.register-brand,
+.register-brand:visited,
+.register-brand:hover,
+.register-brand:active {
+    color: colors.$sandy-pink;
+    font-size: 22px;
+}
+
+.headLiner {
+    margin-bottom: 2em;
+    text-align: center;
+}
+
+
+.theBlock {
+    margin-bottom: 3em;
+    padding: 1em;
+    height: auto;
+    // background-color: colors.$smoke;
+    // border: 2px solid colors.$off-black;
+    background: rgba(30, 64, 175, 0.18);
+
+    backdrop-filter: blur(14px);
+
+    -webkit-backdrop-filter: blur(14px);
+
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+    border-radius: 20px;
+
+    .oneBlock {
+        padding: 1em;
+        background-color: colors.$off-white;
+        border-radius: 10px;
+        height: auto;
+
+        .easyMode {
+            color: green;
+        }
+        .mediumMode {
+            color: orange;
+        }
+        .hardMode {
+            color: red;
+        }
+
+        .modeTimers {
+            margin: 2em 0 2em 0;
+        }
+    }
+}
