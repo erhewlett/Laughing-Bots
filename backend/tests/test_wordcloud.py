@@ -132,3 +132,5 @@ def test_slash_skill_appears(client, db_session):
         "/wordcloud", json={"job_title": "Data Analyst"}
     ).json()["words"]]
     assert "CI/CD" in names
+
+# CI trigger for scenario 3 and 4 evidence
