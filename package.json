@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test:watch": "jest --watch",
     "sass": "sass --watch frontend/scss/style.scss:frontend/css/style.css"
   },
   "jest": {
