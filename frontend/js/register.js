@@ -679,8 +679,7 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
 
     // Rules to check in order for the form to validate properly
     function notValidFirstName() {
-        if (firstNameVal.length === 0)
-            return "empty";
+        
         if (firstNameVal.length < 4)
             return "tooShort";
         if (firstNameVal.length > 16)
@@ -691,8 +690,7 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
     }
 
     function notValidLastName() {
-        if (lastNameVal.length === 0)
-            return "empty";
+        
         if (lastNameVal.length < 4)
             return "tooShort";
         if (lastNameVal.length > 16)
