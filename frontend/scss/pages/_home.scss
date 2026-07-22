@@ -28,8 +28,12 @@ nav {
     margin-right: 3em;
 }
 
-.navbar-brand {
-    color: colors.$platinum;
+.home-brand,
+.home-brand:visited,
+.home-brand:hover,
+.home-brand:active {
+    color: colors.$sandy-pink;
+    font-size: 22px;
 }
 
 .nav-link {

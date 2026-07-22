@@ -23,8 +23,8 @@
         <header class="bg-info p-3">
 
             <div class="container-fluid">
-                <a class="navbar-brand" href="../html/main.html">
-                    <img src="../assets/JobHopper_logo2.svg" alt="JobHopper Logo" width="140" height="70">
+                <a class="navbar-brand register-brand" href="../html/main.html">
+                    JobHopper
                 </a>
             </div>
 
@@ -201,7 +201,8 @@
                     <div class="mb-4">
                         <!-- label -->
                         <label for="jobTitleInput" class="form-label fw-semibold">Job Title:</label>
-                        <span class="text-muted small">(Optional)</span>
+                        <span class="text-danger small">(Required)</span>
+
                         <!-- input constraints -->
                         <!-- note: this field is left as not required since the user will need to input at least one from (Job Title, Job Industry)-->
                         <input
@@ -214,30 +215,6 @@
 
                         <!-- Error message if error found -->
                         <div id="jobTitleError" class="jobRequirementError invalid-feedback"></div>
-
-                    </div>
-
-                    <!-- JOB INDUSTRY INPUT FIELD -->
-                    <div class="mb-4">
-                        <!-- label -->
-                        <label for="jobIndustryInput" class="form-label fw-semibold">Job Industry:</label>
-                        <span class="text-muted small">(Optional)</span>
-                        <!-- input constraints -->
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="jobIndustryInput"
-                            placeholder="e.g. Healthcare"
-                            aria-describedby="jobRequirementHelp"
-                        >
-
-                        <!-- Error message if error found -->
-                        <div id="jobIndustryError" class="jobRequirementError invalid-feedback"></div>
-
-                        <div id="jobRequirementHelp" class="form-text text-muted mt-2">
-                            Please provide a job title, job industry, or both to create your word cloud.
-                        </div>
-                        
 
                     </div>
 
@@ -293,7 +270,7 @@
                     <!-- KEYWORD AMOUNT MENU -->
                     <div class="mb-4">
                         <label for="wordCountSelect" class="form-label fw-semibold">How many keywords would you like to see in the word cloud?</label>
-                        <span class="text-muted small">(Optional)</span>
+                        <span class="text-danger small">(Required)</span>
                         <div class="row">    
                             <div class="col-12 col-md-3">
                                 <select class="form-select" id="wordCountSelect" required>
@@ -304,6 +281,8 @@
                                     <option value="30">30</option>
                                     <option value="40">40</option>
                                 </select>
+                                <div class="invalid-feedback" id="countError"></div>
+
                             </div>
                         </div>
                     </div>
@@ -311,16 +290,19 @@
                     <!-- WORD CLOUD SHAPE MENU -->
                     <div class="mb-4">
                         <label for="wordCloudShapeSelect" class="form-label fw-semibold">Place select a shape for the word cloud:</label>
-                        <span class="text-muted small">(Optional)</span>
+                        <span class="text-danger small">(Required)</span>
                         <div class="row">
                             <div class="col-12 col-md-3">
                                 <select class="form-select" id="wordCloudShapeSelect" required>
                                     <option value="" selected disabled>Select a shape...</option>
 
-                                    <option value="placeholderShape1">Placeholder Shape 1</option>
-                                    <option value="placeholderShape2">Placeholder Shape 2</option>
-                                    <option value="placeholderShape3">Placeholder Shape 3</option>
+                                    <option value="circle">Circle</option>
+                                    <option value="diamond">Diamond</option>
+                                    <option value="square">Square</option>
+                                    <option value="star">Star</option>
                                 </select>
+                                <div class="invalid-feedback" id="shapeError"></div>
+
                             </div>
                         </div>
                     </div>

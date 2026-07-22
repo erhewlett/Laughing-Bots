@@ -11879,8 +11879,12 @@ nav {
   margin-right: 3em;
 }
 
-.navbar-brand {
-  color: #E5E4E2;
+.home-brand,
+.home-brand:visited,
+.home-brand:hover,
+.home-brand:active {
+  color: #F7E4E0;
+  font-size: 22px;
 }
 
 .nav-link {
@@ -11958,6 +11962,14 @@ img {
 
 footer {
   background-color: #7E96C4;
+}
+
+.register-brand,
+.register-brand:visited,
+.register-brand:hover,
+.register-brand:active {
+  color: #F7E4E0;
+  font-size: 22px;
 }
 
 .theAuthor {
