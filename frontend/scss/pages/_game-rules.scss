@@ -1,0 +1,8 @@
+// import colors file
+@use '../colors';
+
+.squareOne {
+    height: 15em;
+    width: 80%;
+    background-color: colors.$blue;
+}

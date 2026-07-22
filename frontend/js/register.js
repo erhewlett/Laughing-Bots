@@ -10,7 +10,6 @@ const confirmUserField = document.querySelector('#confirmUsernameInput');
 const passwordField = document.querySelector('#passwordInput');
 const confirmPasswordField = document.querySelector('#confirmPasswordInput');
 const jobTitleField = document.querySelector('#jobTitleInput');
-const jobIndustryField = document.querySelector('#jobIndustryInput');
 const locationField = document.querySelector('#locationInput');
 const minSalaryField = document.querySelector('#minimumSalaryInput');
 const theWordCount = document.querySelector('#wordCountSelect');
@@ -24,6 +23,8 @@ const confirmPasswordError = document.querySelector('#confirmPasswordError');
 const jobTitleError = document.querySelector("#jobTitleError");
 const jobIndustryError = document.querySelector("#jobIndustryError");
 const salaryError = document.querySelector("#salaryError");
+const countError = document.querySelector('#countError');
+const shapeError = document.querySelector('#shapeError');
 
 
 // location
@@ -102,6 +103,25 @@ registrationForm.addEventListener("submit", async (e)=> {
 
     const submitButton = registrationForm.querySelector('#sign-up-btn');
 
+
+    const job_title = jobTitleField.value.trim();
+    const the_location = locationField.value.trim();
+    const min_salary = minSalaryField.value.trim();
+    const word_count = theWordCount.value.trim();
+    const shape = cloudShape.value.trim();
+
+    const wordCloudGeneration = {
+        job_title: job_title,
+        industry: '',
+        location: the_location,
+        min_salary: min_salary,
+        word_count: word_count,
+        shape: shape
+    };
+
+    // localStroage set up
+    localStorage.setItem("word_cloud_parameters", JSON.stringify(wordCloudGeneration));
+
     // combine first and last name to store name variable if not empty
     if (!firstNameField.value === "" && !lastNameField.value === "") {
         const nameInput = `${firstNameField.value.trim()} ${lastNameField.value.trim()}`.trim();
@@ -120,10 +140,13 @@ registrationForm.addEventListener("submit", async (e)=> {
         passwordField, 
         confirmPasswordField, 
         jobTitleField, 
-        jobIndustryField,
         locationField,
-        minSalaryField
+        minSalaryField,
+        theWordCount,
+        cloudShape
     );
+
+
 
     if (!isValid) {
         console.log('Form validation did not pass');
@@ -149,7 +172,7 @@ registrationForm.addEventListener("submit", async (e)=> {
     const userData = {
         username: userNameField.value.trim(),
         password: passwordField.value,
-        email: emailInput.value.trim() || null,
+        email: emailInput.value.trim() || null, // not in use
         name: nameInput || null
 
     };
@@ -248,7 +271,7 @@ registrationForm.addEventListener("submit", async (e)=> {
 });
 
 //the funciton for verifiying all inputs within the registration form are valid inputs
-function verifying_registration(firstName, lastName, userName, confirmUserName, passWord, confirmPassword, jobTitle, jobIndustry, location, minSalary) {
+function verifying_registration(firstName, lastName, userName, confirmUserName, passWord, confirmPassword, jobTitle, location, minSalary, wordCount, shape) {
     // assigning variables to the arguments and clearing empty space
     const firstNameVal = firstName.value.trim();
     const lastNameVal = lastName.value.trim();
@@ -257,7 +280,8 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
     const passwordVal = passWord.value;
     const confirmPasswordVal = confirmPassword.value;
     const jobTitleVal = jobTitle.value.trim();
-    const jobIndustryVal = jobIndustry.value.trim();
+    const theCount = wordCount.value.trim();
+    const theShape = shape.value.trim();
     // Regex to detect email
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -475,27 +499,15 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
 
             jobTitle.classList.remove("is-valid");
 
-            jobIndustry.classList.add("is-invalid");
-
-            jobIndustry.classList.remove("is-valid");
-
             jobTitleError.classList.add("invalid-feedback");
-
-            jobIndustryError.classList.add("invalid-feedback");
 
             jobTitleError.textContent =
 
-                "Enter either a job title or a job industry.";
-
-            jobIndustryError.textContent =
-
-                "Enter either a job title or a job industry.";
+                "Please enter a job title.";
 
         } else {
 
             jobTitle.classList.remove("is-invalid");
-
-            jobIndustry.classList.remove("is-invalid");
 
             // Optional
 
@@ -505,15 +517,7 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
 
             }
 
-            if (jobIndustry.value.trim() !== "") {
-
-                jobIndustry.classList.add("is-valid");
-
-            }
-
             jobTitleError.textContent = "";
-
-            jobIndustryError.textContent = "";
 
         }
 
@@ -584,6 +588,52 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
         salaryError.classList.remove("invalid-feedback");
         salaryError.textContent = "";
 
+    }
+
+    function validateCount() {
+        if (theCount === "") {
+            wordCount.classList.add("is-invalid");
+            wordCount.classList.remove("is-valid");
+
+            countError.classList.add("invalid-feedback");
+            countError.classList.remove("valid-feedback");
+
+            countError.textContent = "Please select a given number.";
+
+            return false;
+
+        } 
+
+        wordCount.classList.remove("is-invalid");
+        wordCount.classList.add("is-valid");
+
+        countError.classList.remove("invalid-feedback");
+        countError.textContent = "";
+
+        return true;
+    }
+
+    function validateShape() {
+        if (theShape === "") {
+            shape.classList.add("is-invalid");
+            shape.classList.remove("is-valid");
+
+            shapeError.classList.add("invalid-feedback");
+            shapeError.classList.remove("valid-feedback");
+
+            shapeError.textContent = "Please select a given shape.";
+
+            return false;
+
+        } 
+
+        shape.classList.remove("is-invalid");
+        shape.classList.add("is-valid");
+
+        shapeError.classList.remove("invalid-feedback");
+        shapeError.textContent = "";
+
+        return true;
     }
 
     function validateSalaryRange() {
@@ -712,7 +762,7 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
 
     function noValidJobSelection() {
 
-        if (jobTitle.value.trim() === "" && jobIndustry.value.trim() === "") {
+        if (jobTitle.value.trim() === "") {
 
             return "missing";
 
@@ -752,6 +802,7 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
     const anyJobError = noValidJobSelection();
     const anyLocationError = noValidLocation();
     const anySalaryError = validateSalaryRange();
+    
 
     // Funcitons that check each input for errors
     firstNameFeedback(anyFirstNameError, firstName, firstNameError);
@@ -763,6 +814,8 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
     jobFeedback(anyJobError);
     locationFeedback(anyLocationError);
     salaryFeedback(anySalaryError);
+    validateCount();
+    validateShape();
 
 
     return (

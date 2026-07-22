@@ -7,19 +7,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap" rel="stylesheet">
     <!-- CSS -->
     <link rel="stylesheet" href="../css/style.css">
-    <title>JobHopper App</title>
+    <title>JobHopper Game Rules</title>
 </head>
 <body>
     <nav class="navbar sticky-top navbar-expand-md col-sm-12">
         <div class="container-fluid">
-            <a class="navbar-brand home-brand" href="#">JobHopper</a>
+            <a class="navbar-brand" href="#">JobHopper</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="#">Game Rules</a>
+                <a class="nav-link" aria-current="page" href="#">Home</a>
                 </li>
                 <li class="nav-item">
                 <a class="nav-link" href="#">Stack</a>
@@ -34,31 +34,39 @@
     <div class="container d-flex block-around-content">
         <main class="main-body flex-grow-1 d-flex align-items-center">
             <div class="container-fluid box1">
-                <div class="row primary-app-introduction">
-
-                    <div class="col-md-6 image-block">
-                        <img src="../assets/JobHopper_logo.svg" alt="Picture coming soon" class="img-fluid">
-                    </div>
-
-                    <div class="col-md-6 buttons-block">
-                        <button class="btn signUpBtn mb-5" id="registerBtn">Sign Up</button>
-                        <button class="btn loginBtn" id="userLoginBtn">Login</button>
+                <div class="row headliner">
+                    <div class="col-12">
+                        <h4>How to play the word game</h4>
                     </div>
                 </div>
-                <div class="row app-overview">
-                    <div class="col-12 overview-of-app">
-                        <div class="block-around-text mt-5">
-                            <p>
-                                Welcome to JobHopper an interactive app that is here to help you along on your path to reach the next level in tech.  JobHopper pairs and shares careers with you based on a WordCloud that is created when you sign up.  Once registered you will be able to see the <strong>WordCloud</strong> filled with various IT careers based on your specifications.  As a registered user you will be able to play our <strong>Job Quiz</strong> which is a multiple choice word game.  Click on <a href=../html/game_rules.html">the Rules</a><link rel="stylesheet" href="../html/rules.html"> to see the rules and set up of the game.
-                            </p>
+                <div class="row rules">
+                    <div class="col-12">
+                        <div class="squareOne">
+                            <div class="squareTwo">
+                                <p>The word game is broken up between 3 difficulty modes 
+                                (easy, medium, and hard).  Each mode will have its own unique
+                                timer for the game to challenge you to be quick on your feet 
+                                as some job roles require pristine time management.  The game
+                                will ask you 10 questions pertaining to various IT jobs in 
+                                the job market and score you according to the difficulty
+                                mode you selected.
+                                </p>
+                                <p>Easy Mode: 3 mins</p>
+                                <p>Medium Mode: 2 mins</p>
+                                <p>Hard Mode: 1 mins</p>
+
+                                <p>All questions are multiple choice.<br>
+                                    Live answer feedback<br>
+                                    Updated scoring on the go<br>
+                                    Can you obtain the rank of Tech Master?<br>
+                                    <a href="../html/registration_page.html">Sign up</a> and find out!
+                                </p>
+                            </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </main>
-       
-
     </div>
      <!-- footer -->
     <footer class="text-white text-center fixed py-3">
@@ -66,8 +74,9 @@
             Created by the Laughing Bots
         </div>
     </footer>
+
      <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="../js/main.js"></script>
+    <!-- <script src="../js/main.js"></script> -->
 </body>
 </html>
