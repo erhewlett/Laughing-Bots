@@ -103,7 +103,10 @@ def autoseed() -> None:
     if needs_postings:
         seed()
     if needs_questions:
-        seed_questions()
+        # prune=True: startup treats the fixture as the whole truth, so a skill
+        # dropped from the file stops being offered instead of lingering in a
+        # bank nothing rewrites.
+        seed_questions(prune=True)
         db = SessionLocal()
         try:
             set_meta(db, QUESTIONS_FINGERPRINT_KEY, fingerprint)
