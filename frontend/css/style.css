@@ -12043,6 +12043,89 @@ footer {
   font-size: 15px;
 }
 
+.block-around-all-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.boxOne {
+  width: 80%;
+  display: block;
+  align-items: center;
+}
+.boxOne .headLiner {
+  margin-bottom: 2em;
+  text-align: center;
+}
+.boxOne .theBlock {
+  margin-bottom: 5em;
+  padding: 1em;
+  height: 30em;
+  background: rgba(30, 64, 175, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  border-radius: 20px;
+}
+.boxOne .theBlock .displayBlock {
+  padding: 1em;
+  background-color: #FAF9F6;
+  border-radius: 10px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.boxOne .theBlock .displayBlock .buttonLayout {
+  margin-top: 2em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.boxOne .theBlock .displayBlock .buttonLayout .easyMode {
+  margin-bottom: 5em;
+  height: 3em;
+  color: #FAF9F6;
+  border-radius: 5px;
+  border: 2px solid greenyellow;
+  background-color: green;
+  transition: transform 0.3s ease-out, color 0.2s ease-in;
+}
+.boxOne .theBlock .displayBlock .buttonLayout .easyMode:hover {
+  transform: translateY(-3px);
+  color: #E5E4E2;
+}
+.boxOne .theBlock .displayBlock .buttonLayout .mediumMode {
+  margin-bottom: 5em;
+  color: #FAF9F6;
+  height: 3em;
+  color: #FAF9F6;
+  border-radius: 5px;
+  border: 2px solid rgb(251, 234, 47);
+  background-color: orange;
+  transition: transform 0.3s ease-out, color 0.2s ease-in;
+}
+.boxOne .theBlock .displayBlock .buttonLayout .mediumMode:hover {
+  transform: translateY(-3px);
+  color: #E5E4E2;
+}
+.boxOne .theBlock .displayBlock .buttonLayout .hardMode {
+  margin-bottom: 5em;
+  color: #FAF9F6;
+  height: 3em;
+  color: #FAF9F6;
+  border-radius: 5px;
+  border: 2px solid orangered;
+  background-color: red;
+  transition: transform 0.3s ease-out, color 0.2s ease-in;
+}
+.boxOne .theBlock .displayBlock .buttonLayout .hardMode:hover {
+  transform: translateY(-3px);
+  color: #E5E4E2;
+}
+
 .question-box {
   border: 3px solid #F7E4E0;
   aspect-ratio: 4/3;
@@ -12057,11 +12140,6 @@ footer {
   height: 1200px;
   margin: 0 auto;
   overflow: hidden;
-}
-
-a > span > .app_name {
-  color: #D7B7BC;
-  font-size: 15px;
 }
 
 /*# sourceMappingURL=style.css.map */
