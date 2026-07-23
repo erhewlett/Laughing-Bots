@@ -12062,6 +12062,23 @@ footer {
   margin-bottom: 5em;
   padding: 1em;
   height: 30em;
+.register-brand,
+.register-brand:visited,
+.register-brand:hover,
+.register-brand:active {
+  color: #F7E4E0;
+  font-size: 22px;
+}
+
+.headLiner {
+  margin-bottom: 2em;
+  text-align: center;
+}
+
+.theBlock {
+  margin-bottom: 3em;
+  padding: 1em;
+  height: auto;
   background: rgba(30, 64, 175, 0.18);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -12070,6 +12087,7 @@ footer {
   border-radius: 20px;
 }
 .boxOne .theBlock .displayBlock {
+.theBlock .oneBlock {
   padding: 1em;
   background-color: #FAF9F6;
   border-radius: 10px;
@@ -12124,6 +12142,18 @@ footer {
 .boxOne .theBlock .displayBlock .buttonLayout .hardMode:hover {
   transform: translateY(-3px);
   color: #E5E4E2;
+}
+.theBlock .oneBlock .easyMode {
+  color: green;
+}
+.theBlock .oneBlock .mediumMode {
+  color: orange;
+}
+.theBlock .oneBlock .hardMode {
+  color: red;
+}
+.theBlock .oneBlock .modeTimers {
+  margin: 2em 0 2em 0;
 }
 
 .question-box {

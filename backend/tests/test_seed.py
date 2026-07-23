@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from app import models
 
 
-def _run_question_seed(tmp_path, monkeypatch, questions):
+def _run_question_seed(tmp_path, monkeypatch, questions, prune=False):
     import app.seed_questions as sq
 
     fixture = tmp_path / "questions.json"
@@ -19,10 +19,27 @@ def _run_question_seed(tmp_path, monkeypatch, questions):
     engine = create_engine(
         f"sqlite:///{tmp_path / 'q.db'}", connect_args={"check_same_thread": False}
     )
+    Session = sessionmaker(bind=engine)
     monkeypatch.setattr(sq, "engine", engine)
-    monkeypatch.setattr(sq, "SessionLocal", sessionmaker(bind=engine))
+    monkeypatch.setattr(sq, "SessionLocal", Session)
     monkeypatch.setattr(sq, "FIXTURE", fixture)
-    sq.seed_questions()
+    sq.seed_questions(prune=prune)
+    return Session
+
+
+def _banks(Session):
+    """{(skill_name, difficulty): question count} currently in the database."""
+    with Session() as s:
+        rows = s.execute(
+            select(
+                models.Skill.skill_name,
+                models.Question.difficulty,
+                func.count(models.Question.question_id),
+            )
+            .join(models.Question, models.Question.skill_id == models.Skill.skill_id)
+            .group_by(models.Skill.skill_name, models.Question.difficulty)
+        ).all()
+    return {(name, diff): n for name, diff, n in rows}
 
 
 def test_seed_questions_rejects_invalid_difficulty(tmp_path, monkeypatch):
@@ -167,3 +184,61 @@ def test_seed_rerun_refreshes_without_duplicating(tmp_path, monkeypatch):
     total2, fresh2 = _count(Session)
     assert total2 == total1  # no duplication (dedup on external_id)
     assert fresh2 == total2  # re-run re-stamped every posting inside 30 days
+
+
+def test_prune_removes_banks_the_fixture_dropped(tmp_path, monkeypatch):
+    """A skill deleted from the fixture must stop being offered.
+
+    Without pruning the reload only clears banks it is about to rewrite, so
+    the dropped skill's questions survive and /game/skills keeps advertising
+    a quiz the fixture no longer defines.
+    """
+    _run_question_seed(
+        tmp_path, monkeypatch, [_q(skill="Python"), _q(skill="SQL")], prune=True
+    )
+    Session = _run_question_seed(
+        tmp_path, monkeypatch, [_q(skill="Python")], prune=True
+    )
+
+    assert _banks(Session) == {("Python", "easy"): 1}
+
+
+def test_prune_keeps_banks_the_fixture_still_has(tmp_path, monkeypatch):
+    _run_question_seed(
+        tmp_path,
+        monkeypatch,
+        [_q(skill="Python"), _q(skill="Python", difficulty="hard")],
+        prune=True,
+    )
+    Session = _run_question_seed(
+        tmp_path,
+        monkeypatch,
+        [_q(skill="Python"), _q(skill="Python", difficulty="hard")],
+        prune=True,
+    )
+
+    assert _banks(Session) == {("Python", "easy"): 1, ("Python", "hard"): 1}
+
+
+def test_without_prune_a_partial_fixture_leaves_other_banks_alone(tmp_path, monkeypatch):
+    """The CLI loader stays additive so you can load one skill on its own."""
+    _run_question_seed(tmp_path, monkeypatch, [_q(skill="Python"), _q(skill="SQL")])
+    Session = _run_question_seed(tmp_path, monkeypatch, [_q(skill="Python")])
+
+    assert _banks(Session) == {("Python", "easy"): 1, ("SQL", "easy"): 1}
+
+
+def test_prune_removes_orphaned_answer_options(tmp_path, monkeypatch):
+    """Options must go with their questions, not linger as orphans."""
+    _run_question_seed(
+        tmp_path, monkeypatch, [_q(skill="Python"), _q(skill="SQL")], prune=True
+    )
+    Session = _run_question_seed(
+        tmp_path, monkeypatch, [_q(skill="Python")], prune=True
+    )
+
+    with Session() as s:
+        options = s.scalar(select(func.count()).select_from(models.AnswerOption))
+        questions = s.scalar(select(func.count()).select_from(models.Question))
+    assert questions == 1
+    assert options == 2
