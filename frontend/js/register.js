@@ -26,6 +26,59 @@ const salaryError = document.querySelector("#salaryError");
 const countError = document.querySelector('#countError');
 const shapeError = document.querySelector('#shapeError');
 
+// job titles
+const jobTitleSuggestions = document.querySelector("#jobTitleSuggestions");
+
+// job titles in database
+const jobTitles = [
+    "AI Software Engineer",
+    "Cloud Security Analyst",
+    "Cloud Security Engineer",
+    "Cloud Security Engineer, Senior",
+    "Consumer Insights Data Analyst",
+    "Data Analyst",
+    "Data Analyst (DOJ)",
+    "Data Analyst - Channel",
+    "Data Visualization Analyst",
+    "Data Visualization Analyst and Qlik Developer",
+    "DSCA Full Stack Front-End Developer Mid",
+    "Front End Software Engineer",
+    "Front End Web Developer",
+    "Front-End Developer",
+    "Front-End UI Developer",
+    "Front-End Web Developer, B2B Marketing Technology",
+    "Frontend Web Application Developer",
+    "Identity & Cloud Engineer",
+    "Junior Data Analyst & Developer",
+    "Lead Healthcare Data Analyst",
+    "Lead Software Engineer",
+    "Modern Software Developer, Senior",
+    "Next.js Front End Developer",
+    "Principal Software Engineer",
+    "Security Engineer, Infrastructure",
+    "Security Engineer, WWPS Solutions Architecture",
+    "Senior AWS Cloud Engineer",
+    "Senior Data Analyst",
+    "Senior Front End Developer",
+    "Senior Security Engineer II, Cloud Security",
+    "Senior Software Engineer",
+    "Senior Software Engineer (Radar / RF)",
+    "Senior Software Engineer, Salesforce Platforms",
+    "Software Engineer Skill Level 2",
+    "Sr Full Stack Software Engineer",
+    "Sr. Lead Software Engineer, Full Stack",
+    "Sr. Software Engineer, AI Native",
+    "Talent Management Data Analyst"
+].sort();
+
+// loops through the array
+jobTitles.forEach((job) => {
+    const option = document.createElement("option");
+
+    option.value = job;
+
+    jobTitleSuggestions.appendChild(option);
+});
 
 // location
 const locationSuggestions = document.querySelector("#locationSuggestions");

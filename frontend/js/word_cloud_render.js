@@ -132,7 +132,7 @@ function renderWordCloud(data, shape, playableSet) {
             const word = item[0];
             if (playableSet.has(word)) {
                 localStorage.setItem('selected_skill', word);
-                window.location.href = '../html/game_question_page.html' // TEMPORARY: TO BE UPDATED
+                window.location.href = '../html/game_dashboard.html' // UPDATED
             }
         },
 

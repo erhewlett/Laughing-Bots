@@ -209,10 +209,12 @@
                             type="text"
                             class="form-control"
                             id="jobTitleInput"
-                            placeholder="e.g. Frontend Engineer, Product Manager..."
+                            list="jobTitleSuggestions"
+                            placeholder="e.g. Front End Web Developer, Lead Software Engineer..."
                             aria-describedby="jobRequirementHelp"
                         >
 
+                        <datalist id="jobTitleSuggestions"></datalist>
                         <!-- Error message if error found -->
                         <div id="jobTitleError" class="jobRequirementError invalid-feedback"></div>
 
