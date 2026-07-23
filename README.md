@@ -20,15 +20,25 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-A pre-seeded `backend/jobhopper.db` ships with the repo, so the server runs
-right after install. It upgrades its own schema on startup, so an older local
-copy still works after you pull. To rebuild it from scratch, delete it and run
-the seed loaders:
+The database is built locally and is not committed. On startup the app creates
+`backend/jobhopper.db`, upgrades its schema, and loads any seed data it is
+missing, so a fresh clone works with no extra steps. It also reloads the quiz
+bank whenever `app/seed_data/questions_seed.json` changes and refreshes the job
+postings once they age past a week, which keeps them inside the 30-day window
+the word cloud requires. Set `AUTO_SEED=false` in `backend/.env` to turn that
+off.
+
+You can still run the loaders by hand, for example after editing a fixture:
+
+```bash
+python -m app.seed             # load the shared job postings
+python -m app.seed_questions   # load the quiz question bank
+```
+
+To start over, delete the database and restart the server:
 
 ```bash
 rm -f jobhopper.db jobhopper.db-wal jobhopper.db-shm
-python -m app.seed             # load the shared job postings
-python -m app.seed_questions   # load the quiz question bank
 ```
 
 API docs are available at `http://localhost:8000/docs`.

@@ -8,6 +8,12 @@ Reads app/seed_data/questions_seed.json (Angel's content). Idempotent: for each
 (skill, difficulty) bank present in the fixture, existing questions for that
 bank are deleted and re-inserted, so edits to the fixture take effect and
 re-running never duplicates. Skills are matched/created by name.
+
+Banks missing from the fixture are left alone by default, so you can load a
+trimmed fixture without wiping the rest of the bank. Pass prune=True to make
+the database match the fixture exactly instead, deleting banks the fixture no
+longer contains. Startup auto-seeding uses that, because it treats the fixture
+as the whole truth (see app/autoseed.py).
 """
 from __future__ import annotations
 
@@ -78,7 +84,39 @@ def validate_questions(items: list[dict]) -> None:
         seen[key] = i
 
 
-def seed_questions() -> None:
+def _delete_questions(db, q_ids) -> None:
+    """Remove questions and their options (FK enforcement is on, options first)."""
+    if not q_ids:
+        return
+    db.execute(
+        delete(models.AnswerOption).where(models.AnswerOption.question_id.in_(q_ids))
+    )
+    db.execute(delete(models.Question).where(models.Question.question_id.in_(q_ids)))
+
+
+def _prune_missing_banks(db, banks: set[tuple[int, str]]) -> int:
+    """Delete questions whose bank is no longer in the fixture.
+
+    Without this, dropping a skill from the fixture leaves its questions
+    behind forever: the reload only clears banks it is about to rewrite, so
+    /game/skills keeps advertising a quiz the fixture no longer defines.
+    """
+    stale = [
+        q_id
+        for q_id, skill_id, difficulty in db.execute(
+            select(
+                models.Question.question_id,
+                models.Question.skill_id,
+                models.Question.difficulty,
+            )
+        )
+        if (skill_id, difficulty) not in banks
+    ]
+    _delete_questions(db, stale)
+    return len(stale)
+
+
+def seed_questions(prune: bool = False) -> None:
     initialize_database(engine)
     items = json.loads(FIXTURE.read_text())["questions"]
 
@@ -104,18 +142,9 @@ def seed_questions() -> None:
                     models.Question.difficulty == item["difficulty"],
                 )
             ).all()
-            if q_ids:
-                # delete options first (FK enforcement is on), then questions
-                db.execute(
-                    delete(models.AnswerOption).where(
-                        models.AnswerOption.question_id.in_(q_ids)
-                    )
-                )
-                db.execute(
-                    delete(models.Question).where(
-                        models.Question.question_id.in_(q_ids)
-                    )
-                )
+            _delete_questions(db, q_ids)
+
+        pruned = _prune_missing_banks(db, banks) if prune else 0
         db.flush()
 
         # Pass 2: insert the questions and their options.
@@ -138,7 +167,8 @@ def seed_questions() -> None:
                 )
 
         db.commit()
-        print(f"Seeded {len(items)} questions across {len(banks)} banks.")
+        pruned_note = f", pruned {pruned} from removed banks" if pruned else ""
+        print(f"Seeded {len(items)} questions across {len(banks)} banks{pruned_note}.")
     finally:
         db.close()
 

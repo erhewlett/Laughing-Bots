@@ -16,6 +16,10 @@ class Settings(BaseSettings):
         return self.secret_key == self._DEFAULT_SECRET
     frontend_origins: str = "http://localhost:5500,http://127.0.0.1:5500"
 
+    # Load missing seed data on startup so a fresh clone (or a database left
+    # behind by a fixture change) comes up usable. See app/autoseed.py.
+    auto_seed: bool = True
+
     # JSearch (RapidAPI) - used to ingest real job postings into the seed DB.
     rapidapi_key: str = ""
     rapidapi_host: str = "jsearch.p.rapidapi.com"
