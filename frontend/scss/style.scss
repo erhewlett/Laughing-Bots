@@ -16,11 +16,21 @@
 // Home page
 @use 'pages/home';
 
+// Registration page
+@use 'pages/registration';
+
 // Authors Page
 @use 'pages/authors';
 
+// Game Rules Page
+@use 'pages/game_rules';
+
 // Q&A Game Page
 @use 'pages/game';
+
+// Word Cloud View Page
+@use 'pages/wordCloudRender';
+
 // cascadia code font import
 
 @import url('https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap');

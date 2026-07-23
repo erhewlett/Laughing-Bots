@@ -11879,8 +11879,12 @@ nav {
   margin-right: 3em;
 }
 
-.navbar-brand {
-  color: #E5E4E2;
+.home-brand,
+.home-brand:visited,
+.home-brand:hover,
+.home-brand:active {
+  color: #F7E4E0;
+  font-size: 22px;
 }
 
 .nav-link {
@@ -11960,6 +11964,14 @@ footer {
   background-color: #7E96C4;
 }
 
+.register-brand,
+.register-brand:visited,
+.register-brand:hover,
+.register-brand:active {
+  color: #F7E4E0;
+  font-size: 22px;
+}
+
 .theAuthor {
   margin-bottom: 3em;
   padding-top: 1em;
@@ -12031,11 +12043,63 @@ footer {
   font-size: 15px;
 }
 
+.register-brand,
+.register-brand:visited,
+.register-brand:hover,
+.register-brand:active {
+  color: #F7E4E0;
+  font-size: 22px;
+}
+
+.headLiner {
+  margin-bottom: 2em;
+  text-align: center;
+}
+
+.theBlock {
+  margin-bottom: 3em;
+  padding: 1em;
+  height: auto;
+  background: rgba(30, 64, 175, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  border-radius: 20px;
+}
+.theBlock .oneBlock {
+  padding: 1em;
+  background-color: #FAF9F6;
+  border-radius: 10px;
+  height: auto;
+}
+.theBlock .oneBlock .easyMode {
+  color: green;
+}
+.theBlock .oneBlock .mediumMode {
+  color: orange;
+}
+.theBlock .oneBlock .hardMode {
+  color: red;
+}
+.theBlock .oneBlock .modeTimers {
+  margin: 2em 0 2em 0;
+}
+
 .question-box {
   border: 3px solid #F7E4E0;
   aspect-ratio: 4/3;
   width: 100%;
   padding: 2rem;
+}
+
+.word-cloud-container {
+  border: 3px solid #F7E4E0;
+  padding: 2rem;
+  width: 1200px;
+  height: 1200px;
+  margin: 0 auto;
+  overflow: hidden;
 }
 
 /*# sourceMappingURL=style.css.map */

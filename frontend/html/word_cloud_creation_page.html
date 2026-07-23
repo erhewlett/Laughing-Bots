@@ -21,12 +21,12 @@
     <body>
 
         <!-- page header -->
-        <header class="bg-info p-3">
+        <header class="bg-primary p-3">
 
-            <div class="container-fluid">
-                <div class="bg-secondary text-dark p-2 text-center" style="max-width: 120px;">
+            <div class="fs-5 fw-semibold p-2 text-center" style="max-width: 120px; color: #F7E4E0;">
+                <a href="../html/user_info_view_page.html" class="text-decoration-none d-block" style="color: #F7E4E0;">
                     JobHopper
-                </div>
+                </a>
             </div>
 
         </header>
@@ -45,8 +45,8 @@
                 </div>
 
                 <div class="col-6 ms-auto">
-                    <div class="bg-secondary text-dark p-4 text-center rounded-4">
-                        Welcome {USER}!
+                    <div id="word-cloud-creation-welcome-message" class="bg-secondary text-dark p-4 text-center rounded-4">
+                        Welcome, Guest!
                     </div>
                 </div>
 
@@ -56,35 +56,21 @@
                 <!-- [WORD CLOUD INPUTS] -->
                 <form id="wordCloudForm">
                     <div class="card p-5 bg-dark bg-opacity-10 border-0 rounded-bottom-4">
-                        <!-- JOB TITLE INPUT FIELD -->
-                        <div class="mb-4">
-                            <!-- label -->
-                            <label for="jobTitleInput" class="form-label fw-semibold">Job Title:</label>
-                            <!-- input constraints -->
-                            <!-- note: this field is left as not required since the user will need to input at least one from (Job Title, Job Industry)-->
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="jobTitleInput"
-                                placeholder="e.g. Frontend Engineer, Product Manager..."
-                                aria-describedby="jobRequirementHelp"
-                            >
-                        </div>
 
-                        <!-- JOB INDUSTRY MENU -->
+                        <!-- JOB TITLE SELECTION MENU -->
                         <div class="mb-4">
-                            <!-- label -->
-                            <label for="jobIndustryInput" class="form-label fw-semibold">Job Industry:</label>
-                            <!-- input constraints -->
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="jobIndustryInput"
-                                placeholder="e.g. Healthcare"
-                                aria-describedby="jobRequirementHelp"
-                            >
-                            <div id="jobRequirementHelp" class="form-text text-muted mt-2">
-                                Please provide a job title, job industry, or both to create your word cloud.
+                            <label for="jobTitleInput" class="form-label fw-semibold">Job Title:</label>
+                            <div class="row">    
+                                <div class="col-12 col-md-3">
+                                    <select class="form-select" id="jobTitleInput" required>
+                                        <option value="" selected disabled>Select a job title...</option>
+
+                                        <option value="Cloud Security Engineer">Cloud Security Engineer</option>
+                                        <option value="Data Analyst">Data Analyst</option>
+                                        <option value="Frontend Developer">Frontend Developer</option>
+                                        <option value="Software Engineer">Software Engineer</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -146,9 +132,10 @@
                                     <select class="form-select" id="wordCloudShapeSelect" required>
                                         <option value="" selected disabled>Select a shape...</option>
 
-                                        <option value="placeholderShape1">Placeholder Shape 1</option>
-                                        <option value="placeholderShape2">Placeholder Shape 2</option>
-                                        <option value="placeholderShape3">Placeholder Shape 3</option>
+                                        <option value="circle">circle</option>
+                                        <option value="diamond">diamond</option>
+                                        <option value="square">square</option>
+                                        <option value="star">star</option>
                                     </select>
                                 </div>
                             </div>
@@ -171,11 +158,14 @@
         </main>
 
         <!-- footer -->
-        <footer class="bg-primary text-white text-center py-3 mt-5">
+        <footer class="bg-info text-white text-center py-3 mt-5">
             <div class="container">
                 Created by the Laughing Bots
             </div>
         </footer>
+        
+        <!-- script -->
+        <script type="module" src="../js/word_cloud_inputs.js"></script>
 
     </body>
 
