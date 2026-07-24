@@ -82,9 +82,13 @@ def test_recent_search_includes_min_salary(client, db_session):
     assert search["min_salary"] == 90000  # salary filter is reproducible from history
 
 
-def test_anonymous_wordcloud_saves_no_search(client, db_session):
+def test_anonymous_wordcloud_is_rejected(client, db_session):
+    """/wordcloud requires a user so every cloud lands in Recent Word Clouds.
+
+    It used to return 200 anonymously and silently record nothing.
+    """
     _seed_cloud(db_session)
-    assert client.post("/wordcloud", json={"job_title": "Data Analyst"}).status_code == 200
+    assert client.post("/wordcloud", json={"job_title": "Data Analyst"}).status_code == 401
     assert db_session.scalar(select(func.count()).select_from(models.Search)) == 0
 
 

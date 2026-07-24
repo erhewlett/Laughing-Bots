@@ -24,7 +24,9 @@ SKILL_ALIASES: dict[str, list[str]] = {
     "TypeScript": ["typescript"],
     "C++": [r"c\+\+"],
     "C#": [r"c#"],
-    "Go": ["golang"],
+    # Bare "go" is safe with the boundaries below: it rejects "Google",
+    # "going" and "Django" but still catches "experience in Go".
+    "Go": ["go", "golang"],
     "SQL": ["sql"],
     "PostgreSQL": ["postgresql", "postgres"],
     "MySQL": ["mysql"],
@@ -39,7 +41,7 @@ SKILL_ALIASES: dict[str, list[str]] = {
     "Git": ["git"],
     "React": ["react", r"react\.js", "reactjs"],
     "Node.js": [r"node\.js", "nodejs"],
-    "REST": ["restful", "rest api"],
+    "REST": ["restful", "rest apis?"],
     "GraphQL": ["graphql"],
     "CI/CD": ["ci/cd", "cicd"],
     "Machine Learning": ["machine learning"],
@@ -63,10 +65,27 @@ SKILL_ALIASES: dict[str, list[str]] = {
     "Django": ["django"],
 }
 
+def _alias_to_regex(alias: str) -> str:
+    """Let any space in an alias also match a hyphen or newline.
+
+    Postings write "machine-learning" as often as "machine learning".
+    """
+    return r"[\s-]+".join(alias.split(" "))
+
+
 # Pre-compile one word-boundary pattern per canonical skill.
+#
+# The trailing boundary rejects letters, "_", "+" and "#" but deliberately
+# ALLOWS digits, because a trailing digit is a version rather than a different
+# word: "C++17", "Python3" and "Java8" used to match nothing at all. Letters
+# stay excluded so "Java" still does not match "JavaScript" and "SQL" does not
+# match "PostgreSQL".
 _PATTERNS: dict[str, re.Pattern] = {
     skill: re.compile(
-        r"(?<![\w+#])(?:" + "|".join(aliases) + r")(?![\w+#])", re.IGNORECASE
+        r"(?<![\w+#])(?:"
+        + "|".join(_alias_to_regex(a) for a in aliases)
+        + r")(?![A-Za-z_+#])",
+        re.IGNORECASE,
     )
     for skill, aliases in SKILL_ALIASES.items()
 }
