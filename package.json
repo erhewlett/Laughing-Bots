@@ -14,5 +14,9 @@
   "dependencies": {
     "bootstrap": "^5.3.8",
     "sass": "^1.101.0"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1"
   }
 }
