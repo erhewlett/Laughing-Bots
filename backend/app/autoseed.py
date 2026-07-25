@@ -26,6 +26,8 @@ from __future__ import annotations
 
 import hashlib
 
+from datetime import datetime
+
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -41,6 +43,7 @@ from app.utils import utcnow_naive
 POSTING_MAX_AGE_DAYS = 7
 
 QUESTIONS_FINGERPRINT_KEY = "questions_fixture_sha256"
+POSTINGS_SEEDED_AT_KEY = "postings_seeded_at"
 
 
 def fixture_fingerprint(path=QUESTIONS_FIXTURE) -> str:
@@ -73,11 +76,26 @@ def questions_need_seeding(db: Session, fingerprint: str) -> bool:
 
 
 def postings_need_seeding(db: Session, max_age_days: int = POSTING_MAX_AGE_DAYS) -> bool:
-    """True when there are no postings, or the freshest one has gone stale."""
-    newest = db.scalar(select(func.max(models.JobPosting.date_posted)))
-    if newest is None:
+    """True when there are no postings, or the last seed load has gone stale.
+
+    Staleness is tracked against when `seed()` last ran, not against the
+    posting dates themselves. Reading the dates does not work in either
+    direction: `max(date_posted)` is pinned to "now" by any single fresh row
+    (one `ingest` run is enough) which suppressed the refresh forever, and
+    `min(date_posted)` is always ~20 days back because `seed()` deliberately
+    staggers its rows, which would re-seed on every single restart.
+    """
+    if db.scalar(select(func.count()).select_from(models.JobPosting)) == 0:
         return True
-    return (utcnow_naive() - newest).days >= max_age_days
+    loaded_at = get_meta(db, POSTINGS_SEEDED_AT_KEY)
+    if not loaded_at:
+        # Database predates this marker; refresh once to establish it.
+        return True
+    try:
+        loaded = datetime.fromisoformat(loaded_at)
+    except ValueError:
+        return True
+    return (utcnow_naive() - loaded).days >= max_age_days
 
 
 def autoseed() -> None:
@@ -102,6 +120,12 @@ def autoseed() -> None:
 
     if needs_postings:
         seed()
+        db = SessionLocal()
+        try:
+            set_meta(db, POSTINGS_SEEDED_AT_KEY, utcnow_naive().isoformat())
+            db.commit()
+        finally:
+            db.close()
     if needs_questions:
         # prune=True: startup treats the fixture as the whole truth, so a skill
         # dropped from the file stops being offered instead of lingering in a

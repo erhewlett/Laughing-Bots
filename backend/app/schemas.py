@@ -14,6 +14,15 @@ from app.services.security import (
     USERNAME_MIN,
 )
 
+# Largest value SQLite stores in an INTEGER column. Anything above this reaches
+# the driver and raises OverflowError, which surfaces as a 500 rather than a
+# validation error, so bound every client-supplied integer by it.
+MAX_DB_INT = 2**63 - 1
+
+# Matches the users.email column width; SQLite does not enforce VARCHAR limits,
+# so without this a 10,000-character email was accepted and stored.
+EMAIL_MAX = 255
+
 
 class SearchRequest(BaseModel):
     """User's job-search parameters for generating a word cloud."""
@@ -21,7 +30,9 @@ class SearchRequest(BaseModel):
     job_title: str | None = Field(default=None, max_length=150)
     industry: str | None = Field(default=None, max_length=100)
     location: str | None = Field(default=None, max_length=100)
-    min_salary: int | None = Field(default=None, ge=0)
+    # le= keeps oversized values inside SQLite's signed-64-bit range; without
+    # it the driver raised OverflowError and FastAPI returned a 500.
+    min_salary: int | None = Field(default=None, ge=0, le=MAX_DB_INT)
     word_count: int = Field(default=30, ge=5, le=100)
     # Alphanumeric-only (review #9): shape comes from a frontend dropdown, so
     # junk/markup can't flow through and get echoed back. Convert to a
@@ -48,7 +59,10 @@ class WordCloudResponse(BaseModel):
     role: str                 # the matched role the cloud was built from
     shape: str                # echoes the requested shape
     word_count: int           # echoes the requested max word count (drives rendering)
-    posting_count: int        # postings the cloud was computed over
+    # Postings matching the search. When min_salary is set this counts only
+    # postings whose salary is known to clear it; postings with no salary data
+    # still feed the cloud but are not reported as confirmed matches.
+    posting_count: int
     words: list[WordCloudWord]
 
 
@@ -69,9 +83,23 @@ class RegisterRequest(BaseModel):
         min_length=USERNAME_MIN, max_length=USERNAME_MAX, pattern=r"^[A-Za-z0-9]+$"
     )
     password: str = Field(min_length=PASSWORD_MIN, max_length=PASSWORD_MAX)
-    email: str | None = None
+    email: str | None = Field(default=None, max_length=EMAIL_MAX)
     name: str | None = Field(default=None, max_length=100)
-    
+
+    @field_validator("email")
+    @classmethod
+    def blank_email_is_none(cls, v: str | None) -> str | None:
+        """Treat "" / whitespace as "no email supplied".
+
+        The email column is unique, so an empty string inserted for the first
+        user made every later blank-email registration collide with it and
+        fail as "already in use".
+        """
+        if v is None:
+            return None
+        v = v.strip()
+        return v or None
+
     @field_validator("password")
     @classmethod
     def password_within_bcrypt_limit(cls, v: str) -> str:
@@ -138,12 +166,13 @@ class GameQuestions(BaseModel):
 
 
 class SubmittedAnswer(BaseModel):
-    question_id: int
-    option_id: int
+    # Bounded so oversized ids fail validation instead of overflowing SQLite.
+    question_id: int = Field(ge=1, le=MAX_DB_INT)
+    option_id: int = Field(ge=1, le=MAX_DB_INT)
 
 
 class GameSubmission(BaseModel):
-    quiz_id: int
+    quiz_id: int = Field(ge=1, le=MAX_DB_INT)
     difficulty: Difficulty
     answers: list[SubmittedAnswer]
 

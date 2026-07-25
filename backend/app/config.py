@@ -1,12 +1,39 @@
 """Application settings loaded from environment / .env file."""
+from pathlib import Path
+
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Anchor .env to the backend package instead of the process CWD. A relative
+# ".env" is resolved against wherever uvicorn was launched from, so starting
+# the app from the repo root silently fell back to the placeholder secret and
+# re-resolved the sqlite path to a brand new empty database.
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+_ENV_FILE = _BACKEND_DIR / ".env"
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=_ENV_FILE, extra="ignore")
 
-    database_url: str = "sqlite:///./jobhopper.db"
+    database_url: str = f"sqlite:///{_BACKEND_DIR / 'jobhopper.db'}"
     secret_key: str = "change-me-to-a-long-random-string"
+
+    @field_validator("database_url")
+    @classmethod
+    def _anchor_relative_sqlite_path(cls, value: str) -> str:
+        """Resolve a relative sqlite path against backend/ rather than the CWD.
+
+        `.env` ships `sqlite:///./jobhopper.db`, which otherwise points at a
+        different (empty) file depending on where the server was started from.
+        """
+        prefix = "sqlite:///"
+        if not value.startswith(prefix):
+            return value
+        path = value[len(prefix):]
+        # ":memory:" and absolute paths are already unambiguous.
+        if not path or path.startswith(("/", ":")):
+            return value
+        return f"{prefix}{(_BACKEND_DIR / path).resolve()}"
 
     _DEFAULT_SECRET = "change-me-to-a-long-random-string"
 
