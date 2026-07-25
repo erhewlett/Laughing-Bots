@@ -58,60 +58,88 @@ def _seed(
     return role
 
 
-def test_requires_title_or_industry(client):
-    assert client.post("/wordcloud", json={"word_count": 5}).status_code == 422
-
-
-def test_unknown_role_404(client, db_session):
+def test_requires_auth(client, db_session):
     _seed(db_session)
-    r = client.post("/wordcloud", json={"job_title": "Underwater Basket Weaver"})
+    # The cloud is a per-user feature: it records a search against the caller.
+    assert client.post("/wordcloud", json={"job_title": "Data Analyst"}).status_code == 401
+
+
+def test_requires_title_or_industry(client, auth_headers):
+    r = client.post("/wordcloud", json={"word_count": 5}, headers=auth_headers)
+    assert r.status_code == 422
+
+
+def test_unknown_role_404(client, db_session, auth_headers):
+    _seed(db_session)
+    r = client.post(
+        "/wordcloud", json={"job_title": "Underwater Basket Weaver"}, headers=auth_headers
+    )
     assert r.status_code == 404
 
 
-def test_happy_path_weights_normalized(client, db_session):
+def test_happy_path_weights_normalized(client, db_session, auth_headers):
     _seed(db_session, skills={"Python": 4, "SQL": 2, "AWS": 1})
-    r = client.post("/wordcloud", json={"job_title": "Data Analyst", "word_count": 5})
+    r = client.post(
+        "/wordcloud",
+        json={"job_title": "Data Analyst", "word_count": 5},
+        headers=auth_headers,
+    )
     assert r.status_code == 200
     body = r.json()
     assert body["role"] == "Data Analyst"
     assert body["words"][0]["weight"] == 100  # top skill normalized to 100
 
 
-def test_word_count_respected(client, db_session):
+def test_word_count_respected(client, db_session, auth_headers):
     # 7 skills available, ask for 5 (the schema minimum); expect exactly 5.
     _seed(
         db_session,
         skills={"Python": 7, "SQL": 6, "AWS": 5, "React": 4, "Java": 3, "Go": 2, "C++": 1},
     )
-    r = client.post("/wordcloud", json={"job_title": "Data Analyst", "word_count": 5})
+    r = client.post(
+        "/wordcloud",
+        json={"job_title": "Data Analyst", "word_count": 5},
+        headers=auth_headers,
+    )
     assert r.status_code == 200
     assert len(r.json()["words"]) == 5
+    # the requested word_count is echoed back so the render page can use it
+    assert r.json()["word_count"] == 5
 
 
-def test_shape_echoed(client, db_session):
+def test_shape_echoed(client, db_session, auth_headers):
     _seed(db_session)
-    r = client.post("/wordcloud", json={"job_title": "Data Analyst", "shape": "hexagon"})
+    r = client.post(
+        "/wordcloud",
+        json={"job_title": "Data Analyst", "shape": "hexagon"},
+        headers=auth_headers,
+    )
     assert r.json()["shape"] == "hexagon"
 
 
-def test_shape_rejects_markup(client):
-    r = client.post("/wordcloud", json={"job_title": "Data Analyst", "shape": "<script>"})
+def test_shape_rejects_markup(client, auth_headers):
+    r = client.post(
+        "/wordcloud",
+        json={"job_title": "Data Analyst", "shape": "<script>"},
+        headers=auth_headers,
+    )
     assert r.status_code == 422
 
 
-def test_literal_percent_does_not_match_everything(client, db_session):
+def test_literal_percent_does_not_match_everything(client, db_session, auth_headers):
     _seed(db_session)
     # "%" is escaped, so it must not act as a wildcard matching the role.
-    assert client.post("/wordcloud", json={"job_title": "%"}).status_code == 404
+    r = client.post("/wordcloud", json={"job_title": "%"}, headers=auth_headers)
+    assert r.status_code == 404
 
 
-def test_30_day_filter_excludes_stale(client, db_session):
+def test_30_day_filter_excludes_stale(client, db_session, auth_headers):
     _seed(db_session, days_old=45)  # every posting older than 30 days
-    r = client.post("/wordcloud", json={"job_title": "Data Analyst"})
+    r = client.post("/wordcloud", json={"job_title": "Data Analyst"}, headers=auth_headers)
     assert r.status_code == 422  # nothing fresh -> not enough data
 
 
-def test_job_title_resolves_via_posting_title(client, db_session):
+def test_job_title_resolves_via_posting_title(client, db_session, auth_headers):
     _seed(
         db_session,
         role_name="Frontend Developer",
@@ -119,15 +147,69 @@ def test_job_title_resolves_via_posting_title(client, db_session):
         titles=["Front End Software Engineer"] * 3,
         skills={"React": 3, "JavaScript": 2},
     )
-    r = client.post("/wordcloud", json={"job_title": "Front End Software Engineer"})
+    r = client.post(
+        "/wordcloud",
+        json={"job_title": "Front End Software Engineer"},
+        headers=auth_headers,
+    )
     assert r.status_code == 200
     assert r.json()["role"] == "Frontend Developer"
 
 
-def test_slash_skill_appears(client, db_session):
+def test_incidental_word_does_not_hijack_role(client, db_session, auth_headers):
+    """A stray word in a single posting title must not resolve the search.
+
+    "Marketing" appearing once in a Frontend Developer posting used to return
+    a full frontend-engineering cloud as though it were a marketing result.
+    """
+    _seed(
+        db_session,
+        role_name="Frontend Developer",
+        n_postings=3,
+        titles=["Front-End Web Developer, B2B, Marketing Technology", "Dev 2", "Dev 3"],
+        skills={"React": 3, "JavaScript": 2},
+    )
+    r = client.post("/wordcloud", json={"industry": "Marketing"}, headers=auth_headers)
+    assert r.status_code == 404
+
+
+def test_ambiguous_role_term_reports_candidates(client, db_session, auth_headers):
+    """"Engineer" matches two roles; picking one alphabetically was misleading."""
+    _seed(db_session, role_name="Software Engineer", skills={"Python": 2})
+    _seed(db_session, role_name="Cloud Security Engineer", skills={"AWS": 2})
+    r = client.post("/wordcloud", json={"job_title": "Engineer"}, headers=auth_headers)
+    assert r.status_code == 409
+    assert "Software Engineer" in r.json()["detail"]
+    assert "Cloud Security Engineer" in r.json()["detail"]
+
+
+def test_posting_count_excludes_unknown_salary(client, db_session, auth_headers):
+    """Postings with no salary still feed the cloud but are not counted as matches."""
+    _seed(db_session, n_postings=3, skills={"Python": 2})  # salaries left NULL
+    r = client.post(
+        "/wordcloud",
+        json={"job_title": "Data Analyst", "min_salary": 999_999},
+        headers=auth_headers,
+    )
+    assert r.status_code == 200
+    assert r.json()["words"]          # cloud still rendered
+    assert r.json()["posting_count"] == 0  # but nothing verifiably matched
+
+
+def test_oversized_min_salary_is_rejected_not_500(client, db_session, auth_headers):
+    _seed(db_session)
+    r = client.post(
+        "/wordcloud",
+        json={"job_title": "Data Analyst", "min_salary": 2**63},
+        headers=auth_headers,
+    )
+    assert r.status_code == 422
+
+
+def test_slash_skill_appears(client, db_session, auth_headers):
     _seed(db_session, skills={"CI/CD": 3, "Python": 1})
     names = [w["skill"] for w in client.post(
-        "/wordcloud", json={"job_title": "Data Analyst"}
+        "/wordcloud", json={"job_title": "Data Analyst"}, headers=auth_headers
     ).json()["words"]]
     assert "CI/CD" in names
 

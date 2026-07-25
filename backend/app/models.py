@@ -32,6 +32,7 @@ class User(Base):
     target_role: Mapped[str | None] = mapped_column(String(100))
     target_location: Mapped[str | None] = mapped_column(String(100))
 
+
     searches: Mapped[list["Search"]] = relationship(back_populates="user")
     roadmaps: Mapped[list["Roadmap"]] = relationship(back_populates="user")
     game_attempts: Mapped[list["GameAttempt"]] = relationship(back_populates="user")
@@ -213,3 +214,17 @@ class RoadmapStep(Base):
 
     roadmap: Mapped["Roadmap"] = relationship(back_populates="steps")
     skill: Mapped["Skill"] = relationship(back_populates="roadmap_steps")
+
+
+class AppMeta(Base):
+    """Tiny key/value scratch space for bookkeeping the app owns itself.
+
+    Currently holds the fingerprint of the question fixture, so startup can
+    tell "the bank changed, reload it" apart from "nothing to do" without
+    rewriting every question on every boot.
+    """
+
+    __tablename__ = "app_meta"
+
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    value: Mapped[str] = mapped_column(Text)

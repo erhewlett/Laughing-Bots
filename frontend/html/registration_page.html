@@ -23,9 +23,9 @@
         <header class="bg-info p-3">
 
             <div class="container-fluid">
-                <div class="bg-secondary text-dark p-2 text-center" style="max-width: 120px;">
+                <a class="navbar-brand register-brand" href="../html/main.html">
                     JobHopper
-                </div>
+                </a>
             </div>
 
         </header>
@@ -38,14 +38,71 @@
             </h2>
 
             <!-- registration card -->
-            <form>
+            <form id="registrationForm" novalidate>
                 <div class="card p-5 bg-dark bg-opacity-10 border-0 rounded-top-4">
                     <!-- [USER INPUTS]-->
+                    <!-- FIRST NAME INPUT FIELD -->
+                    <div class="mb-4">
+                        <!-- label -->
+                        <label for="firstNameInput" class="form-label fw-semibold">First Name:</label>
+                        <span class="text-muted small">(Optional)</span>
+                        
+
+                        <!-- input constraints -->
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="firstNameInput"
+                            minlength="4"
+                            maxlength="16"
+                            pattern="[a-zA-Z0-9]+"
+                            aria-describedby="firstNameHelp"
+                            required
+                        >
+                        <!-- Error message if error found -->
+                        <div class="invalid-feedback" id="firstNameError"></div>
+                        <div class="valid-feedback" id="firstNameGood"></div>
+                        
+                        <!-- accessibility text -->
+                        <div id="firstNameHelp" class="form-text text-muted">
+                            First name must be between 4 and 16 characters and contain only letters and numbers.
+                        </div>
+                        
+                    </div>
+
+                    <!-- LAST NAME INPUT FIELD -->
+                    <div class="mb-4">
+                        <!-- label -->
+                        <label for="lastNameInput" class="form-label fw-semibold">Last Name:</label>
+                        <span class="text-muted small">(Optional)</span>
+                        <!-- input constraints -->
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="lastNameInput"
+                            minlength="4"
+                            maxlength="16"
+                            pattern="[a-zA-Z0-9]+"
+                            aria-describedby="lastNameHelp"
+                            required
+                        >
+                        <!-- Error message if error found -->
+                        <div class="invalid-feedback" id="lastNameError"></div>
+                        <div class="valid-feedback" id="lastNameGood"></div>
+                        
+                        <!-- accessibility text -->
+                        <div id="lastNameHelp" class="form-text text-muted">
+                            Last name must be between 4 and 16 characters and contain only letters and numbers.
+                        </div>
+                        
+                    </div>
+
                     <!-- USERNAME INPUT FIELD -->
                     <div class="mb-4">
                         <!-- label -->
                         <label for="usernameInput" class="form-label fw-semibold">Create a username:</label>
-
+                        <span class="text-danger small">(Required)</span>
+    
                         <!-- input constraints -->
                         <input
                             type="text"
@@ -56,12 +113,16 @@
                             pattern="[a-zA-Z0-9]+"
                             aria-describedby="usernameHelp"
                             required
-                            >
+                        >
+                        <!-- Error message if error found -->
+                        <div class="invalid-feedback" id="usernameError"></div>
+                        <div class="valid-feedback" id="usernameGood"></div>
                         
                         <!-- accessibility text -->
                         <div id="usernameHelp" class="form-text text-muted">
                             Username must be between 4 and 16 characters and contain only letters and numbers.
                         </div>
+                        
                     </div>
 
                     <!-- CONFIRM USERNAME INPUT FIELD -->
@@ -78,14 +139,18 @@
                             maxlength="16"
                             pattern="[a-zA-Z0-9]+"
                             required
-                            >
+                        >
+                        <!-- Error message if error found -->
+                        <div class="invalid-feedback" id="confirmUsernameError"></div>
+                        <div class="valid-feedback" id="confirmUsernameGood"></div>
+
                     </div>
 
                     <!-- PASSWORD INPUT FIELD-->
                     <div class="mb-4">
                         <!-- label -->
                         <label for="passwordInput" class="form-label fw-semibold">Create a password:</label>
-
+                        <span class="text-danger small">(Required)</span>
                         <!-- input constraints -->
                         <input
                             type="password"
@@ -96,6 +161,10 @@
                             aria-describedby="passwordHelp"
                             required
                         >
+                        <!-- Error message if error found -->
+                        <div class="invalid-feedback" id="passwordError"></div>
+                        <div class="valid-feedback" id="passwordGood"></div>
+
 
                         <!-- accessibility text -->
                         <div id="passwordHelp" class="form-text text-muted">
@@ -117,6 +186,10 @@
                             maxlength="20"
                             required
                         >
+                        <!-- Error message if error found -->
+                        <div class="invalid-feedback" id="confirmPasswordError"></div>
+                        <div class="valid-feedback" id="confirmPasswordGood"></div>
+
                     </div>
                 </div>
             
@@ -128,44 +201,42 @@
                     <div class="mb-4">
                         <!-- label -->
                         <label for="jobTitleInput" class="form-label fw-semibold">Job Title:</label>
+                        <span class="text-danger small">(Required)</span>
+
                         <!-- input constraints -->
                         <!-- note: this field is left as not required since the user will need to input at least one from (Job Title, Job Industry)-->
                         <input
                             type="text"
                             class="form-control"
                             id="jobTitleInput"
-                            placeholder="e.g. Frontend Engineer, Product Manager..."
+                            list="jobTitleSuggestions"
+                            placeholder="e.g. Front End Web Developer, Lead Software Engineer..."
                             aria-describedby="jobRequirementHelp"
                         >
-                    </div>
 
-                    <!-- JOB INDUSTRY INPUT FIELD -->
-                    <div class="mb-4">
-                        <!-- label -->
-                        <label for="jobIndustryInput" class="form-label fw-semibold">Job Industry:</label>
-                        <!-- input constraints -->
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="jobIndustryInput"
-                            placeholder="e.g. Healthcare"
-                            aria-describedby="jobRequirementHelp"
-                        >
-                        <div id="jobRequirementHelp" class="form-text text-muted mt-2">
-                            Please provide a job title, job industry, or both to create your word cloud.
-                        </div>
+                        <datalist id="jobTitleSuggestions"></datalist>
+                        <!-- Error message if error found -->
+                        <div id="jobTitleError" class="jobRequirementError invalid-feedback"></div>
+
                     </div>
 
                     <!-- LOCATION INPUT -->
                     <div class="mb-4">
                         <label for="locationInput" class="form-label fw-semibold">Location:</label>
+                        <span class="text-muted small">(Optional)</span>
                         <input
                             type="text"
                             class="form-control"
                             id="locationInput"
+                            list="locationSuggestions"
                             pattern="[a-zA-Z0-9, \-.']+"
                             placeholder="e.g. Atlanta, GA"
                         >
+
+                        <datalist id="locationSuggestions"></datalist>
+                        <!-- Error message if error found -->
+                        <div class="invalid-feedback" id="locationError"></div>
+
                     </div>
 
                     <!-- DESIRED MIN SALARY INPUT GROUP -->
@@ -182,9 +253,17 @@
                                         class="form-control"
                                         id="minimumSalaryInput"
                                         placeholder="e.g 30000"
-                                        pattern="[0-9]+"
+                                        min="30000"
+                                        max="500000"
+                                        step="10000"
                                         aria-label="Minimum Salary"
                                     >
+                                </div>
+                                <div id="salaryError" class="invalid-feedback"></div>
+                                <div class="form-text">
+
+                                    Salary must be between $30,000 and $500,000 in increments of $10,000.
+
                                 </div>
                             </div>
                         </div>
@@ -193,6 +272,7 @@
                     <!-- KEYWORD AMOUNT MENU -->
                     <div class="mb-4">
                         <label for="wordCountSelect" class="form-label fw-semibold">How many keywords would you like to see in the word cloud?</label>
+                        <span class="text-danger small">(Required)</span>
                         <div class="row">    
                             <div class="col-12 col-md-3">
                                 <select class="form-select" id="wordCountSelect" required>
@@ -203,6 +283,8 @@
                                     <option value="30">30</option>
                                     <option value="40">40</option>
                                 </select>
+                                <div class="invalid-feedback" id="countError"></div>
+
                             </div>
                         </div>
                     </div>
@@ -210,15 +292,19 @@
                     <!-- WORD CLOUD SHAPE MENU -->
                     <div class="mb-4">
                         <label for="wordCloudShapeSelect" class="form-label fw-semibold">Place select a shape for the word cloud:</label>
+                        <span class="text-danger small">(Required)</span>
                         <div class="row">
                             <div class="col-12 col-md-3">
                                 <select class="form-select" id="wordCloudShapeSelect" required>
                                     <option value="" selected disabled>Select a shape...</option>
 
-                                    <option value="placeholderShape1">Placeholder Shape 1</option>
-                                    <option value="placeholderShape2">Placeholder Shape 2</option>
-                                    <option value="placeholderShape3">Placeholder Shape 3</option>
+                                    <option value="circle">Circle</option>
+                                    <option value="diamond">Diamond</option>
+                                    <option value="square">Square</option>
+                                    <option value="star">Star</option>
                                 </select>
+                                <div class="invalid-feedback" id="shapeError"></div>
+
                             </div>
                         </div>
                     </div>
@@ -246,7 +332,7 @@
                 Created by the Laughing Bots
             </div>
         </footer>
-
+        <script src="../js/register.js"></script>
     </body>
 
 </html>

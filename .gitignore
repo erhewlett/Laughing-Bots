@@ -19,14 +19,12 @@ frontend/style.css.map
 *.env
 !.env.example
 
-# Databases (built locally)
+# Databases (built locally on first run, see app/autoseed.py)
 *.db
 *.db-wal
 *.db-shm
 *.sqlite
 *.sqlite3
-# except the seeded demo database, committed so teammates can run without seeding
-!backend/jobhopper.db
 
 # macOS
 .DS_Store

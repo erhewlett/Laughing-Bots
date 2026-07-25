@@ -21,10 +21,10 @@
     <body>
 
         <!-- page header -->
-        <header class="bg-info p-3">
+        <header class="bg-primary p-3">
 
             <div class="container-fluid">
-                <div class="bg-secondary text-dark p-2 text-center" style="max-width: 120px;">
+                <div class="fs-5 fw-semibold p-2 text-center" style="max-width: 120px; color: #F7E4E0;">
                     JobHopper
                 </div>
             </div>
@@ -43,8 +43,8 @@
 
                 <div class="col-8 d-flex flex-column align-items-center">
 
-                    <div class="col-9 bg-info fw-semibold p-4 text-center rounded-4 mb-4 ms-5">
-                        Welcome {USER}!
+                    <div id="user-welcome-message" class="col-9 bg-info fw-semibold p-4 text-center rounded-4 mb-4 ms-5">
+                        Welcome, Guest!
                     </div>
 
                     <button
@@ -57,6 +57,14 @@
 
                 </div>
                 
+            </div>
+            
+            <!-- [ERROR MESSAGE FOR USER] -->
+            <div id="user-info-error-message" class="alert alert-danger text-center m-5" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span id="user-info-error-text"></span>
+                    <button type="button" class="btn-close" onclick="document.getElementById('user-info-error-message').style.display='none'"></button>
+                </div>
             </div>
 
             <!-- user info -->
@@ -76,19 +84,10 @@
 
                             <tbody>
                                 <tr>
-                                    <td class="p-3 text-center">Placeholder Keyword 1</td>
-                                    <td class="p-3 text-center">Placeholder Game Score 1</td>
+                                    <td class="p-3 text-center" id="recent-game-keyword">No available data yet</td>
+                                    <td class="p-3 text-center" id="recent-game-score">No available data yet</td>
                                 </tr>
 
-                                <tr>
-                                    <td class="p-3 text-center">Placeholder Keyword 2</td>
-                                    <td class="p-3 text-center">Placeholder Game Score 2</td>
-                                </tr>
-
-                                <tr>
-                                    <td class="p-3 text-center">Placeholder Keyword 3</td>
-                                    <td class="p-3 text-center">Placeholder Game Score 3</td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -101,53 +100,53 @@
                         <table class="table table-hover table-striped-columns align-middle">
                             <thead class="table-light">
                                 <tr>
-                                    <th scope="col" class="p-3 text-center w-50">Word Cloud Date</th>
-                                    <th scope="col" class="p-3 text-center w-50">View Word Cloud</th>
+                                    <th scope="col" class="p-3 text-center w-50">Word Cloud Role</th>
+                                    <th scope="col" class="p-3 text-center w-50">Regenerate Word Cloud</th>
                                 </tr>
                             </thead> 
                         
 
                             <tbody>
-                                <tr>
-                                    <td class="p-3 text-center">Placeholder Date 1</td>
+                                <tr id="recent-word-cloud-row-1">
+                                    <td class="p-3 text-center" id="recent-word-cloud-role-1">N/A</td>
                                     <td>
                                         <div class="d-flex justify-content-center">
                                             <button
-                                                id="view-first-recent-word-cloud-btn"
+                                                id="rerun-word-cloud-btn-1"
                                                 type="button"
                                                 class="btn btn-secondary view-recent-word-cloud-btn fw-semibold text-dark rounded-4 px-5"
                                             >
-                                            View
+                                            Search Again
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
 
-                                <tr>
-                                    <td class="p-3 text-center">Placeholder Data 2</td>
+                                <tr id="recent-word-cloud-row-2">
+                                    <td class="p-3 text-center" id="recent-word-cloud-role-2">N/A</td>
                                     <td>
                                         <div class="d-flex justify-content-center">
                                             <button
-                                                id="view-second-recent-word-cloud-btn"
+                                                id="rerun-word-cloud-btn-2"
                                                 type="button"
                                                 class="btn btn-secondary view-recent-word-cloud-btn fw-semibold text-dark rounded-4 px-5"
                                             >
-                                            View
+                                            Search Again
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
 
-                                <tr>
-                                    <td class="p-3 text-center">Placeholder Date 3</td>
+                                <tr id="recent-word-cloud-row-3">
+                                    <td class="p-3 text-center" id="recent-word-cloud-role-3">N/A</td>
                                     <td>
                                         <div class="d-flex justify-content-center">
                                             <button
-                                                id="view-third-recent-word-cloud-btn"
+                                                id="rerun-word-cloud-btn-3"
                                                 type="button"
                                                 class="btn btn-secondary view-recent-word-cloud-btn fw-semibold text-dark rounded-4 px-5"
                                             >
-                                            View
+                                            Search Again
                                             </button>
                                         </div>
                                     </td>
@@ -161,16 +160,22 @@
 
         </main>
 
+        <!-- sign out -->
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <a href="#" id="sign-out-link" class="text-decoration-underline text-muted">Sign Out</a>
+            </div>
+        </div>
 
         <!-- footer -->
-        <footer class="bg-primary text-white text-center py-3 mt-5">
+        <footer class="bg-info text-white text-center py-3 mt-4">
             <div class="container">
                 Created by the Laughing Bots
             </div>
         </footer>
 
-        
-
+        <!-- JS SCRIPT -->
+        <script src="../js/user_info_view_page.js"></script>
     </body>
 
 </html>
