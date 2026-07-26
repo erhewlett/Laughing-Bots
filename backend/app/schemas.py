@@ -118,12 +118,19 @@ class RegisterRequest(BaseModel):
         return v
 
 
+# A sanity bound on login fields. Deliberately far above the real 4-16 and
+# 8-20 policies: the point is to stop an unbounded string reaching bcrypt, not
+# to enforce the policy here. Anything a real user could type still returns 401
+# rather than 422, so the policy stays unleaked.
+LOGIN_FIELD_MAX = 1024
+
+
 class LoginRequest(BaseModel):
     # Login only checks presence (requirement: username/password not empty).
     # The 8-20 policy lives on register, not here, so a wrong-length attempt
     # returns 401, not 422, and does not leak the policy.
-    username: str = Field(min_length=1)
-    password: str = Field(min_length=1)
+    username: str = Field(min_length=1, max_length=LOGIN_FIELD_MAX)
+    password: str = Field(min_length=1, max_length=LOGIN_FIELD_MAX)
 
 
 class TokenResponse(BaseModel):
@@ -203,7 +210,10 @@ class SubmittedAnswer(BaseModel):
 class GameSubmission(BaseModel):
     quiz_id: int = Field(ge=1, le=MAX_DB_INT)
     difficulty: Difficulty
-    answers: list[SubmittedAnswer]
+    # A quiz is 10 questions. submit_game already rejects any answer set that
+    # is not exactly the questions it served, but that check runs after the
+    # whole list is parsed, so bound it here too. Generous on purpose.
+    answers: list[SubmittedAnswer] = Field(max_length=100)
     # How long the player took, sent by the quiz page's timer. Optional so an
     # older client that omits it still submits successfully; when present it is
     # persisted so the history and rank pages can show finish times.

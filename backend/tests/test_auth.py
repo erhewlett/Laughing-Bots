@@ -196,3 +196,33 @@ def test_validation_error_detail_names_the_field(client):
 
     assert r.status_code == 422
     assert r.json()["detail"].startswith("password:")
+
+
+def test_login_rejects_unbounded_input(client):
+    """A huge password must not reach bcrypt.
+
+    Register bounds both fields; login only checked presence, so a multi-
+    megabyte string was accepted and hashed.
+    """
+    r = client.post(
+        "/auth/login", json={"username": "someone", "password": "x" * 100_000}
+    )
+    assert r.status_code == 422
+
+
+def test_login_does_not_leak_the_password_policy(client):
+    """A wrong-length but plausible password still returns 401, not 422.
+
+    The 8-20 policy lives on register. Answering 422 here would tell an
+    attacker the policy without them holding an account.
+    """
+    client.post(
+        "/auth/register", json={"username": "policy", "password": "password123"}
+    )
+    short = client.post("/auth/login", json={"username": "policy", "password": "x"})
+    long_ = client.post(
+        "/auth/login", json={"username": "policy", "password": "y" * 200}
+    )
+
+    assert short.status_code == 401
+    assert long_.status_code == 401

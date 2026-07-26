@@ -440,3 +440,19 @@ def test_submit_reports_not_recorded_when_anonymous(client, db_session):
 
     assert body["score"] == 3          # still graded
     assert body["recorded"] is False   # but not persisted
+
+
+def test_submit_rejects_an_oversized_answer_list(client, db_session):
+    """Bound the list before the exact-question-set check parses all of it."""
+    _seed_questions(db_session, n=3)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    answers = [{"question_id": 1, "option_id": 1} for _ in range(500)]
+    r = client.post(
+        "/game/Python/submit",
+        json={
+            "quiz_id": quiz["quiz_id"],
+            "difficulty": "easy",
+            "answers": answers,
+        },
+    )
+    assert r.status_code == 422
