@@ -26,7 +26,7 @@ import json
 import random
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session, selectinload
 
@@ -120,12 +120,19 @@ def _claim_quiz(db: Session, session_id: int) -> bool:
 
 
 @router.get("/skills", response_model=list[SkillQuizzes])
-def list_quiz_skills(db: Session = Depends(get_db)) -> list[SkillQuizzes]:
+def list_quiz_skills(
+    response: Response, db: Session = Depends(get_db)
+) -> list[SkillQuizzes]:
     """Skills that have quiz questions, with the difficulties available for each.
 
     Declared before the /{skill_name:path} route so "skills" is not captured as
     a skill name. Lets the frontend make only playable word-cloud words clickable.
+
+    Changes only when the question bank changes, so it is browser-cacheable.
+    The word cloud response now also carries a `playable` flag per word, which
+    removes the need to call this at all just to decide what is clickable.
     """
+    response.headers["Cache-Control"] = "public, max-age=300"
     rows = db.execute(
         select(models.Skill.skill_name, models.Question.difficulty)
         .join(models.Question, models.Question.skill_id == models.Skill.skill_id)
@@ -299,6 +306,10 @@ def submit_game(
             status_code=409, detail="This quiz has already been submitted."
         )
 
+    # The 0..10000 display score, computed server-side so a stored attempt and
+    # the number the player saw can never disagree.
+    score_normalized = round(score / total * 10_000) if total else 0
+
     # Save only for logged-in players; anonymous play stores no attempt.
     if user is not None:
         db.add(
@@ -308,6 +319,7 @@ def submit_game(
                 difficulty=quiz.difficulty,
                 score=score,
                 max_score=total,
+                time_taken_seconds=submission.elapsed_seconds,
             )
         )
     db.commit()
@@ -321,4 +333,7 @@ def submit_game(
         total_questions=total,
         mastered=mastered,
         results=results,
+        score_normalized=score_normalized,
+        elapsed_seconds=submission.elapsed_seconds,
+        recorded=user is not None,
     )
