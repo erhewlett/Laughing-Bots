@@ -369,3 +369,74 @@ def test_logged_in_submit_saves_attempt(client, db_session):
     assert len(attempts) == 1
     assert attempts[0].score == 10 and attempts[0].max_score == 10
     assert attempts[0].difficulty == "easy"
+
+
+# --- normalized score / elapsed time ----------------------------------------
+
+
+def test_submit_returns_normalized_score(client, db_session):
+    """The 0..10000 display score comes from the server, not just the client.
+
+    Keeps a stored attempt and the number the player saw from disagreeing.
+    """
+    _seed_questions(db_session, n=10)
+    body = _play(client, "Python", "easy").json()
+
+    assert body["score"] == 10
+    assert body["score_normalized"] == 10_000
+
+
+def test_normalized_score_scales_with_partial_score(client, db_session):
+    _seed_questions(db_session, n=10)
+    body = _play(client, "Python", "easy", wrong=4).json()
+
+    assert body["score"] == 6
+    assert body["score_normalized"] == 6_000
+
+
+def test_submit_rejects_negative_elapsed_seconds(client, db_session):
+    _seed_questions(db_session, n=3)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    answers = [
+        {
+            "question_id": q["question_id"],
+            "option_id": next(
+                o for o in q["options"] if o["option_text"] == "opt0"
+            )["option_id"],
+        }
+        for q in quiz["questions"]
+    ]
+    r = client.post(
+        "/game/Python/submit",
+        json={
+            "quiz_id": quiz["quiz_id"],
+            "difficulty": "easy",
+            "answers": answers,
+            "elapsed_seconds": -5,
+        },
+    )
+    assert r.status_code == 422
+
+
+def test_quiz_skills_is_cacheable(client, db_session):
+    _seed_questions(db_session, n=1)
+    assert "max-age" in client.get("/game/skills").headers["cache-control"]
+
+
+def test_submit_reports_recorded_when_logged_in(client, db_session):
+    _seed_questions(db_session, n=3)
+    h = {"Authorization": f"Bearer {_token(client)}"}
+    assert _play(client, "Python", "easy", headers=h).json()["recorded"] is True
+
+
+def test_submit_reports_not_recorded_when_anonymous(client, db_session):
+    """Anonymous play is graded but not saved, and now says so.
+
+    A caller that forgot its Authorization header used to get a clean 200 and
+    silently store nothing.
+    """
+    _seed_questions(db_session, n=3)
+    body = _play(client, "Python", "easy").json()
+
+    assert body["score"] == 3          # still graded
+    assert body["recorded"] is False   # but not persisted

@@ -154,6 +154,9 @@ def generate_wordcloud(
     db: Session = Depends(get_db),
     user: models.User = Depends(security.get_current_user),
 ) -> WordCloudResponse:
+    # Read the username before any commit below. The session expires loaded
+    # instances on commit, so reading it afterwards would re-SELECT the user.
+    username = user.username
     role = _match_role(db, req)
     if role is None:
         raise HTTPException(
@@ -173,22 +176,20 @@ def generate_wordcloud(
     )
 
     # Document frequency per skill: # of distinct postings (matching all the
-    # search filters) that mention the skill. JobSkill has one row per
-    # (job, skill), so a count works.
+    # search filters) that mention the skill. JobSkill's primary key is
+    # (job_id, skill_id), so one posting can contribute at most one row per
+    # skill and a plain COUNT(*) is already distinct by construction. Dropping
+    # the redundant COUNT(DISTINCT) removes a dedup pass from both the
+    # projection and the sort on the hottest query in the app.
+    df_count = func.count().label("df")
     df_rows = db.execute(
-        select(
-            models.Skill.skill_name,
-            func.count(func.distinct(models.JobSkill.job_id)).label("df"),
-        )
+        select(models.Skill.skill_name, df_count)
         .join(models.JobSkill, models.JobSkill.skill_id == models.Skill.skill_id)
         .join(models.JobPosting, models.JobPosting.job_id == models.JobSkill.job_id)
         .where(*filters)
         .group_by(models.Skill.skill_name)
         # secondary sort by name so tied document-frequencies are deterministic
-        .order_by(
-            func.count(func.distinct(models.JobSkill.job_id)).desc(),
-            models.Skill.skill_name,
-        )
+        .order_by(func.count().desc(), models.Skill.skill_name)
         .limit(req.word_count)
     ).all()
 
@@ -199,6 +200,18 @@ def generate_wordcloud(
             detail="Not enough job information to generate a word cloud.",
         )
 
+    # Which of these skills can actually start a quiz. One small query here
+    # saves the cloud page a whole round trip to GET /game/skills, which it
+    # currently awaits before this request even starts.
+    playable = set(
+        db.scalars(
+            select(models.Skill.skill_name)
+            .join(models.Question, models.Question.skill_id == models.Skill.skill_id)
+            .where(models.Skill.skill_name.in_([row.skill_name for row in df_rows]))
+            .distinct()
+        )
+    )
+
     # sqrt-scale document frequencies, normalized so the top skill = 100.
     max_sqrt = math.sqrt(df_rows[0].df)  # rows are ordered by df desc
     words = [
@@ -206,6 +219,7 @@ def generate_wordcloud(
             skill=name,
             count=df,
             weight=max(1, round(math.sqrt(df) / max_sqrt * 100)),
+            playable=name in playable,
         )
         for name, df in df_rows
     ]
@@ -230,4 +244,5 @@ def generate_wordcloud(
         word_count=req.word_count,
         posting_count=posting_count or 0,
         words=words,
+        username=username,
     )
