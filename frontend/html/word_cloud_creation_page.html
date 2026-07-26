@@ -52,6 +52,10 @@
 
             </div>
 
+            <!-- [ERROR MESSAGE FOR USER] -->
+            <div id="word-cloud-inputs-error-message" class="alert alert-danger text-center mx-5" style="display: none;"></div>
+
+
             <div class="bg-primary text-center text-white p-4 rounded-top-4">Generate a Tools and Skills Word Cloud</div>
                 <!-- [WORD CLOUD INPUTS] -->
                 <form id="wordCloudForm">
@@ -75,15 +79,19 @@
                         </div>
 
                         <!-- LOCATION INPUT -->
-                        <div class="mb-4">
+                        <div class="mb-4 col-12 col-md-5">
                             <label for="locationInput" class="form-label fw-semibold">Location:</label>
                             <input
-                                type="text"
                                 class="form-control"
+                                list="locationOptions"
                                 id="locationInput"
-                                pattern="[a-zA-Z0-9, \-.']+"
-                                placeholder="e.g. Atlanta, GA"
+                                placeholder="Select a location..."
+                                autocomplete="off"
+                                aria-label="Location"
                             >
+                            <datalist id="locationOptions">
+                                <!-- to be populated dynamically based on locations from backend -->
+                            </datalist>
                         </div>
 
                         <!-- DESIRED SALARY RANGE INPUT GROUP -->
