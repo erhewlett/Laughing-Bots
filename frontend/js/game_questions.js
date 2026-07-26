@@ -391,6 +391,8 @@ document.addEventListener("DOMContentLoaded", () => {
         clearInterval(timerInterval);
 
         try {
+            // save token
+            const token = localStorage.getItem('token');
             const response = await fetch(
                 `${API_BASE_URL}/game/${encodeURIComponent(chosenSkill)}/submit`,
                 {
@@ -401,7 +403,10 @@ document.addEventListener("DOMContentLoaded", () => {
                             "application/json",
 
                         Accept:
-                            "application/json"
+                            "application/json",
+                        
+                        Authorization:
+                            `Bearer ${token}`
                     },
 
                     body: JSON.stringify({
