@@ -14,7 +14,6 @@ if (theSkill) {
     skillDisplay.textContent = theSkill;
 
     // Remove it so it won't be there after a refresh
-    localStorage.removeItem("selected_skill");
     
 } else {
 
@@ -22,98 +21,24 @@ if (theSkill) {
 
 }
 
-/* Loads the question file and filters questions
-
- * by the selected skill and difficulty.
-
-*/
-
-async function selectDifficulty(difficulty) {
-
-    try {
-
-        if (!theSkill) {
-
-            throw new Error("No skill was selected.");
-
-        }
-
-        // Path to questions data
-        const response = await fetch(SEED_API);
-
-        // if the response is NOT okay
-        if (!response.ok) {
-            // then give an error stating:
-            throw new Error(
-
-                `Could not load questions. Status: ${response.status}`
-
-            );
-
-        }
-
-        // represents the entire JSON object
-        const questionData = await response.json();
-        
-        // we only want questions that match up with the skills in the database
-        const matchingQuestions = questionData.questions.filter((question) => {
-
-            const skillMatches = question.skill.toLowerCase() === theSkill.toLowerCase();
-
-            const difficultyMatches = question.difficulty.toLowerCase() === difficulty.toLowerCase();
-
-            return skillMatches && difficultyMatches;
-
-        });
-
-        if (matchingQuestions.length === 0) {
-
-            throw new Error(
-
-                `No ${difficulty} questions were found for ${theSkill}.`
-
-            );
-
-        }
-
-        // Store the difficulty for the quiz page
-
-        localStorage.setItem("selectedDifficulty", difficulty);
-
-        // Store the matching questions temporarily
-
-        localStorage.setItem("quizQuestions", JSON.stringify(matchingQuestions));
-
-        // Send the user to the questions
-        window.location.href = "../html/game_question_page.html";
-
-    } catch (error) {
-
-        console.error("Question loading error:", error);
-
-        alert(error.message);
-
-    }
-
-}
 
 easyBtn.addEventListener("click", () => {
 
-    selectDifficulty("easy");
+    startGame("easy");
     console.log("easy difficulty selected");
 
 });
 
 mediumBtn.addEventListener("click", () => {
 
-    selectDifficulty("medium");
+    startGame("medium");
     console.log("medium difficulty selected");
 
 });
 
 hardBtn.addEventListener("click", () => {
 
-    selectDifficulty("hard");
+    startGame("hard");
     console.log("hard difficulty selected");
 
 });
@@ -148,12 +73,11 @@ async function startGame(difficulty) {
     try {
 
         const skillPath = encodeURIComponent(theSkill);
+        const difficultyPath = encodeURIComponent(difficulty);
 
         const requestURL =
 
-            `${API_BASE_URL}/game/${skillPath}` +
-
-            `?difficulty=${encodeURIComponent(difficulty)}`;
+            `${API_BASE_URL}/game/${skillPath}` + `?difficulty=${difficultyPath}`;
 
         const response = await fetch(requestURL, {
 
@@ -167,15 +91,52 @@ async function startGame(difficulty) {
 
         });
 
-        const responseData = await response.json();
+
+        let responseData;
+        
+        try {
+
+            responseData = await response.json();
+
+        } catch {
+
+            responseData = null;
+
+        }
 
         if (!response.ok) {
 
             throw new Error(
 
-                responseData.detail ||
+                responseData?.detail ||
 
                 `The quiz could not be loaded. Status: ${response.status}`
+
+            );
+
+        }
+
+        if (!responseData?.quiz_id) {
+
+            throw new Error(
+
+                "The server returned an invalid quiz response."
+
+            );
+
+        }
+
+        if (
+
+            !Array.isArray(responseData.questions) ||
+
+            responseData.questions.length === 0
+
+        ) {
+
+            throw new Error(
+
+                `No ${difficulty} questions were found for ${theSkill}.`
 
             );
 
@@ -228,6 +189,11 @@ async function startGame(difficulty) {
         sessionStorage.setItem("selected_difficulty", responseData.difficulty);
 
         sessionStorage.setItem("selected_skill", responseData.skill);
+
+        //remove theSKill after the quiz has successfully loaded and has been 
+        // copied into sessionStorage:
+        localStorage.removeItem("selected_skill");
+
 
         window.location.href = "../html/game_question_page.html";
 

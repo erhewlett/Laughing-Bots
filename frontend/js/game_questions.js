@@ -37,8 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
      *
      * GET /game/{skill}?difficulty=easy
      *
-     * inside sessionStorage under the key "current_quiz".
+     * inside sessionStorage under the key "current_quiz"d
+     * which will read the quiz
      */
+
     const currentQuiz = JSON.parse(sessionStorage.getItem("current_quiz"));
 
     if (!currentQuiz || !Array.isArray(currentQuiz.questions)) {
