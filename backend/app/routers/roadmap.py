@@ -148,11 +148,12 @@ def update_step(
     user: models.User = Depends(security.get_current_user),
     db: Session = Depends(get_db),
 ) -> RoadmapStepOut:
+    # Someone else's step answers exactly like a step that does not exist.
+    # Returning 403 here and 404 above told an attacker which sequential step
+    # ids are real, which is an enumeration oracle over other users' roadmaps.
     step = db.get(models.RoadmapStep, step_id)
-    if step is None:
+    if step is None or step.roadmap.user_id != user.user_id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Step not found.")
-    if step.roadmap.user_id != user.user_id:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "Not your roadmap.")
     step.status = req.status
     db.commit()
     db.refresh(step)

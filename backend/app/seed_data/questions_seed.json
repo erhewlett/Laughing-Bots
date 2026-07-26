@@ -18453,7 +18453,7 @@
       "question_text": "Why shouldn't Flask's built-in development server be used in production?",
       "options": [
         {
-          "text": "It is single-threaded/not optimized by default, lacks robustness, security hardening, and scalability features that production WSGI servers like Gunicorn provide",
+          "text": "It is built for development convenience and lacks the robustness, security hardening, and scalability of a production WSGI server such as Gunicorn",
           "correct": true
         },
         {
@@ -18496,10 +18496,10 @@
     {
       "skill": "Flask",
       "difficulty": "hard",
-      "question_text": "How does `url_for()` typically handle cache-busting for static files across deployments?",
+      "question_text": "How is cache-busting for static files normally handled with `url_for()` in Flask?",
       "options": [
         {
-          "text": "It can append a query parameter based on the file's last-modified timestamp when a static file endpoint is used, helping browsers fetch updated versions",
+          "text": "Flask adds nothing on its own; you pass your own value, such as url_for('static', filename='app.css', v=version)",
           "correct": true
         },
         {

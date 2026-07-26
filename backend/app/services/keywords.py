@@ -24,9 +24,24 @@ SKILL_ALIASES: dict[str, list[str]] = {
     "TypeScript": ["typescript"],
     "C++": [r"c\+\+"],
     "C#": [r"c#"],
-    # Bare "go" is safe with the boundaries below: it rejects "Google",
-    # "going" and "Django" but still catches "experience in Go".
-    "Go": ["go", "golang"],
+    # A bare "go" alias was not safe. The boundaries below reject "Google",
+    # "going" and "Django", but not the ordinary English verb: "ready to go
+    # the extra mile", "go-to-market", "go-getter" all scored as the language.
+    # On the live ingest path that puts a phantom top skill in the cloud with
+    # no question bank behind it, which renders as an unclickable word.
+    # Require the language name or an adjacent context word instead.
+    # The trailing boundary rejects letters, so plurals need an explicit "s?".
+    "Go": [
+        "golang",
+        "go developers?",
+        "go engineers?",
+        "go programming",
+        "go language",
+        "go lang",
+        "go modules?",
+        "go routines?",
+        "goroutines?",
+    ],
     "SQL": ["sql"],
     "PostgreSQL": ["postgresql", "postgres"],
     "MySQL": ["mysql"],

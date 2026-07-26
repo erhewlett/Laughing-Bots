@@ -54,6 +54,11 @@ def validate_questions(items: list[dict]) -> None:
     seen: dict[tuple[str, str, str], int] = {}
     for i, item in enumerate(items):
         where = _where(item, i)
+        # Checked here so a bank missing this key fails with a message naming
+        # the entry, rather than a bare KeyError from the dedupe key below.
+        skill = (item.get("skill") or "").strip()
+        if not skill:
+            raise ValueError(f"{where} has no skill.")
         if item.get("difficulty") not in VALID_DIFFICULTIES:
             raise ValueError(
                 f"{where} has invalid difficulty {item.get('difficulty')!r}; "
@@ -78,7 +83,7 @@ def validate_questions(items: list[dict]) -> None:
                 f"found {correct_count}."
             )
 
-        key = (item["skill"].strip().lower(), item["difficulty"], text.lower())
+        key = (skill.lower(), item["difficulty"], text.lower())
         if key in seen:
             raise ValueError(f"{where} duplicates question {seen[key]} in the same bank.")
         seen[key] = i

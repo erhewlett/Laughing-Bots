@@ -242,3 +242,46 @@ def test_prune_removes_orphaned_answer_options(tmp_path, monkeypatch):
         questions = s.scalar(select(func.count()).select_from(models.Question))
     assert questions == 1
     assert options == 2
+
+
+def test_seed_questions_names_the_entry_missing_a_skill(tmp_path, monkeypatch):
+    """A bank with no skill must name the entry, not raise a bare KeyError.
+
+    Every other validation failure names the offending question; this one used
+    to surface as KeyError('skill') with no indication of which entry was bad.
+    """
+    with pytest.raises(ValueError) as exc:
+        _run_question_seed(
+            tmp_path,
+            monkeypatch,
+            [
+                {
+                    "difficulty": "easy",
+                    "question_text": "What is a list?",
+                    "options": [
+                        {"text": "a", "correct": True},
+                        {"text": "b", "correct": False},
+                    ],
+                }
+            ],
+        )
+    assert "skill" in str(exc.value).lower()
+
+
+def test_seed_questions_rejects_blank_skill(tmp_path, monkeypatch):
+    with pytest.raises(ValueError):
+        _run_question_seed(
+            tmp_path,
+            monkeypatch,
+            [
+                {
+                    "skill": "   ",
+                    "difficulty": "easy",
+                    "question_text": "?",
+                    "options": [
+                        {"text": "a", "correct": True},
+                        {"text": "b", "correct": False},
+                    ],
+                }
+            ],
+        )
