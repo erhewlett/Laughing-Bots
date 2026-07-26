@@ -49,3 +49,15 @@ def client(db_session):
     finally:
         client.close()
         app.dependency_overrides.clear()
+
+
+@pytest.fixture()
+def auth_headers(client):
+    """Authorization header for a freshly registered user.
+
+    /wordcloud and the game/roadmap routes all require a logged-in user.
+    """
+    creds = {"username": "tester1", "password": "password123"}
+    client.post("/auth/register", json=creds)
+    token = client.post("/auth/login", json=creds).json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
