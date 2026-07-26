@@ -1,11 +1,142 @@
 // import colors file
 @use '../colors';
 
+// question block
+// .questionBlock {
+//     justify-content: center;
+//     align-items: center;
+// }
 // question box
 
-.question-box {
-    border: 3px solid #F7E4E0;  // border color is sandy pink
-    aspect-ratio: 4 / 3;    // keeps box a rectangle (4:3 aspect ratio)
-    width: 100%;
-    padding: 2rem
+.game_question_page {
+    
+    .question-box {
+        border: 3px solid #F7E4E0;  // border color is sandy pink
+        aspect-ratio: 4 / 3;    // keeps box a rectangle (4:3 aspect ratio)
+        width: 100%;
+        padding: 2rem
+    }
+
+    .game-set-up {
+
+        justify-content: center;
+        
+    }
+
+    p {
+        margin-bottom: 0;
+        color: greenyellow;
+
+    }
+
+
+    .clock {
+
+        position: relative;
+        margin: 1em;
+        padding: 0.5em;
+        display: flex;
+        background-color: colors.$blue;
+        height: 7em;
+        width: 13em;
+        border-radius: 6px;
+        
+        .back-drop {
+            
+            position: relative;
+            background-color: colors.$off-black;
+            height: 6em;
+            width: 100%;
+            place-content: center;
+            text-align: center;
+
+            .time-left {
+
+                margin-bottom: 0;
+                font-size: 30px;
+                color: greenyellow;
+            }
+
+        }
+        
+    }
+
+    .mode {
+
+        position: relative;
+        margin: 1em;
+        padding: 0.5em;
+        display: flex;
+        background-color: colors.$blue;
+        height: 7em;
+        width: 13em;
+        border-radius: 6px;
+
+        .back-drop {
+            
+            position: relative;
+            background-color: colors.$off-black;
+            height: 6em;
+            width: 100%;
+            place-content: center;
+            text-align: center;
+
+            .time-left {
+
+                margin-bottom: 0;
+                font-size: 30px;
+                color: greenyellow;
+            }
+
+        }
+
+
+    }
+
+    .points {
+
+        position: relative;
+        margin: 1em;
+        padding: 0.5em;
+        display: flex;
+        background-color: colors.$blue;
+        height: 7em;
+        width: 13em;
+        border-radius: 6px;
+        
+        .back-drop {
+            
+            position: relative;
+            background-color: colors.$off-black;
+            height: 6em;
+            width: 100%;
+            place-content: center;
+            text-align: center;
+
+            .points-added {
+
+                margin-bottom: 0;
+                font-size: 25px;
+                color: greenyellow;
+            }
+
+            .score-percentage {
+                margin-bottom: 0;
+                font-size: 15px;
+                color: greenyellow;
+            }
+
+        }
+
+    }
+
+    // centers answers in its flexbox
+    #choices-container {
+        display: flex;
+        align-items: center;
+    }
+
+    label {
+        width: 70%;
+    }
 }

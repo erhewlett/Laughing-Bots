@@ -12169,11 +12169,99 @@ footer {
   margin: 2em 0 2em 0;
 }
 
-.question-box {
+.game_question_page .question-box {
   border: 3px solid #F7E4E0;
   aspect-ratio: 4/3;
   width: 100%;
   padding: 2rem;
+}
+.game_question_page .game-set-up {
+  justify-content: center;
+}
+.game_question_page p {
+  margin-bottom: 0;
+  color: greenyellow;
+}
+.game_question_page .clock {
+  position: relative;
+  margin: 1em;
+  padding: 0.5em;
+  display: flex;
+  background-color: #8BA6E9;
+  height: 7em;
+  width: 13em;
+  border-radius: 6px;
+}
+.game_question_page .clock .back-drop {
+  position: relative;
+  background-color: #353839;
+  height: 6em;
+  width: 100%;
+  place-content: center;
+  text-align: center;
+}
+.game_question_page .clock .back-drop .time-left {
+  margin-bottom: 0;
+  font-size: 30px;
+  color: greenyellow;
+}
+.game_question_page .mode {
+  position: relative;
+  margin: 1em;
+  padding: 0.5em;
+  display: flex;
+  background-color: #8BA6E9;
+  height: 7em;
+  width: 13em;
+  border-radius: 6px;
+}
+.game_question_page .mode .back-drop {
+  position: relative;
+  background-color: #353839;
+  height: 6em;
+  width: 100%;
+  place-content: center;
+  text-align: center;
+}
+.game_question_page .mode .back-drop .time-left {
+  margin-bottom: 0;
+  font-size: 30px;
+  color: greenyellow;
+}
+.game_question_page .points {
+  position: relative;
+  margin: 1em;
+  padding: 0.5em;
+  display: flex;
+  background-color: #8BA6E9;
+  height: 7em;
+  width: 13em;
+  border-radius: 6px;
+}
+.game_question_page .points .back-drop {
+  position: relative;
+  background-color: #353839;
+  height: 6em;
+  width: 100%;
+  place-content: center;
+  text-align: center;
+}
+.game_question_page .points .back-drop .points-added {
+  margin-bottom: 0;
+  font-size: 25px;
+  color: greenyellow;
+}
+.game_question_page .points .back-drop .score-percentage {
+  margin-bottom: 0;
+  font-size: 15px;
+  color: greenyellow;
+}
+.game_question_page #choices-container {
+  display: flex;
+  align-items: center;
+}
+.game_question_page label {
+  width: 70%;
 }
 
 .word-cloud-container {
