@@ -225,7 +225,10 @@ registrationForm.addEventListener("submit", async (e)=> {
     const userData = {
         username: userNameField.value.trim(),
         password: passwordField.value,
-        email: emailInput.value.trim() || null, // not in use
+        // [CHANGED] (to match with what the backend expects)
+        // old line: email: emailInput.value.trim() || null,
+        // new line
+        email: "", // not in use
         name: nameInput || null
 
     };
