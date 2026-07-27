@@ -120,7 +120,9 @@ function renderWordCloudHistory(searches) {
         // check that data exists for current index in the array
         if (searches && searches[i]) {
             row.style.display = 'table-row';
-            roleCell.innerText = searches[i].job_title;
+            // a search saved from the industry field has no job_title, which
+            // rendered as an empty cell
+            roleCell.innerText = searches[i].job_title || searches[i].industry || 'Saved search';
             // TODO: implement word cloud regeneration (with word_cloud_view_page)
             btn.onclick = () => handleRerunSearch(searches[i]);
         } else {

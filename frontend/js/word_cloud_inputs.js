@@ -47,6 +47,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         // save to localStorage
         localStorage.setItem('word_cloud_parameters', JSON.stringify(formData));
 
+        // submitting the form is the one thing that means "run a new search".
+        // the view page only calls the backend when it sees this, so a reload
+        // over there redraws instead of recording another search.
+        localStorage.setItem('word_cloud_pending', '1');
+
         // redirect to word cloud view/render page
         window.location.href = '../html/word_cloud_view_page.html';
     });

@@ -194,6 +194,13 @@ class QuizSession(Base):
     skill_id: Mapped[int] = mapped_column(ForeignKey("skills.skill_id"), index=True)
     difficulty: Mapped[str] = mapped_column(String(10))
     question_ids: Mapped[str] = mapped_column(Text)  # JSON-encoded list of ids
+    # Answers locked in one at a time by POST /game/{skill}/answer, as a JSON
+    # object of {"question_id": option_id}. Recording the choice server-side is
+    # what makes it safe to tell the player whether they were right straight
+    # away: the pick is already committed, so knowing the answer afterwards
+    # cannot change it. Submit then grades these same choices, so the running
+    # score the player watched and the final score always agree.
+    answers: Mapped[str] = mapped_column(Text, default="{}", server_default="{}")
     completed: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), index=True
