@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Page elements
     const timeLeftInGame = document.querySelector(".time-left");
-    const playersChoice = document.querySelector(".difficulty-chosen");
+    // [CHANGED] ".difficulty-chosen" TO "#difficulty-chosen" (to match the HTML class)
+    const playersChoice = document.querySelector("#difficulty-chosen");
     const pointsInGame = document.querySelector(".points-added");
     const totalPercentage = document.querySelector(".score-percentage");
     const questionText = document.querySelector("#question-text");
@@ -221,7 +222,8 @@ document.addEventListener("DOMContentLoaded", () => {
              * This creates a span automatically if
              * one is not already present.
              */
-            if (choiceText) {
+            // [CHANGED] - added ! (only create a new span element if choiceText does not exist)
+            if (!choiceText) {
                 choiceText =
                     document.createElement("span");
 
