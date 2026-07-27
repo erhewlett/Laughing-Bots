@@ -175,6 +175,12 @@ registrationForm.addEventListener("submit", async (e)=> {
     // localStroage set up
     localStorage.setItem("word_cloud_parameters", JSON.stringify(wordCloudGeneration));
 
+    // a brand new account inherits nothing from whoever used this browser
+    // last. The parameters just set above are this user's own; the cached
+    // cloud and any half-finished search are not.
+    localStorage.removeItem('word_cloud_results');
+    localStorage.removeItem('word_cloud_pending');
+
     // combine first and last name to store name variable if not empty
     if (!firstNameField.value === "" && !lastNameField.value === "") {
         const nameInput = `${firstNameField.value.trim()} ${lastNameField.value.trim()}`.trim();
