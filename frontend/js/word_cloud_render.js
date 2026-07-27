@@ -3,6 +3,7 @@
 import { getUsername } from "./utils.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log("Current stored token:", localStorage.getItem('token'));
     const username = await getUsername()
 
     // get data from local storage
