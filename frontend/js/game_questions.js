@@ -4,6 +4,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const MAX_POINTS = 10000;
 
     /*
+     * The page's state rules, loaded as a plain script just before this one.
+     * Kept in their own file so the tests exercise the same rules the page
+     * runs rather than a restatement of them.
+     */
+    const flow = window.gameFlow;
+
+    if (!flow) {
+        console.error(
+            "game_flow.js did not load, so the quiz page cannot run."
+        );
+
+        return;
+    }
+
+    /*
      * How long the correct answer stays on screen before the next
      * question loads.
      *
@@ -47,9 +62,51 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    const answerLabels = choicesContainer.querySelectorAll("label");
+    /*
+     * The markup ships four answer rows. A question with more options than
+     * that used to have the extras silently dropped, which on a question
+     * whose correct option fell off the end made it unanswerable. Every
+     * question in the bank has exactly four today, so instead of relying on
+     * that staying true, the first row is kept as a template and more rows
+     * are cloned from it when a question needs them.
+     */
+    const answerRowTemplate = choicesContainer.querySelector("label");
 
-    const answerInputs = choicesContainer.querySelectorAll("input[name='answerChoice']");
+    if (!answerRowTemplate) {
+        displayGameError("The answer choices could not be found on this page.");
+
+        submitAnswerBtn.disabled = true;
+
+        return;
+    }
+
+    let answerLabels = choicesContainer.querySelectorAll("label");
+
+    let answerInputs = choicesContainer.querySelectorAll("input[name='answerChoice']");
+
+    /**
+     * Makes sure the page has at least `needed` answer rows, cloning the
+     * template for any that are missing, then refreshes the cached lists.
+     */
+    function ensureAnswerRows(needed) {
+        while (choicesContainer.querySelectorAll("label").length < needed) {
+            const row = answerRowTemplate.cloneNode(true);
+
+            const input = row.querySelector("input[name='answerChoice']");
+
+            if (!input) {
+                break;
+            }
+
+            input.checked = false;
+
+            choicesContainer.appendChild(row);
+        }
+
+        answerLabels = choicesContainer.querySelectorAll("label");
+
+        answerInputs = choicesContainer.querySelectorAll("input[name='answerChoice']");
+    }
 
     /*
      * The game dashboard stores the response from:
@@ -60,9 +117,19 @@ document.addEventListener("DOMContentLoaded", () => {
      * which will read the quiz
      */
 
-    const currentQuiz = JSON.parse(sessionStorage.getItem("current_quiz"));
+    /*
+     * A malformed value here used to throw straight out of the listener,
+     * which left the page on its placeholder question with nothing said
+     * about why. Anything unreadable is treated as "no quiz".
+     */
+    const currentQuiz = readCurrentQuiz();
 
-    if (!currentQuiz || !Array.isArray(currentQuiz.questions)) {
+    if (
+        !currentQuiz ||
+        !Array.isArray(currentQuiz.questions) ||
+        currentQuiz.questions.length === 0 ||
+        typeof currentQuiz.difficulty !== "string"
+    ) {
         displayGameError(
             "No active quiz was found. Return to the dashboard and select a difficulty."
         );
@@ -71,7 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return;
     }
-    
 
     const quizId = currentQuiz.quiz_id;
     const chosenSkill = currentQuiz.skill;
@@ -123,25 +189,28 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentQuestionIndex = 0;
     let remainingTime = currentSettings.timeInSeconds;
     let timerInterval = null;
-    let gameFinished = false;
-    let submissionInProgress = false;
+
+    /*
+     * What the page is doing right now. One value at a time, so what a
+     * Submit click means is never ambiguous. See js/game_flow.js for the
+     * rules and for the bugs the old set of overlapping booleans caused.
+     */
+    let phase = flow.PHASE.ANSWERING;
 
     /*
      * True while the correct answer is on screen between questions.
-     * Freezes the countdown (see FEEDBACK_DELAY_MS).
+     * Freezes the countdown (see FEEDBACK_DELAY_MS) and swallows clicks.
+     * Not a phase: it can sit on top of grading.
      */
     let feedbackShowing = false;
 
     /*
-     * True once the completed quiz has been sent for grading.
-     *
-     * Kept apart from submissionInProgress, which is also raised while a
-     * single answer is being graded. Sharing one flag meant a clock that ran
-     * out mid-grade found it already set, skipped submitting, and then the
-     * grading call returned to a finished game and stopped too, so the quiz
-     * was never sent at all.
+     * Whether the submission currently in flight (or the one that just
+     * failed) is a timed-out one. A retry has to send the same flag: a
+     * partial quiz re-sent as a normal submission is rejected with
+     * "Submit exactly the questions served for this quiz."
      */
-    let finalSubmitStarted = false;
+    let pendingTimedOut = false;
 
     /*
      * The running 0-10,000 score, as graded by the backend one answer
@@ -187,21 +256,61 @@ document.addEventListener("DOMContentLoaded", () => {
      * Enable the Submit button when the player selects
      * one of the answer choices.
      */
-    answerInputs.forEach((input) => {
-        input.addEventListener("change", () => {
-            if (!gameFinished && !submissionInProgress) {
-                submitAnswerBtn.disabled = false;
+    /*
+     * One delegated listener rather than one per radio, so answer rows
+     * cloned for a question with more than four options are covered
+     * without having to re-bind anything.
+     */
+    choicesContainer.addEventListener("change", (event) => {
+        if (!event.target.matches("input[name='answerChoice']")) {
+            return;
+        }
 
-                clearGameError();
-            }
-        });
+        if (flow.acceptsAnswerSelection(phase, feedbackShowing)) {
+            submitAnswerBtn.disabled = false;
+
+            clearGameError();
+        }
     });
 
     /*
-     * Run submitCurrentAnswer() whenever the Submit
-     * button is clicked.
+     * The Submit button does one of two different jobs depending on where
+     * the quiz is: grade the answer on screen, or re-send a completed quiz
+     * whose submission failed. It used to be wired straight to
+     * submitCurrentAnswer, so the retry path re-entered the answer flow and
+     * left the quiz permanently unsubmittable (see js/game_flow.js).
      */
-    submitAnswerBtn.addEventListener("click", submitCurrentAnswer);
+    submitAnswerBtn.addEventListener("click", handleSubmitClick);
+
+    function handleSubmitClick() {
+        const action = flow.submitClickAction(phase, feedbackShowing);
+
+        if (action === "grade-answer") {
+            submitCurrentAnswer();
+
+            return;
+        }
+
+        if (action === "retry-submit") {
+            clearGameError();
+
+            submitCompletedQuiz({ timedOut: pendingTimedOut });
+        }
+    }
+
+    /**
+     * The quiz the difficulty page stored, or null if there isn't a
+     * readable one.
+     */
+    function readCurrentQuiz() {
+        try {
+            return JSON.parse(sessionStorage.getItem("current_quiz"));
+        } catch (error) {
+            console.error("The stored quiz could not be read:", error);
+
+            return null;
+        }
+    }
 
     /**
      * Displays the current question and answer choices.
@@ -220,6 +329,12 @@ document.addEventListener("DOMContentLoaded", () => {
          * Display the question text.
          */
         questionText.textContent = question.question_text;
+
+        /*
+         * Make sure there is a row for every option before any of them are
+         * filled in, so none can be dropped for want of somewhere to go.
+         */
+        ensureAnswerRows(question.options.length);
 
         /*
          * Clear the previous radio-button selection.
@@ -260,7 +375,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const currentInput = answerInputs[index];
 
+            /*
+             * ensureAnswerRows() above guarantees a row per option, so this
+             * only guards against a malformed cloned row.
+             */
             if (!currentLabel || !currentInput) {
+                console.error("An answer choice had nowhere to render.");
+
                 return;
             }
 
@@ -334,10 +455,10 @@ document.addEventListener("DOMContentLoaded", () => {
         submitAnswerBtn.disabled = true;
 
         /*
-         * The previous submission is complete, so
-         * the next answer may now be selected.
+         * The previous answer is graded and done with, so this question is
+         * open for one.
          */
-        submissionInProgress = false;
+        phase = flow.PHASE.ANSWERING;
     }
 
     /**
@@ -345,16 +466,8 @@ document.addEventListener("DOMContentLoaded", () => {
      */
     async function submitCurrentAnswer() {
         /*
-         * Prevent answers after the game ends, prevent double-click
-         * submissions, and ignore clicks while the correct answer is
-         * still being shown.
-         */
-        if (gameFinished || submissionInProgress || feedbackShowing) {
-            return;
-        }
-
-        /*
-         * Find the selected radio input.
+         * Find the selected radio input. handleSubmitClick has already
+         * established that this is the right thing to be doing.
          */
         const selectedAnswer = choicesContainer.querySelector(
             "input[name='answerChoice']:checked"
@@ -376,7 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
          * inputs so the user cannot double-click or
          * change the answer during submission.
          */
-        submissionInProgress = true;
+        phase = flow.PHASE.GRADING;
         submitAnswerBtn.disabled = true;
 
         setAnswerInputsDisabled(true);
@@ -397,8 +510,17 @@ document.addEventListener("DOMContentLoaded", () => {
          * The completed quiz is still submitted in full at the end.
          * Grading below is what moves the score during play; the
          * final submission is what records the attempt.
+         *
+         * recordAnswer refuses a second answer for a question already
+         * answered. The backend rejects duplicates outright, so recording
+         * one would make the whole quiz unsubmittable.
          */
-        submittedAnswers.push(answer);
+        if (!flow.recordAnswer(submittedAnswers, answer)) {
+            console.warn(
+                "Ignoring a repeat answer for question",
+                answer.question_id
+            );
+        }
 
         renderProgress(submittedAnswers.length);
 
@@ -410,12 +532,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         /*
          * Grading is a round trip, so the clock can run out while it
-         * is in flight. If it did, stop here rather than loading
-         * another question on top of the expiry message. The
-         * countdown is frozen while feedback is on screen, so this
-         * only covers the request itself.
+         * is in flight. If it did, the expiry has already submitted what
+         * was answered and moved the phase on, so stop here rather than
+         * loading another question on top of the expiry message. The
+         * countdown is frozen while feedback is on screen, so this only
+         * covers the request itself.
          */
-        if (gameFinished) {
+        if (phase !== flow.PHASE.GRADING) {
             return;
         }
 
@@ -604,13 +727,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 `All ${totalQuestions} questions must be answered before submission.`
             );
 
-            submissionInProgress = false;
+            phase = flow.PHASE.ANSWERING;
 
             return;
         }
 
-        submissionInProgress = true;
-        finalSubmitStarted = true;
+        /*
+         * Remembered so a retry re-sends the same kind of submission. A
+         * partial quiz re-sent without timed_out is rejected outright.
+         */
+        pendingTimedOut = timedOut;
+
+        phase = flow.PHASE.SUBMITTING;
 
         /*
          * Stop the timer while the quiz is submitted.
@@ -668,26 +796,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 error
             );
 
+            /*
+             * The send failed, so the quiz is not on its way after all. The
+             * answers are all still here, so the player can re-send them:
+             * the phase says the Submit button now retries the submission
+             * instead of grading another answer. Getting that wrong is what
+             * used to leave a quiz permanently unsubmittable.
+             */
+            phase = flow.PHASE.SUBMIT_FAILED;
+
             displayGameError(
-                error.message ||
-                "The quiz could not be submitted."
+                `${error.message || "The quiz could not be submitted."} ` +
+                "Press Submit to try again."
             );
 
-            submissionInProgress = false;
-
-            /*
-             * The send failed, so the quiz is not on its way after all.
-             */
-            finalSubmitStarted = false;
-
-            /*
-             * Allow another go at submitting, but only while the game
-             * is still live. Re-enabling the button after the clock
-             * expired would let the player carry on answering.
-             */
-            if (!gameFinished) {
-                submitAnswerBtn.disabled = false;
-            }
+            submitAnswerBtn.disabled = false;
         }
     }
 
@@ -696,8 +819,7 @@ document.addEventListener("DOMContentLoaded", () => {
      * the graded quiz result.
      */
     function finishCompletedGame(result) {
-        gameFinished = true;
-        submissionInProgress = false;
+        phase = flow.PHASE.FINISHED;
 
         clearInterval(timerInterval);
 
@@ -859,15 +981,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /**
-     * Updates the points and percentage displayed
-     * on the game page.
-     */
-    function updateScoreDisplay(correctAnswers, questionCount) {
-
-        renderScore(calculateTheScore(correctAnswers, questionCount));
-    }
-
-    /**
      * Moves the progress bar to show how much of the quiz is done.
      *
      * The markup carried a bar that nothing ever updated, so it sat
@@ -913,10 +1026,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         timerInterval = setInterval(() => {
             /*
-             * The clock does not run while the player is being shown
-             * the correct answer between questions.
+             * The clock does not run while the player is being shown the
+             * correct answer between questions, nor once the quiz is on its
+             * way to be graded. It does keep running while a single answer
+             * is graded - that round trip is the player's time.
              */
-            if (feedbackShowing) {
+            if (!flow.clockRuns(phase, feedbackShowing)) {
                 return;
             }
 
@@ -965,18 +1080,17 @@ document.addEventListener("DOMContentLoaded", () => {
     function handleTimeExpired() {
         clearInterval(timerInterval);
 
-        gameFinished = true;
-
         submitAnswerBtn.disabled = true;
 
         setAnswerInputsDisabled(true);
 
         /*
          * Only skip when the completed quiz is genuinely already on its
-         * way. An answer being graded right now must not stop this, or a
-         * clock running out mid-grade would leave the quiz unsubmitted.
+         * way, or already graded. An answer being graded right now must not
+         * stop this, or a clock running out mid-grade would leave the quiz
+         * unsubmitted.
          */
-        if (finalSubmitStarted) {
+        if (!flow.expiryShouldSubmit(phase)) {
             return;
         }
 

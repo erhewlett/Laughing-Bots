@@ -44,13 +44,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             shape: document.getElementById('wordCloudShapeSelect').value
         };
 
-        // save to localStorage
-        localStorage.setItem('word_cloud_parameters', JSON.stringify(formData));
-
         // submitting the form is the one thing that means "run a new search".
-        // the view page only calls the backend when it sees this, so a reload
-        // over there redraws instead of recording another search.
-        localStorage.setItem('word_cloud_pending', '1');
+        // stageSearch stores the parameters, flags the search as deliberate and
+        // drops the previous cloud, so a reload on the view page redraws
+        // instead of recording another search. The keys live in
+        // js/word_cloud_search.js so every page that starts a search agrees.
+        window.wordCloudSearch.stageSearch(formData);
 
         // redirect to word cloud view/render page
         window.location.href = '../html/word_cloud_view_page.html';

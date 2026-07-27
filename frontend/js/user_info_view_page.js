@@ -65,10 +65,10 @@ async function initDashboard() {
 
 // handle sign out logic
 function handleSignOut() {
-    // clear session data
+    // clear session data. The search keys are cleared by the module that owns
+    // them, so signing out cannot leave one of the three behind.
     localStorage.removeItem('token');
-    localStorage.removeItem('word_cloud_results');
-    localStorage.removeItem('word_cloud_parameters');
+    window.wordCloudSearch.clearSession();
 
     // replace and redirect to landing page
     window.location.replace('../html/main.html');
@@ -117,6 +117,11 @@ function renderWordCloudHistory(searches) {
         // store current iteration's button in variable, btn
         const btn = document.getElementById(`rerun-word-cloud-btn-${i+1}`);
 
+        // a page missing one of these rows should show the others, not throw
+        if (!row || !roleCell || !btn) {
+            continue;
+        }
+
         // check that data exists for current index in the array
         if (searches && searches[i]) {
             row.style.display = 'table-row';
@@ -132,42 +137,30 @@ function renderWordCloudHistory(searches) {
     }
 }
 
-async function handleRerunSearch(searchData) {
-    // save user's search history parameters
-    const wordCloudParameters = {
+/* Re-run a saved search by staging it and letting the view page run it.
+ *
+ * This used to POST /wordcloud itself and store the result. Two things were
+ * wrong with that. It hardcoded industry:"" while passing job_title straight
+ * through, so a search saved from the industry field (which has no job_title -
+ * see renderWordCloudHistory above) sent neither, was rejected by the backend
+ * every time, and could never be re-run at all. And the fetch had no error
+ * handling, so a backend that was down made the button do nothing whatsoever.
+ *
+ * Staging it instead means one page owns running a search, with the error
+ * handling that page already has, and the industry comes along with it.
+ */
+function handleRerunSearch(searchData) {
+    window.wordCloudSearch.stageSearch({
         job_title: searchData.job_title,
-        industry: "", // TEMP: to be removed after upcoming updates to backend
+        industry: searchData.industry,
         location: searchData.location,
         min_salary: searchData.min_salary,
-
         word_count: searchData.word_count,
         shape: searchData.shape
-    };
-
-    // make a wordcloud POST request to the backend
-    const response = await fetch('http://localhost:8000/wordcloud', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(wordCloudParameters)
     });
 
-    if (response.ok) {
-        const resultData = await response.json();
-
-        // contains: role, shape, word_count, posting_count, and weighted keywords
-        localStorage.setItem('word_cloud_results', JSON.stringify(resultData));
-
-        // store word cloud parameters for history and context
-        localStorage.setItem('word_cloud_parameters', JSON.stringify(wordCloudParameters));
-
-        // redirect user to word cloud view page
-        window.location.href = '../html/word_cloud_view_page.html';
-    } else {
-        showErrorMessage("Failed to regenerate word cloud. Please try again.");
-    }
+    // redirect user to word cloud view page, which runs the staged search
+    window.location.href = '../html/word_cloud_view_page.html';
 }
 
 document.addEventListener('DOMContentLoaded', () => {

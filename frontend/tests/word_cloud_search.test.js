@@ -3,171 +3,246 @@
  */
 
 /*
- * The word cloud view page used to POST /wordcloud on every load. The backend
- * records a Search row on each POST and the profile page keeps only the five
- * most recent, so refreshing the page a few times quietly erased the user's
- * real search history.
- *
- * A search now only runs when someone actually asked for one: the creation
- * form sets word_cloud_pending, and the profile page's Search Again leaves
- * fresh results behind. A plain reload finds neither and redraws what is
- * stored.
- *
- * These cover that decision directly. word_cloud_render.js is an ES module
- * that runs on DOMContentLoaded and reaches for a live backend, so the rule is
- * restated here rather than imported.
+ * These used to restate the search rules inside this file, because the page
+ * that ran them was an ES module reaching for a live backend. A restated rule
+ * cannot catch a regression in the shipped file, which is the whole point of
+ * pinning it down - so the rules now live in js/word_cloud_search.js and this
+ * requires that file directly. Every page that starts a search uses it too.
  */
 
-const RESULTS_KEY = "word_cloud_results";
-const PENDING_KEY = "word_cloud_pending";
+const search = require("../js/word_cloud_search.js");
 
-function readStoredResults() {
-    try {
-        const parsed = JSON.parse(localStorage.getItem(RESULTS_KEY));
-        return parsed && Array.isArray(parsed.words) ? parsed : null;
-    } catch (error) {
-        return null;
-    }
-}
+const { PARAMETERS, RESULTS, PENDING } = search.KEYS;
 
-/** True when the page should call the backend rather than redraw. */
-function shouldRunSearch() {
-    if (!localStorage.getItem(PENDING_KEY)) {
-        if (readStoredResults()) {
-            return false;
-        }
-    }
-    return true;
-}
+const CLOUD = { words: [{ skill: "Python", weight: 100, playable: true }] };
 
-/**
- * What the page does just before it calls the backend: consume the flag so
- * the search runs once, and drop the previous cloud so a failure cannot
- * leave it on screen under the new search's title.
- */
-function startSearch() {
-    localStorage.removeItem(PENDING_KEY);
-    localStorage.removeItem(RESULTS_KEY);
-}
+beforeEach(() => {
+    localStorage.clear();
+});
 
-const CLOUD = { words: [{ skill: "Python", weight: 100 }] };
-
-describe("word cloud search gating", () => {
-    beforeEach(() => {
-        localStorage.clear();
+describe("deciding whether to run a search or redraw", () => {
+    /*
+     * The backend records a Search row on every POST /wordcloud and the profile
+     * page keeps only the five most recent, so posting on every page load meant
+     * a few refreshes quietly erased the user's real search history.
+     */
+    test("a staged search runs", () => {
+        localStorage.setItem(PENDING, "1");
+        expect(search.shouldRunSearch()).toBe(true);
     });
 
-    test("submitting the creation form runs a search", () => {
-        localStorage.setItem(PENDING_KEY, "1");
-        expect(shouldRunSearch()).toBe(true);
-    });
-
-    test("submitting runs a search even when an older cloud is cached", () => {
-        localStorage.setItem(RESULTS_KEY, JSON.stringify(CLOUD));
-        localStorage.setItem(PENDING_KEY, "1");
-        expect(shouldRunSearch()).toBe(true);
+    test("a staged search runs even when an older cloud is cached", () => {
+        localStorage.setItem(RESULTS, JSON.stringify(CLOUD));
+        localStorage.setItem(PENDING, "1");
+        expect(search.shouldRunSearch()).toBe(true);
     });
 
     test("a plain reload redraws instead of recording another search", () => {
-        localStorage.setItem(RESULTS_KEY, JSON.stringify(CLOUD));
-        expect(shouldRunSearch()).toBe(false);
-    });
-
-    test("Search Again redraws the results it already fetched", () => {
-        // the profile page POSTs itself, then stores the cloud and redirects,
-        // so the view page must not fetch a second time
-        localStorage.setItem(RESULTS_KEY, JSON.stringify(CLOUD));
-        expect(shouldRunSearch()).toBe(false);
+        localStorage.setItem(RESULTS, JSON.stringify(CLOUD));
+        expect(search.shouldRunSearch()).toBe(false);
     });
 
     test("nothing cached still runs a search", () => {
-        expect(shouldRunSearch()).toBe(true);
+        expect(search.shouldRunSearch()).toBe(true);
     });
 
     test("unreadable cached results fall back to searching", () => {
-        localStorage.setItem(RESULTS_KEY, "{not json");
-        expect(shouldRunSearch()).toBe(true);
+        localStorage.setItem(RESULTS, "{not json");
+        expect(search.shouldRunSearch()).toBe(true);
     });
 
     test("a cached value without a words array is not treated as a cloud", () => {
-        localStorage.setItem(RESULTS_KEY, JSON.stringify({ role: "Data Analyst" }));
-        expect(shouldRunSearch()).toBe(true);
-    });
-
-    test("a failed search does not leave the previous cloud on screen", () => {
-        // cloud from search A is cached, then search B is started and fails.
-        // reloading must not draw A under B's title.
-        localStorage.setItem(RESULTS_KEY, JSON.stringify(CLOUD));
-        localStorage.setItem(PENDING_KEY, "1");
-
-        expect(shouldRunSearch()).toBe(true);
-        startSearch();                       // the request goes out, and fails
-
-        expect(localStorage.getItem(RESULTS_KEY)).toBeNull();
-        expect(shouldRunSearch()).toBe(true); // a reload retries rather than
-                                              // redrawing the unrelated cloud
-    });
-
-    test("a successful search replaces the cached cloud", () => {
-        localStorage.setItem(RESULTS_KEY, JSON.stringify({ words: [{ skill: "Old" }] }));
-        localStorage.setItem(PENDING_KEY, "1");
-
-        startSearch();
-        localStorage.setItem(RESULTS_KEY, JSON.stringify(CLOUD));
-
-        expect(shouldRunSearch()).toBe(false);
-        expect(readStoredResults().words[0].skill).toBe("Python");
+        localStorage.setItem(RESULTS, JSON.stringify({ role: "Data Analyst" }));
+        expect(search.shouldRunSearch()).toBe(true);
     });
 
     test("repeated reloads never run more than the one real search", () => {
-        localStorage.setItem(PENDING_KEY, "1");
-        expect(shouldRunSearch()).toBe(true);
+        search.stageSearch({ job_title: "Data Analyst" });
+        expect(search.shouldRunSearch()).toBe(true);
 
-        // the page consumes the flag and stores what it fetched
-        startSearch();
-        localStorage.setItem(RESULTS_KEY, JSON.stringify(CLOUD));
+        search.beginSearch();
+        search.storeResults(CLOUD);
 
         for (let reload = 0; reload < 5; reload++) {
-            expect(shouldRunSearch()).toBe(false);
+            expect(search.shouldRunSearch()).toBe(false);
         }
+    });
+
+    test("a failed search does not leave the previous cloud on screen", () => {
+        // cloud from search A is cached, then search B is staged and fails.
+        // reloading must not draw A under B's title.
+        localStorage.setItem(RESULTS, JSON.stringify(CLOUD));
+        search.stageSearch({ job_title: "Software Engineer" });
+
+        expect(search.shouldRunSearch()).toBe(true);
+        search.beginSearch(); // the request goes out, and fails
+
+        expect(localStorage.getItem(RESULTS)).toBeNull();
+        expect(search.shouldRunSearch()).toBe(true); // a reload retries
+    });
+});
+
+describe("staging a search", () => {
+    test("stores the parameters, flags it, and drops the stale cloud", () => {
+        localStorage.setItem(RESULTS, JSON.stringify(CLOUD));
+
+        search.stageSearch({ job_title: "Data Analyst", shape: "star" });
+
+        expect(search.readStoredParameters().job_title).toBe("Data Analyst");
+        expect(localStorage.getItem(PENDING)).toBe("1");
+        expect(localStorage.getItem(RESULTS)).toBeNull();
+    });
+
+    test("clearSession forgets all three keys", () => {
+        search.stageSearch({ job_title: "Data Analyst" });
+        search.storeResults(CLOUD);
+
+        search.clearSession();
+
+        expect(localStorage.getItem(PARAMETERS)).toBeNull();
+        expect(localStorage.getItem(RESULTS)).toBeNull();
+        expect(localStorage.getItem(PENDING)).toBeNull();
     });
 });
 
 describe("stored search parameters", () => {
-    function readStoredParameters() {
-        try {
-            const parsed = JSON.parse(localStorage.getItem("word_cloud_parameters"));
-            return parsed && typeof parsed === "object" ? parsed : null;
-        } catch (error) {
-            return null;
-        }
-    }
-
-    beforeEach(() => {
-        localStorage.clear();
-    });
-
     test("missing parameters return null rather than throwing", () => {
         // reading .job_title straight off JSON.parse(null) threw a TypeError
         // above the page's try block, so it hung on "generating..." forever
-        expect(readStoredParameters()).toBeNull();
+        expect(search.readStoredParameters()).toBeNull();
     });
 
     test("unreadable parameters return null rather than throwing", () => {
-        localStorage.setItem("word_cloud_parameters", "{not json");
-        expect(readStoredParameters()).toBeNull();
+        localStorage.setItem(PARAMETERS, "{not json");
+        expect(search.readStoredParameters()).toBeNull();
     });
 
     test("a stored string is not accepted as parameters", () => {
-        localStorage.setItem("word_cloud_parameters", JSON.stringify("nope"));
-        expect(readStoredParameters()).toBeNull();
+        localStorage.setItem(PARAMETERS, JSON.stringify("nope"));
+        expect(search.readStoredParameters()).toBeNull();
+    });
+});
+
+describe("building the request body", () => {
+    /*
+     * Forms hand over strings, and a field nobody filled in hands over "".
+     * Passing those through turned an unselected dropdown into a validation
+     * error instead of a search.
+     */
+    test("numbers come through as numbers", () => {
+        const body = search.requestBodyFrom({
+            job_title: "Data Analyst",
+            min_salary: "90000",
+            word_count: "20",
+        });
+
+        expect(body.min_salary).toBe(90000);
+        expect(body.word_count).toBe(20);
     });
 
-    test("real parameters come back", () => {
-        localStorage.setItem(
-            "word_cloud_parameters",
-            JSON.stringify({ job_title: "Data Analyst", shape: "circle" })
-        );
-        expect(readStoredParameters().job_title).toBe("Data Analyst");
+    test("an empty word count falls back to the documented default", () => {
+        const body = search.requestBodyFrom({ job_title: "Data Analyst", word_count: "" });
+
+        expect(body.word_count).toBe(search.DEFAULT_WORD_COUNT);
+    });
+
+    test("an empty shape falls back to the documented default", () => {
+        // the backend requires shape to match ^[A-Za-z0-9_-]+$, so "" is a 422
+        const body = search.requestBodyFrom({ job_title: "Data Analyst", shape: "" });
+
+        expect(body.shape).toBe(search.DEFAULT_SHAPE);
+    });
+
+    test("an empty minimum salary is null, not zero", () => {
+        const body = search.requestBodyFrom({ job_title: "Data Analyst", min_salary: "" });
+
+        expect(body.min_salary).toBeNull();
+    });
+
+    test("a deliberate zero minimum salary survives", () => {
+        const body = search.requestBodyFrom({ job_title: "Data Analyst", min_salary: 0 });
+
+        expect(body.min_salary).toBe(0);
+    });
+
+    test("a non-numeric salary becomes null rather than NaN", () => {
+        const body = search.requestBodyFrom({ job_title: "Data Analyst", min_salary: "lots" });
+
+        expect(body.min_salary).toBeNull();
+    });
+
+    test("industry is passed through, not blanked", () => {
+        // the profile page hardcoded industry:"" while passing job_title
+        // through, so an industry-only saved search re-ran as neither and was
+        // rejected every single time
+        const body = search.requestBodyFrom({ job_title: null, industry: "Marketing" });
+
+        expect(body.industry).toBe("Marketing");
+    });
+
+    test("whitespace-only fields are treated as absent", () => {
+        const body = search.requestBodyFrom({ job_title: "   ", industry: "Marketing" });
+
+        expect(body.job_title).toBe("");
+    });
+
+    test("missing parameters do not throw", () => {
+        expect(() => search.requestBodyFrom(null)).not.toThrow();
+        expect(() => search.requestBodyFrom(undefined)).not.toThrow();
+    });
+});
+
+describe("knowing a search is missing its one required field", () => {
+    test("a job title is enough", () => {
+        expect(search.isSearchable({ job_title: "Data Analyst", industry: "" })).toBe(true);
+    });
+
+    test("an industry alone is enough", () => {
+        expect(search.isSearchable({ job_title: "", industry: "Marketing" })).toBe(true);
+    });
+
+    test("neither is not", () => {
+        expect(search.isSearchable({ job_title: "", industry: "" })).toBe(false);
+    });
+
+    test("an industry-only saved search is re-runnable end to end", () => {
+        // the exact row that could never be re-run before
+        const saved = { job_title: null, industry: "Marketing", location: "Alexandria, Virginia" };
+
+        search.stageSearch(saved);
+        const body = search.requestBodyFrom(search.readStoredParameters());
+
+        expect(search.isSearchable(body)).toBe(true);
+        expect(body.industry).toBe("Marketing");
+    });
+});
+
+describe("which words can start a quiz", () => {
+    /*
+     * Taken from the flag on the /wordcloud response. The page used to fetch
+     * GET /game/skills for this, above its own error handling, so a backend
+     * that was down left it saying "generating word cloud..." forever.
+     */
+    test("only the playable ones", () => {
+        const playable = search.playableSkills({
+            words: [
+                { skill: "Python", playable: true },
+                { skill: "Excel", playable: false },
+                { skill: "SQL", playable: true },
+            ],
+        });
+
+        expect([...playable].sort()).toEqual(["Python", "SQL"]);
+    });
+
+    test("a cloud with no playable words yields an empty set", () => {
+        const playable = search.playableSkills({ words: [{ skill: "Excel" }] });
+
+        expect(playable.size).toBe(0);
+    });
+
+    test("a missing or malformed cloud does not throw", () => {
+        expect(search.playableSkills(null).size).toBe(0);
+        expect(search.playableSkills({}).size).toBe(0);
     });
 });

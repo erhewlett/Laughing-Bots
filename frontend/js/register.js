@@ -137,6 +137,19 @@ registrationForm.addEventListener("submit", async (e)=> {
     const word_count = theWordCount.value.trim();
     const shape = cloudShape.value.trim();
 
+    /*
+     * The search this signup form also collects. Held in a variable for now
+     * and only written to localStorage once the account actually exists - see
+     * where stageSearch is called further down.
+     *
+     * It used to be stored here, at the top of the handler, along with
+     * clearing the cached cloud and raising the pending flag. All three
+     * happened before the form was validated and before the account was
+     * created, so someone who was already logged in on this browser and then
+     * abandoned a signup lost their cached cloud and had a bogus search left
+     * staged, which fired and wrote a junk row into their history the next
+     * time they opened the view page.
+     */
     const wordCloudGeneration = {
         job_title: job_title,
         industry: '',
@@ -145,20 +158,6 @@ registrationForm.addEventListener("submit", async (e)=> {
         word_count: word_count,
         shape: shape
     };
-
-    // localStroage set up
-    localStorage.setItem("word_cloud_parameters", JSON.stringify(wordCloudGeneration));
-
-    // a brand new account inherits nothing from whoever used this browser
-    // last. The parameters just set above are this user's own; the cached
-    // cloud is not.
-    localStorage.removeItem('word_cloud_results');
-
-    // the signup form collects search parameters, so registering is itself a
-    // deliberate search and the view page should run it. Set explicitly rather
-    // than leaning on the creation page to do it, because registration does
-    // not always go through the creation page.
-    localStorage.setItem('word_cloud_pending', '1');
 
     // Combine first and last name, using whichever parts were filled in.
     //
@@ -285,11 +284,25 @@ registrationForm.addEventListener("submit", async (e)=> {
 
         // valid
         console.log("User registered:", result);
-        console.log("Checking token property:", result.access_token);
-        // [CHANGED] added to store access token received after registration in localStorage 
+
+        /*
+         * The account exists, so this browser now belongs to the new user.
+         * clearSession drops whatever the previous one left behind (nobody is
+         * obliged to sign out) before the new token goes in.
+         */
+        window.wordCloudSearch.clearSession();
+
+        // [CHANGED] added to store access token received after registration in localStorage
         if (result.access_token) {
             localStorage.setItem("token", result.access_token);
         }
+
+        /*
+         * Only now is the signup's search a real one. Staging it here rather
+         * than at the top of the handler is what stops an abandoned or
+         * rejected signup from disturbing the session already in this browser.
+         */
+        window.wordCloudSearch.stageSearch(wordCloudGeneration);
 
         alert("Account created successfully.");
 

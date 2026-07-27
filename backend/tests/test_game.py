@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 
 from app import models
 from app.routers.game import _claim_quiz
@@ -894,3 +894,114 @@ def test_submit_rejects_an_oversized_answer_list(client, db_session):
         },
     )
     assert r.status_code == 422
+
+
+# --- a bank that moves under a live quiz -------------------------------------
+#
+# QuizSession stores its question ids as JSON with no foreign key, and
+# seed_questions() deletes and re-inserts every question in a bank it reloads
+# (startup does that whenever the fixture fingerprint changes). So a fixture
+# edit plus a restart can leave a quiz someone still has open pointing at ids
+# that are gone. /answer used to raise a bare KeyError, and /submit used to
+# grade the shorter quiz it found and record a max_score below the full 10.
+
+
+def _drop_question(db, question_id):
+    """Delete one question the way a bank reload does: options first."""
+    db.execute(
+        delete(models.AnswerOption).where(
+            models.AnswerOption.question_id == question_id
+        )
+    )
+    db.execute(
+        delete(models.Question).where(models.Question.question_id == question_id)
+    )
+    db.commit()
+
+
+def test_answer_reports_a_moved_bank_instead_of_crashing(client, db_session):
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    _drop_question(db_session, quiz["questions"][0]["question_id"])
+
+    r = _answer(client, "Python", quiz, 0)
+    assert r.status_code == 409
+    assert "start a new quiz" in r.json()["detail"]
+
+
+def test_answer_reports_a_moved_bank_for_a_question_still_present(client, db_session):
+    """Any missing id invalidates the quiz, not just the one being answered."""
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    _drop_question(db_session, quiz["questions"][5]["question_id"])
+
+    assert _answer(client, "Python", quiz, 0).status_code == 409
+
+
+def test_submit_reports_a_moved_bank_instead_of_shrinking_the_quiz(client, db_session):
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    answers = [
+        {
+            "question_id": q["question_id"],
+            "option_id": next(
+                o["option_id"] for o in q["options"] if o["option_text"] == "opt0"
+            ),
+        }
+        for q in quiz["questions"]
+    ]
+    _drop_question(db_session, quiz["questions"][0]["question_id"])
+
+    r = client.post(
+        "/game/Python/submit",
+        json={"quiz_id": quiz["quiz_id"], "difficulty": "easy", "answers": answers},
+    )
+    assert r.status_code == 409
+    assert "start a new quiz" in r.json()["detail"]
+
+
+def test_moved_bank_records_no_attempt(client, db_session):
+    """A quiz that cannot be graded must not leave a partial attempt behind."""
+    headers = {"Authorization": f"Bearer {_token(client)}"}
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy", headers=headers)
+    answers = [
+        {
+            "question_id": q["question_id"],
+            "option_id": q["options"][0]["option_id"],
+        }
+        for q in quiz["questions"]
+    ]
+    _drop_question(db_session, quiz["questions"][0]["question_id"])
+
+    client.post(
+        "/game/Python/submit",
+        json={"quiz_id": quiz["quiz_id"], "difficulty": "easy", "answers": answers},
+        headers=headers,
+    )
+    assert db_session.scalar(select(func.count()).select_from(models.GameAttempt)) == 0
+
+
+def test_submit_results_follow_the_served_question_order(client, db_session):
+    """The player saw them in this order, so the results have to match it."""
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    served = [q["question_id"] for q in quiz["questions"]]
+    answers = [
+        {"question_id": q["question_id"], "option_id": q["options"][0]["option_id"]}
+        for q in quiz["questions"]
+    ]
+    r = client.post(
+        "/game/Python/submit",
+        json={"quiz_id": quiz["quiz_id"], "difficulty": "easy", "answers": answers},
+    )
+    assert r.status_code == 200
+    assert [item["question_id"] for item in r.json()["results"]] == served
+
+
+def test_an_intact_bank_still_grades_normally(client, db_session):
+    """The guard must not fire on the ordinary path."""
+    _seed_questions(db_session, n=10)
+    r = _play(client, "Python", "easy")
+    assert r.status_code == 200
+    assert r.json()["max_score"] == 10

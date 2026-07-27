@@ -44,10 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // drop whatever the previous session left behind. Signing out
                 // clears these, but nobody is obliged to sign out, so without
                 // this the next person to log in on the same browser could be
-                // shown the cloud belonging to the last one.
-                localStorage.removeItem('word_cloud_results');
-                localStorage.removeItem('word_cloud_parameters');
-                localStorage.removeItem('word_cloud_pending');
+                // shown the cloud belonging to the last one. The keys are
+                // cleared by the module that owns them (js/word_cloud_search.js)
+                // so no page can miss one as they are added.
+                window.wordCloudSearch.clearSession();
 
                 // alert the user that the login was successful (for testing)
                 // alert('Login successful!');
