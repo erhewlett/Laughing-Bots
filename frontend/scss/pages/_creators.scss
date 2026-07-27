@@ -1,11 +1,10 @@
 // import colors file
 @use '../colors';
 
-.theAuthor {
+.theCreators {
     margin-bottom: 3em;
     padding-top: 1em;
-    // background-color: colors.$smoke;
-    // border: 2px solid colors.$off-black;
+    width: 100%;
     background: rgba(30, 64, 175, 0.18);
 
     backdrop-filter: blur(14px);
@@ -18,18 +17,23 @@
 
     border-radius: 20px;
 
+    p {
+        text-align: center;
+
+    }
+
     // A creator of JobHopper
-    .authorOne {
+    .creatorOne {
         text-align: center;
         font-size: 20px;
     }
 
-    // the invisible block around ALL the authors' image - centers the picture perfectly
+    // the invisible block around ALL the creators' image - centers the picture perfectly
    .imgBox {
+            margin-bottom: 2em;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 15em;
     }
 
     // image styling for ALL images on this page - adds nice smooth rounded edges to the image
@@ -49,15 +53,14 @@
 
     // the invisible box that contains an image of the logo of a programming language
     .langLogo {
-        margin-top: 2em;
+        margin: 2em 0 2em 0;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 10em;
     }
 
     // A creator of JobHopper
-    .authorTwo {
+    .creatorTwo {
         text-align: center;
         font-size: 20px;
     }
@@ -72,7 +75,7 @@
     }
 
     // A creator of JobHopper
-    .authorThree {
+    .creatorThree {
         text-align: center;
         font-size: 20px;
     }
@@ -87,7 +90,7 @@
     }
 
     // A creator of JobHopper 
-    .authorFour {
+    .creatorFour {
         text-align: center;
         font-size: 20px;
     }
@@ -104,6 +107,7 @@
 
     //the biography settings
     .bio {
+        padding: 0.5em;
         text-align: center;
         font-size: 15px;
     }

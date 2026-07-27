@@ -11972,9 +11972,10 @@ footer {
   font-size: 22px;
 }
 
-.theAuthor {
+.theCreators {
   margin-bottom: 3em;
   padding-top: 1em;
+  width: 100%;
   background: rgba(30, 64, 175, 0.18);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -11982,63 +11983,66 @@ footer {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   border-radius: 20px;
 }
-.theAuthor .authorOne {
+.theCreators p {
+  text-align: center;
+}
+.theCreators .creatorOne {
   text-align: center;
   font-size: 20px;
 }
-.theAuthor .imgBox {
+.theCreators .imgBox {
+  margin-bottom: 2em;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 15em;
 }
-.theAuthor img {
+.theCreators img {
   border-radius: 10px;
 }
-.theAuthor .faveOne {
+.theCreators .faveOne {
   text-align: center;
 }
-.theAuthor .faveOne p {
+.theCreators .faveOne p {
   font-size: 25px;
 }
-.theAuthor .langLogo {
-  margin-top: 2em;
+.theCreators .langLogo {
+  margin: 2em 0 2em 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 10em;
 }
-.theAuthor .authorTwo {
+.theCreators .creatorTwo {
   text-align: center;
   font-size: 20px;
 }
-.theAuthor .faveTwo {
+.theCreators .faveTwo {
   text-align: center;
 }
-.theAuthor .faveTwo p {
+.theCreators .faveTwo p {
   font-size: 25px;
 }
-.theAuthor .authorThree {
+.theCreators .creatorThree {
   text-align: center;
   font-size: 20px;
 }
-.theAuthor .faveThree {
+.theCreators .faveThree {
   text-align: center;
 }
-.theAuthor .faveThree p {
+.theCreators .faveThree p {
   font-size: 25px;
 }
-.theAuthor .authorFour {
+.theCreators .creatorFour {
   text-align: center;
   font-size: 20px;
 }
-.theAuthor .faveFour {
+.theCreators .faveFour {
   text-align: center;
 }
-.theAuthor .faveFour p {
+.theCreators .faveFour p {
   font-size: 25px;
 }
-.theAuthor .bio {
+.theCreators .bio {
+  padding: 0.5em;
   text-align: center;
   font-size: 15px;
 }
