@@ -15,21 +15,49 @@
         <link rel="stylesheet" href="../css/style.css">
 
     </head>
-    <body>
+    <body class="game_question_page">
 
         <!-- page header -->
         <header class="bg-info p-3">
 
             <div class="container-fluid">
-                <div class="bg-secondary text-dark p-2 text-center" style="max-width: 120px;">
+                <!-- [CHANGED] href="#" TO href="user_info_view_page.html" -->
+                <a class="navbar-brand register-brand" href="user_info_view_page.html">
                     JobHopper
-                </div>
+                </a>
             </div>
 
         </header>
 
         <!-- [MAIN CONTENT] -->
         <main class="container my-5">
+            <div class="row game-set-up">
+                <!-- Timer -->
+                <div class="col-12 col-md-4 clock">
+                    <div class="back-drop">
+                        <p id="time-title">Time Remaining:</p>
+                        <p class="time-left">2:00</p>
+                    </div>
+                </div>
+
+                <!-- Difficulty -->
+                <div class="col-12 col-md-4 mode">
+                    <div class="back-drop">
+                        <p id="difficulty-title">Game Difficulty:</p><br>
+                        <p id="difficulty-chosen">Medium</p>
+                    </div>
+                </div>
+                
+                <!-- Points -->
+                <div class="col-12 col-md-4 points">
+                    <div class="back-drop">
+                        <p id="point-title">Score:</p>
+                        <div class="points-added">0 pts</div>
+                        <div class="score-percentage">0%</div>
+                    </div>
+                </div>
+
+            </div>
             <!-- progress bar -->
             <div class="progress mb-5" role="progressbar" aria-label="question progress bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                 <div
@@ -40,39 +68,51 @@
             </div>
 
             <!-- question and options row -->
-            <div class="row align-items-center">
+            <div class="row">
 
                 <!-- question box -->
                 <div class="col-12 col-md-6 mb-4">
-                    <div id="question-container" class="question-box bg-info rounded-3 border m-3 d-flex justify-content-center align-items-center">
+                    <div id="question-container" class="question-box bg-info rounded-3 border d-flex justify-content-center align-items-center">
                         <h3 id="question-text" class="text-center">Placeholder Question</h3>
                     </div>
                 </div>
 
                 <!-- answer choices -->
                 <div class="col-12 col-md-6">
-                    <div id="choices-container" class="list-group me-3 ms-5">
+                    <div id="choices-container" class="list-group">
                         <label class="list-group-item d-flex align-items-center mb-5 rounded-3 border-3">
                             <input class="form-check-input me-3" type="radio" name="answerChoice">
-                            Choice 1
+                            <span class="choice-text">Choice 1</span>
                         </label>
 
                         <label class="list-group-item d-flex align-items-center mb-5 rounded-3 border-3">
                             <input class="form-check-input me-3" type="radio" name="answerChoice">
-                            Choice 2
+                            <span class="choice-text">Choice 2</span>                      
                         </label>
 
                         <label class="list-group-item d-flex align-items-center mb-5 rounded-3 border-3">
                             <input class="form-check-input me-3" type="radio" name="answerChoice">
-                            Choice 3
+                            <span class="choice-text">Choice 3</span>                           
                         </label>
 
                         <label class="list-group-item d-flex align-items-center mb-5 rounded-3 border-3">
                             <input class="form-check-input me-3" type="radio" name="answerChoice">
-                            Choice 4
+                            <span class="choice-text">Choice 4</span>
                         </label>
-
-                        <div class="d-flex justify-content-center mb-3">
+                    </div>
+                    <!--
+                        Not .invalid-feedback: Bootstrap keeps that hidden
+                        unless a sibling carries .is-invalid, which nothing
+                        here ever sets, so every message written to this div
+                        was invisible.
+                    -->
+                    <div
+                        id="game-display-error"
+                        class="text-danger text-center fw-semibold mb-3"
+                        role="alert"
+                        hidden
+                    ></div>
+                    <div class="d-flex justify-content-center mb-3">
                         <button
                             id="submit-answer-btn"
                             type="button"
@@ -80,7 +120,7 @@
                         >
                         Submit
                         </button>
-                    </div>
+                    
 
                     </div>
                 </div>
@@ -94,5 +134,6 @@
                 Created by the Laughing Bots
             </div>
         </footer>
+        <script src="../js/game_questions.js"></script>
     </body>
 </html>

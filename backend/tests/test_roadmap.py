@@ -126,9 +126,24 @@ def test_patch_step_bad_status_422(client, db_session):
     assert client.patch(f"/roadmap/steps/{step_id}", json={"status": "done"}, headers=h).status_code == 422
 
 
-def test_patch_step_not_owner_403(client, db_session):
+def test_patch_step_not_owner_404(client, db_session):
+    """Another user's step must be indistinguishable from a missing one.
+
+    A 403 here and a 404 for an unknown id let anyone walk the sequential step
+    ids and learn which ones exist on other people's roadmaps.
+    """
     _seed_role(db_session)
     ta = {"Authorization": f"Bearer {_token(client, 'alice')}"}
     step_id = _create(client, ta).json()["steps"][0]["step_id"]
     tb = {"Authorization": f"Bearer {_token(client, 'bobby')}"}
-    assert client.patch(f"/roadmap/steps/{step_id}", json={"status": "completed"}, headers=tb).status_code == 403
+
+    foreign = client.patch(
+        f"/roadmap/steps/{step_id}", json={"status": "completed"}, headers=tb
+    )
+    missing = client.patch(
+        "/roadmap/steps/999999", json={"status": "completed"}, headers=tb
+    )
+
+    assert foreign.status_code == 404
+    # same status AND same body, so the response itself leaks nothing
+    assert foreign.json() == missing.json()

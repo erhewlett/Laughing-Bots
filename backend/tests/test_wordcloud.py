@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
+from sqlalchemy import select
+
 from app import models
 from app.services.ingest import _rebuild_role_skill
 
@@ -214,3 +216,69 @@ def test_slash_skill_appears(client, db_session, auth_headers):
     assert "CI/CD" in names
 
 # CI trigger for scenario 3 and 4 evidence
+
+
+def test_words_flag_playable_skills(client, db_session, auth_headers):
+    """Each word says whether it can start a quiz.
+
+    Lets the cloud page decide what is clickable from this one response instead
+    of also calling GET /game/skills.
+    """
+    _seed(db_session)  # Python + SQL on recent Data Analyst postings
+    skill = db_session.scalar(
+        select(models.Skill).where(models.Skill.skill_name == "Python")
+    )
+    q = models.Question(
+        skill_id=skill.skill_id, difficulty="easy", question_text="Q"
+    )
+    db_session.add(q)
+    db_session.flush()
+    db_session.add(
+        models.AnswerOption(question_id=q.question_id, option_text="a", is_correct=True)
+    )
+    db_session.commit()
+
+    words = client.post(
+        "/wordcloud", json={"job_title": "Data Analyst"}, headers=auth_headers
+    ).json()["words"]
+    by_skill = {w["skill"]: w["playable"] for w in words}
+
+    assert by_skill["Python"] is True    # has a question
+    assert by_skill["SQL"] is False      # no questions seeded
+
+
+def test_playable_ignores_an_unsupported_difficulty(client, db_session, auth_headers):
+    """A stray difficulty must not make a skill look clickable.
+
+    GET /game/skills already drops these, and GET /game/{skill} answers 422 for
+    every difficulty, so flagging the word playable produced a link that could
+    only ever fail.
+    """
+    _seed(db_session)
+    skill = db_session.scalar(
+        select(models.Skill).where(models.Skill.skill_name == "Python")
+    )
+    # a seed typo, the same case test_skills_ignores_unknown_difficulty covers
+    db_session.add(
+        models.Question(
+            skill_id=skill.skill_id, difficulty="meduim", question_text="Q"
+        )
+    )
+    db_session.commit()
+
+    words = client.post(
+        "/wordcloud", json={"job_title": "Data Analyst"}, headers=auth_headers
+    ).json()["words"]
+    by_skill = {w["skill"]: w["playable"] for w in words}
+
+    assert by_skill["Python"] is False
+
+
+def test_response_includes_username(client, db_session, auth_headers):
+    """Saves the cloud page a blocking GET /auth/me before it can render."""
+    _seed(db_session)
+    body = client.post(
+        "/wordcloud", json={"job_title": "Data Analyst"}, headers=auth_headers
+    ).json()
+
+    assert body["username"] == "tester1"

@@ -41,6 +41,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 // access_token is the key defined in the backend (contains the JWT token returned by the backend server upon successful login)
                 localStorage.setItem('token', data.access_token);
 
+                // drop whatever the previous session left behind. Signing out
+                // clears these, but nobody is obliged to sign out, so without
+                // this the next person to log in on the same browser could be
+                // shown the cloud belonging to the last one.
+                localStorage.removeItem('word_cloud_results');
+                localStorage.removeItem('word_cloud_parameters');
+                localStorage.removeItem('word_cloud_pending');
+
                 // alert the user that the login was successful (for testing)
                 // alert('Login successful!');
 

@@ -369,3 +369,528 @@ def test_logged_in_submit_saves_attempt(client, db_session):
     assert len(attempts) == 1
     assert attempts[0].score == 10 and attempts[0].max_score == 10
     assert attempts[0].difficulty == "easy"
+
+
+# --- normalized score / elapsed time ----------------------------------------
+
+
+def test_submit_returns_normalized_score(client, db_session):
+    """The 0..10000 display score comes from the server, not just the client.
+
+    Keeps a stored attempt and the number the player saw from disagreeing.
+    """
+    _seed_questions(db_session, n=10)
+    body = _play(client, "Python", "easy").json()
+
+    assert body["score"] == 10
+    assert body["score_normalized"] == 10_000
+
+
+def test_normalized_score_scales_with_partial_score(client, db_session):
+    _seed_questions(db_session, n=10)
+    body = _play(client, "Python", "easy", wrong=4).json()
+
+    assert body["score"] == 6
+    assert body["score_normalized"] == 6_000
+
+
+def test_submit_rejects_negative_elapsed_seconds(client, db_session):
+    _seed_questions(db_session, n=3)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    answers = [
+        {
+            "question_id": q["question_id"],
+            "option_id": next(
+                o for o in q["options"] if o["option_text"] == "opt0"
+            )["option_id"],
+        }
+        for q in quiz["questions"]
+    ]
+    r = client.post(
+        "/game/Python/submit",
+        json={
+            "quiz_id": quiz["quiz_id"],
+            "difficulty": "easy",
+            "answers": answers,
+            "elapsed_seconds": -5,
+        },
+    )
+    assert r.status_code == 422
+
+
+def test_quiz_skills_is_cacheable(client, db_session):
+    _seed_questions(db_session, n=1)
+    assert "max-age" in client.get("/game/skills").headers["cache-control"]
+
+
+def test_submit_reports_recorded_when_logged_in(client, db_session):
+    _seed_questions(db_session, n=3)
+    h = {"Authorization": f"Bearer {_token(client)}"}
+    assert _play(client, "Python", "easy", headers=h).json()["recorded"] is True
+
+
+def test_submit_reports_not_recorded_when_anonymous(client, db_session):
+    """Anonymous play is graded but not saved, and now says so.
+
+    A caller that forgot its Authorization header used to get a clean 200 and
+    silently store nothing.
+    """
+    _seed_questions(db_session, n=3)
+    body = _play(client, "Python", "easy").json()
+
+    assert body["score"] == 3          # still graded
+    assert body["recorded"] is False   # but not persisted
+
+
+# --- running out of time -----------------------------------------------------
+
+
+def _correct_option(question):
+    return next(o for o in question["options"] if o["option_text"] == "opt0")["option_id"]
+
+
+def test_timed_out_quiz_scores_what_was_answered(client, db_session):
+    """Running out of time used to bin the attempt. Now it scores."""
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    answers = [
+        {"question_id": q["question_id"], "option_id": _correct_option(q)}
+        for q in quiz["questions"][:6]          # only got through 6
+    ]
+    r = client.post(
+        "/game/Python/submit",
+        json={
+            "quiz_id": quiz["quiz_id"],
+            "difficulty": "easy",
+            "answers": answers,
+            "timed_out": True,
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["score"] == 6
+    assert body["max_score"] == 10           # still out of the whole quiz
+    assert body["score_normalized"] == 6_000
+    assert len(body["results"]) == 10        # the 4 unreached ones are reported
+    assert sum(1 for x in body["results"] if not x["is_correct"]) == 4
+
+
+def test_timed_out_cannot_beat_answering_everything(client, db_session):
+    """Otherwise stopping early would be a way to farm a better percentage."""
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    only_right_one = [
+        {
+            "question_id": quiz["questions"][0]["question_id"],
+            "option_id": _correct_option(quiz["questions"][0]),
+        }
+    ]
+    body = client.post(
+        "/game/Python/submit",
+        json={
+            "quiz_id": quiz["quiz_id"],
+            "difficulty": "easy",
+            "answers": only_right_one,
+            "timed_out": True,
+        },
+    ).json()
+    # 1 of 10, not 1 of 1
+    assert body["score"] == 1 and body["max_score"] == 10
+    assert body["score_normalized"] == 1_000
+
+
+def test_timed_out_hard_quiz_is_never_mastered(client, db_session):
+    _seed_questions(db_session, difficulty="hard", n=10)
+    quiz = _fetch_quiz(client, "Python", "hard")
+    answers = [
+        {"question_id": q["question_id"], "option_id": _correct_option(q)}
+        for q in quiz["questions"][:9]
+    ]
+    body = client.post(
+        "/game/Python/submit",
+        json={
+            "quiz_id": quiz["quiz_id"],
+            "difficulty": "hard",
+            "answers": answers,
+            "timed_out": True,
+        },
+    ).json()
+    assert body["score"] == 9
+    assert body["mastered"] is False
+
+
+def test_timed_out_counts_answers_already_graded_live(client, db_session):
+    """The server knows what was answered, so the client need not resend it."""
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    for i in range(3):
+        _answer(client, "Python", quiz, i)          # graded live, then the page dies
+
+    body = client.post(
+        "/game/Python/submit",
+        json={
+            "quiz_id": quiz["quiz_id"],
+            "difficulty": "easy",
+            "answers": [],                          # client sent nothing
+            "timed_out": True,
+        },
+    ).json()
+    assert body["score"] == 3
+    assert body["score_normalized"] == 3_000
+
+
+def test_timed_out_still_rejects_a_foreign_question(client, db_session):
+    _seed_questions(db_session, skill_name="Python", difficulty="easy", n=10)
+    _seed_questions(db_session, skill_name="SQL", difficulty="easy", n=3)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    other = _fetch_quiz(client, "SQL", "easy")
+    r = client.post(
+        "/game/Python/submit",
+        json={
+            "quiz_id": quiz["quiz_id"],
+            "difficulty": "easy",
+            "answers": [
+                {
+                    "question_id": other["questions"][0]["question_id"],
+                    "option_id": other["questions"][0]["options"][0]["option_id"],
+                }
+            ],
+            "timed_out": True,
+        },
+    )
+    assert r.status_code == 422
+
+
+def test_partial_quiz_without_the_timeout_flag_is_still_rejected(client, db_session):
+    """The relaxation only applies when the client says the clock ran out."""
+    _seed_questions(db_session, n=10)
+    quiz_id, answers = _quiz_answers(client, "Python", "easy", count=3)
+    r = client.post(
+        "/game/Python/submit",
+        json={"quiz_id": quiz_id, "difficulty": "easy", "answers": answers},
+    )
+    assert r.status_code == 422
+
+
+def test_timed_out_records_the_attempt_for_a_logged_in_player(client, db_session):
+    _seed_questions(db_session, n=10)
+    h = {"Authorization": f"Bearer {_token(client)}"}
+    quiz = _fetch_quiz(client, "Python", "easy", headers=h)
+    answers = [
+        {"question_id": q["question_id"], "option_id": _correct_option(q)}
+        for q in quiz["questions"][:4]
+    ]
+    client.post(
+        "/game/Python/submit",
+        json={
+            "quiz_id": quiz["quiz_id"],
+            "difficulty": "easy",
+            "answers": answers,
+            "timed_out": True,
+        },
+        headers=h,
+    )
+    attempts = db_session.scalars(select(models.GameAttempt)).all()
+    assert len(attempts) == 1
+    assert attempts[0].score == 4 and attempts[0].max_score == 10
+
+
+# --- per-answer grading (live points) ----------------------------------------
+
+
+def _answer(client, skill, quiz, index, *, correct=True, headers=None, option_id=None):
+    """Grade one answer of a fetched quiz through POST /game/{skill}/answer."""
+    q = quiz["questions"][index]
+    if option_id is None:
+        picked = next(
+            o for o in q["options"] if (o["option_text"] == "opt0") == correct
+        )
+        option_id = picked["option_id"]
+    return client.post(
+        f"/game/{skill}/answer",
+        json={
+            "quiz_id": quiz["quiz_id"],
+            "question_id": q["question_id"],
+            "option_id": option_id,
+        },
+        headers=headers or {},
+    )
+
+
+def test_answer_grades_a_correct_pick(client, db_session):
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    body = _answer(client, "Python", quiz, 0).json()
+
+    assert body["is_correct"] is True
+    assert body["correct_count"] == 1
+    assert body["answered_count"] == 1
+    assert body["total_questions"] == 10
+    assert body["quiz_complete"] is False
+
+
+def test_answer_grades_a_wrong_pick(client, db_session):
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    body = _answer(client, "Python", quiz, 0, correct=False).json()
+
+    assert body["is_correct"] is False
+    assert body["correct_count"] == 0
+    assert body["score_normalized"] == 0
+
+
+def test_answer_reveals_the_correct_option(client, db_session):
+    """The page marks the right option, so it has to be told which one it is."""
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    body = _answer(client, "Python", quiz, 0, correct=False).json()
+
+    right = next(o for o in quiz["questions"][0]["options"] if o["option_text"] == "opt0")
+    assert body["correct_option_id"] == right["option_id"]
+
+
+def test_running_score_climbs_by_a_thousand_a_question(client, db_session):
+    """One question is worth 1000 points, so the counter moves in 1000s."""
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+
+    assert _answer(client, "Python", quiz, 0).json()["score_normalized"] == 1_000
+    assert _answer(client, "Python", quiz, 1).json()["score_normalized"] == 2_000
+    # a miss does not move it
+    assert _answer(client, "Python", quiz, 2, correct=False).json()["score_normalized"] == 2_000
+    assert _answer(client, "Python", quiz, 3).json()["score_normalized"] == 3_000
+
+
+def test_answer_locks_the_pick_so_a_retry_cannot_hunt_for_the_right_option(
+    client, db_session
+):
+    """The whole point of grading server-side: no guess-until-it-says-correct."""
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    first = _answer(client, "Python", quiz, 0, correct=False).json()
+    assert first["is_correct"] is False
+
+    retry = _answer(client, "Python", quiz, 0, correct=True).json()
+    assert retry["already_answered"] is True
+    assert retry["is_correct"] is False       # still the original wrong pick
+    assert retry["correct_count"] == 0
+    assert retry["answered_count"] == 1       # and it did not count twice
+
+
+def test_answer_refuses_to_grade_a_pick_it_could_not_record(client, db_session, monkeypatch):
+    """Never reveal the answer for a choice that was not committed.
+
+    If every compare-and-set loses, grading anyway would let a client race
+    writes on purpose, read correct_option_id off the response, and then submit
+    that question correctly. Nothing is stored, so answering again is a clean
+    retry.
+    """
+    from app.routers import game as game_router
+
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+
+    # every attempt to persist the pick loses its race
+    monkeypatch.setattr(game_router, "_record_answer", lambda *a, **k: False)
+
+    r = _answer(client, "Python", quiz, 0)
+    assert r.status_code == 409
+    body = r.json()
+    assert "correct_option_id" not in body   # the grade must not leak
+    assert "is_correct" not in body
+
+
+def test_a_pick_that_could_not_be_recorded_stays_unanswered(client, db_session, monkeypatch):
+    """The refusal must not half-record anything, so a retry works normally."""
+    from app.routers import game as game_router
+
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+
+    monkeypatch.setattr(game_router, "_record_answer", lambda *a, **k: False)
+    assert _answer(client, "Python", quiz, 0).status_code == 409
+
+    # persistence recovers; the same question grades cleanly
+    monkeypatch.undo()
+    body = _answer(client, "Python", quiz, 0).json()
+    assert body["already_answered"] is False
+    assert body["answered_count"] == 1
+
+
+def test_answer_flags_the_last_question(client, db_session):
+    _seed_questions(db_session, n=3)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    assert _answer(client, "Python", quiz, 0).json()["quiz_complete"] is False
+    assert _answer(client, "Python", quiz, 1).json()["quiz_complete"] is False
+    assert _answer(client, "Python", quiz, 2).json()["quiz_complete"] is True
+
+
+def test_live_score_matches_the_final_score(client, db_session):
+    """The number the player watched climb must be the number they finish on."""
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    answers = []
+    live_total = 0
+    for i in range(10):
+        correct = i % 3 != 0          # 6 right, 4 wrong
+        graded = _answer(client, "Python", quiz, i, correct=correct).json()
+        live_total = graded["score_normalized"]
+        answers.append(
+            {
+                "question_id": quiz["questions"][i]["question_id"],
+                "option_id": next(
+                    o["option_id"]
+                    for o in quiz["questions"][i]["options"]
+                    if (o["option_text"] == "opt0") == correct
+                ),
+            }
+        )
+
+    final = client.post(
+        "/game/Python/submit",
+        json={"quiz_id": quiz["quiz_id"], "difficulty": "easy", "answers": answers},
+    ).json()
+
+    assert live_total == 6_000
+    assert final["score_normalized"] == live_total
+    assert final["score"] == 6
+
+
+def test_submit_cannot_swap_an_answer_that_was_graded_live(client, db_session):
+    """Otherwise the live score and the recorded score could disagree."""
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    _answer(client, "Python", quiz, 0, correct=False)
+
+    # submit everything correct, including the question already graded wrong
+    answers = [
+        {
+            "question_id": q["question_id"],
+            "option_id": next(
+                o for o in q["options"] if o["option_text"] == "opt0"
+            )["option_id"],
+        }
+        for q in quiz["questions"]
+    ]
+    r = client.post(
+        "/game/Python/submit",
+        json={"quiz_id": quiz["quiz_id"], "difficulty": "easy", "answers": answers},
+    )
+    assert r.status_code == 409
+
+
+def test_submit_fills_in_questions_that_were_never_graded_live(client, db_session):
+    """A grading call lost to a bad connection must not cost the player anything."""
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    _answer(client, "Python", quiz, 0)  # only one question graded live
+
+    answers = [
+        {
+            "question_id": q["question_id"],
+            "option_id": next(
+                o for o in q["options"] if o["option_text"] == "opt0"
+            )["option_id"],
+        }
+        for q in quiz["questions"]
+    ]
+    body = client.post(
+        "/game/Python/submit",
+        json={"quiz_id": quiz["quiz_id"], "difficulty": "easy", "answers": answers},
+    ).json()
+    assert body["score"] == 10
+
+
+def test_answer_rejects_a_question_from_another_quiz(client, db_session):
+    _seed_questions(db_session, skill_name="Python", difficulty="easy", n=10)
+    _seed_questions(db_session, skill_name="SQL", difficulty="easy", n=3)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    other = _fetch_quiz(client, "SQL", "easy")
+    r = client.post(
+        "/game/Python/answer",
+        json={
+            "quiz_id": quiz["quiz_id"],
+            "question_id": other["questions"][0]["question_id"],
+            "option_id": other["questions"][0]["options"][0]["option_id"],
+        },
+    )
+    assert r.status_code == 422
+
+
+def test_answer_rejects_an_option_from_another_question(client, db_session):
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    foreign = quiz["questions"][1]["options"][0]["option_id"]
+    r = _answer(client, "Python", quiz, 0, option_id=foreign)
+    assert r.status_code == 422
+
+
+def test_answer_rejects_a_submitted_quiz(client, db_session):
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    answers = [
+        {
+            "question_id": q["question_id"],
+            "option_id": next(
+                o for o in q["options"] if o["option_text"] == "opt0"
+            )["option_id"],
+        }
+        for q in quiz["questions"]
+    ]
+    client.post(
+        "/game/Python/submit",
+        json={"quiz_id": quiz["quiz_id"], "difficulty": "easy", "answers": answers},
+    )
+    assert _answer(client, "Python", quiz, 0).status_code == 409
+
+
+def test_answer_rejects_another_players_quiz(client, db_session):
+    _seed_questions(db_session, n=10)
+    ha = {"Authorization": f"Bearer {_token(client, 'alice')}"}
+    quiz = _fetch_quiz(client, "Python", "easy", headers=ha)
+    hb = {"Authorization": f"Bearer {_token(client, 'bobby')}"}
+    assert _answer(client, "Python", quiz, 0, headers=hb).status_code == 403
+
+
+def test_answer_unknown_quiz_404(client, db_session):
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    r = client.post(
+        "/game/Python/answer",
+        json={
+            "quiz_id": 999999,
+            "question_id": quiz["questions"][0]["question_id"],
+            "option_id": quiz["questions"][0]["options"][0]["option_id"],
+        },
+    )
+    assert r.status_code == 404
+
+
+def test_answer_works_for_anonymous_players(client, db_session):
+    """Anonymous play is supported, so live points have to work without a token."""
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    assert _answer(client, "Python", quiz, 0).json()["is_correct"] is True
+
+
+def test_answer_routes_for_a_slash_skill(client, db_session):
+    """"CI/CD" must not be swallowed by the /submit or /{skill} routes."""
+    _seed_questions(db_session, skill_name="CI/CD", n=3)
+    quiz = _fetch_quiz(client, "CI/CD", "easy")
+    assert _answer(client, "CI/CD", quiz, 0).status_code == 200
+
+
+def test_submit_rejects_an_oversized_answer_list(client, db_session):
+    """Bound the list before the exact-question-set check parses all of it."""
+    _seed_questions(db_session, n=3)
+    quiz = _fetch_quiz(client, "Python", "easy")
+    answers = [{"question_id": 1, "option_id": 1} for _ in range(500)]
+    r = client.post(
+        "/game/Python/submit",
+        json={
+            "quiz_id": quiz["quiz_id"],
+            "difficulty": "easy",
+            "answers": answers,
+        },
+    )
+    assert r.status_code == 422

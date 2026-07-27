@@ -67,6 +67,10 @@ class Role(Base):
 
 class JobPosting(Base):
     __tablename__ = "job_postings"
+    # Every word cloud filters on (role_id, date_posted) together - see
+    # wordcloud._posting_filters - so the composite lets the two clauses resolve
+    # as one range seek instead of filtering role_id then scanning dates.
+    __table_args__ = (Index("ix_job_postings_role_date", "role_id", "date_posted"),)
 
     job_id: Mapped[int] = mapped_column(primary_key=True)
     # Provider's job id (JSearch job_id) - the dedup key that makes ingest
@@ -103,6 +107,10 @@ class JobSkill(Base):
     """Junction: which skills appear in which postings, and how often."""
 
     __tablename__ = "job_skills"
+    # Deliberately no standalone skill_id index. Both queries that touch this
+    # table (wordcloud's frequency query and ingest's role-skill rollup) filter
+    # job_postings first, so the planner always joins in by job_id, which the
+    # composite primary key already covers. Verified with EXPLAIN QUERY PLAN.
 
     job_id: Mapped[int] = mapped_column(ForeignKey("job_postings.job_id"), primary_key=True)
     skill_id: Mapped[int] = mapped_column(ForeignKey("skills.skill_id"), primary_key=True)
@@ -161,6 +169,9 @@ class GameAttempt(Base):
     difficulty: Mapped[str | None] = mapped_column(String(10))
     score: Mapped[int] = mapped_column(Integer, default=0)
     max_score: Mapped[int] = mapped_column(Integer, default=0)
+    # Seconds the player took, when the client reports it. Nullable because
+    # older clients (and any non-timed submission) simply omit it.
+    time_taken_seconds: Mapped[int | None] = mapped_column(Integer)
     date_taken: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     user: Mapped["User"] = relationship(back_populates="game_attempts")
@@ -183,6 +194,13 @@ class QuizSession(Base):
     skill_id: Mapped[int] = mapped_column(ForeignKey("skills.skill_id"), index=True)
     difficulty: Mapped[str] = mapped_column(String(10))
     question_ids: Mapped[str] = mapped_column(Text)  # JSON-encoded list of ids
+    # Answers locked in one at a time by POST /game/{skill}/answer, as a JSON
+    # object of {"question_id": option_id}. Recording the choice server-side is
+    # what makes it safe to tell the player whether they were right straight
+    # away: the pick is already committed, so knowing the answer afterwards
+    # cannot change it. Submit then grades these same choices, so the running
+    # score the player watched and the final score always agree.
+    answers: Mapped[str] = mapped_column(Text, default="{}", server_default="{}")
     completed: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), index=True

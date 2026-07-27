@@ -4,9 +4,21 @@
         -> which skills have quizzes, and at which difficulties.
   GET  /game/{skill_name}?difficulty=easy|medium|hard
         -> a quiz_id plus up to 10 questions from that bank, WITHOUT answers.
+  POST /game/{skill_name}/answer
+        body: {quiz_id, question_id, option_id}
+        -> whether that one pick was right, which option was, and the score so
+           far, so the quiz page can grade and add points per question instead
+           of only at the end. The pick is recorded before the grade is sent,
+           so knowing the answer afterwards cannot change it, and re-sending a
+           question replays the stored result rather than grading a new option.
+           Optional: a page that skips it still submits normally.
   POST /game/{skill_name}/submit
-        body: {quiz_id, difficulty, answers:[{question_id, option_id}]}
-        -> score, per-question results, and a `mastered` flag.
+        body: {quiz_id, difficulty, answers:[{question_id, option_id}],
+               timed_out?}
+        -> score, per-question results, and a `mastered` flag. Answers already
+           graded above are the ones that count; a submission cannot swap them.
+           `timed_out` accepts a partial quiz when the clock ran out, grading
+           the unanswered questions wrong against the full max score.
 
 Each GET creates a QuizSession recording exactly which questions were served.
 Submissions must reference their quiz_id and answer exactly those questions,
@@ -26,18 +38,21 @@ import json
 import random
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session, selectinload
 
 from app import models
 from app.database import get_db
 from app.schemas import (
+    DIFFICULTY_VALUES,
     AnswerOptionOut,
     Difficulty,
     GameQuestions,
     GameResult,
     GameSubmission,
+    LiveAnswer,
+    LiveAnswerResult,
     QuestionOut,
     QuestionResult,
     SkillQuizzes,
@@ -49,7 +64,11 @@ router = APIRouter(prefix="/game", tags=["game"])
 
 QUIZ_SIZE = 10
 SESSION_TTL_HOURS = 24  # replay guards are retained for one day
-_DIFFICULTY_RANK = {"easy": 0, "medium": 1, "hard": 2}
+# Attempts to write one answer before giving up, see answer_question.
+_ANSWER_WRITE_RETRIES = 3
+# Easiest first. Derived from the same tuple the word cloud's playable check
+# filters on, so the two cannot disagree about what counts as a real difficulty.
+_DIFFICULTY_RANK = {name: i for i, name in enumerate(DIFFICULTY_VALUES)}
 
 
 def _get_skill(db: Session, skill_name: str) -> models.Skill:
@@ -119,13 +138,139 @@ def _claim_quiz(db: Session, session_id: int) -> bool:
     return claimed.rowcount == 1
 
 
+def _locked_answers(quiz: models.QuizSession) -> dict[int, int]:
+    """Answers already graded for this quiz, as {question_id: option_id}.
+
+    JSON object keys are always strings, so they come back as ints here to
+    match how question ids are handled everywhere else. The column is nullable
+    on databases created before it existed, hence the empty-value guard.
+    """
+    if not quiz.answers:
+        return {}
+    return {int(qid): opt for qid, opt in json.loads(quiz.answers).items()}
+
+
+def _dump_answers(answers: dict[int, int]) -> str:
+    # sort_keys so the same set of answers always serializes identically, which
+    # is what lets _record_answer compare against the stored value.
+    return json.dumps({str(qid): opt for qid, opt in answers.items()}, sort_keys=True)
+
+
+def _record_answer(db: Session, session_id: int, before: str | None, after: str) -> bool:
+    """Atomically add one answer, but only if nothing else has written first.
+
+    A compare-and-set on the whole answers blob, in the same spirit as
+    _claim_quiz. Two concurrent grades of the same question cannot both land,
+    so a player cannot fire off several options at once and keep the one that
+    turns out to be right.
+    """
+    written = db.execute(
+        update(models.QuizSession)
+        .where(
+            models.QuizSession.session_id == session_id,
+            models.QuizSession.answers == before,
+        )
+        .values(answers=after)
+        .execution_options(synchronize_session=False)
+    )
+    return written.rowcount == 1
+
+
+def _load_quiz_for_play(
+    db: Session,
+    skill: models.Skill,
+    quiz_id: int,
+    user: models.User | None,
+) -> models.QuizSession:
+    """Fetch a quiz that is open for play, or raise the right error.
+
+    Shared by the per-answer and submit routes so both enforce the same rules:
+    the quiz belongs to this skill, has not been submitted, and was not served
+    to a different player.
+    """
+    quiz = db.get(models.QuizSession, quiz_id)
+    if quiz is None or quiz.skill_id != skill.skill_id:
+        raise HTTPException(status_code=404, detail="Unknown quiz for this skill.")
+    if quiz.completed:
+        raise HTTPException(
+            status_code=409, detail="This quiz has already been submitted."
+        )
+    # A quiz served to a logged-in player can only be played by that player.
+    # Anonymous sessions stay open so someone who logs in mid-quiz can submit.
+    if quiz.user_id is not None and (user is None or user.user_id != quiz.user_id):
+        raise HTTPException(
+            status_code=403, detail="This quiz belongs to another player."
+        )
+    return quiz
+
+
+def _load_served_questions(
+    db: Session, quiz: models.QuizSession
+) -> tuple[list[int], dict[int, models.Question]]:
+    """The questions this quiz served, in order, keyed by id.
+
+    A QuizSession records its question ids as JSON with no foreign key, so
+    nothing stops the rows underneath it from going away: seed_questions()
+    deletes and re-inserts every question in a bank it reloads, which startup
+    does whenever the fixture fingerprint moves (see app/autoseed.py). Sessions
+    live for SESSION_TTL_HOURS, so a fixture edit plus a restart can leave a
+    quiz someone still has open pointing at ids that no longer exist.
+
+    Reading straight through that gap went wrong in two different ways: it
+    raised a bare KeyError on /answer (a 500), and on /submit it quietly graded
+    a shorter quiz, recording a max_score of 9 and making mastery unreachable
+    because that requires the full QUIZ_SIZE. Both routes now treat a bank that
+    moved as a quiz that can no longer be played, which is recoverable - the
+    player starts a new one and nothing was recorded.
+    """
+    quiz_ids = json.loads(quiz.question_ids)
+    questions = db.scalars(
+        select(models.Question)
+        .where(models.Question.question_id.in_(quiz_ids))
+        .options(selectinload(models.Question.options))
+    ).all()
+    by_id = {q.question_id: q for q in questions}
+    if len(by_id) != len(set(quiz_ids)):
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "The question bank changed while this quiz was open. "
+                "Please start a new quiz."
+            ),
+        )
+    return quiz_ids, by_id
+
+
+def _grade(chosen: dict[int, int], questions: list[models.Question]) -> int:
+    """Count how many of the chosen options are correct."""
+    correct = 0
+    for q in questions:
+        picked = chosen.get(q.question_id)
+        if picked is None:
+            continue
+        correct += int(any(o.option_id == picked and o.is_correct for o in q.options))
+    return correct
+
+
+def _normalize(correct: int, total: int) -> int:
+    """The 0..10000 display score. One question is worth 1000 on a full quiz."""
+    return round(correct / total * 10_000) if total else 0
+
+
 @router.get("/skills", response_model=list[SkillQuizzes])
-def list_quiz_skills(db: Session = Depends(get_db)) -> list[SkillQuizzes]:
+def list_quiz_skills(
+    response: Response, db: Session = Depends(get_db)
+) -> list[SkillQuizzes]:
     """Skills that have quiz questions, with the difficulties available for each.
 
     Declared before the /{skill_name:path} route so "skills" is not captured as
     a skill name. Lets the frontend make only playable word-cloud words clickable.
+
+    Changes only when the question bank changes, so it is browser-cacheable.
+    The word cloud response now also carries a `playable` flag per word, which
+    removes the need to call this at all just to decide what is clickable.
     """
+    response.headers["Cache-Control"] = "public, max-age=300"
     rows = db.execute(
         select(models.Skill.skill_name, models.Question.difficulty)
         .join(models.Question, models.Question.skill_id == models.Skill.skill_id)
@@ -220,6 +365,95 @@ def get_game(
     )
 
 
+@router.post("/{skill_name:path}/answer", response_model=LiveAnswerResult)
+def answer_question(
+    skill_name: str,
+    answer: LiveAnswer,
+    db: Session = Depends(get_db),
+    user: models.User | None = Depends(security.get_current_user_optional),
+) -> LiveAnswerResult:
+    """Grade one answer as soon as the player commits to it.
+
+    Lets the quiz page mark the pick right or wrong and move its points counter
+    per question rather than only at the end. The pick is recorded before the
+    grade goes out, so a player who now knows the right answer cannot go back
+    and change the one they gave. Re-sending the same question replays the
+    stored result instead of grading a second option, which is what stops
+    "guess until it says correct".
+
+    Calling this is optional. A page that never does still submits normally,
+    and a grade lost to a dropped connection is filled in from the submission.
+    """
+    skill = _get_skill(db, skill_name)
+    quiz = _load_quiz_for_play(db, skill, answer.quiz_id, user)
+
+    quiz_ids, by_id = _load_served_questions(db, quiz)
+    if answer.question_id not in by_id:
+        raise HTTPException(
+            status_code=422, detail="That question is not part of this quiz."
+        )
+
+    questions = [by_id[qid] for qid in quiz_ids]
+    question = by_id[answer.question_id]
+
+    if not any(o.option_id == answer.option_id for o in question.options):
+        raise HTTPException(
+            status_code=422,
+            detail="An answer references an option that is not on its question.",
+        )
+
+    stored = quiz.answers
+    locked = _locked_answers(quiz)
+    already_answered = answer.question_id in locked
+
+    # Lock the pick in before grading it. The retries cover another answer for
+    # a different question landing at the same moment, which loses the
+    # compare-and-set without meaning this question was answered twice.
+    for _ in range(_ANSWER_WRITE_RETRIES):
+        if already_answered:
+            break
+        locked[answer.question_id] = answer.option_id
+        if _record_answer(db, quiz.session_id, stored, _dump_answers(locked)):
+            db.commit()
+            break
+        # Someone else wrote first. Re-read and build on what they recorded
+        # rather than overwriting it.
+        db.rollback()
+        db.refresh(quiz)
+        stored = quiz.answers
+        locked = _locked_answers(quiz)
+        already_answered = answer.question_id in locked
+
+    if answer.question_id not in locked:
+        # Every attempt lost its compare-and-set, so this pick is not recorded.
+        # Refuse to grade rather than hand back the right answer for a choice
+        # that was never committed. Grading anyway would let a client
+        # deliberately race writes until the retries ran out, read the correct
+        # option off the response, and then submit that question correctly.
+        # Nothing was stored, so simply answering again is a clean retry.
+        raise HTTPException(
+            status_code=409,
+            detail="That answer could not be recorded. Please try again.",
+        )
+
+    graded_option = locked[answer.question_id]
+    correct_ids = [o.option_id for o in question.options if o.is_correct]
+    correct_count = _grade(locked, list(questions))
+    total = len(quiz_ids)
+
+    return LiveAnswerResult(
+        question_id=answer.question_id,
+        is_correct=graded_option in correct_ids,
+        correct_option_id=correct_ids[0] if correct_ids else None,
+        already_answered=already_answered,
+        answered_count=len(locked),
+        total_questions=total,
+        correct_count=correct_count,
+        score_normalized=_normalize(correct_count, total),
+        quiz_complete=len(locked) >= total,
+    )
+
+
 @router.post("/{skill_name:path}/submit", response_model=GameResult)
 def submit_game(
     skill_name: str,
@@ -228,24 +462,19 @@ def submit_game(
     user: models.User | None = Depends(security.get_current_user_optional),
 ) -> GameResult:
     skill = _get_skill(db, skill_name)
-    if not submission.answers:
+    # A quiz the clock ran out on may legitimately carry no answers at all.
+    if not submission.answers and not submission.timed_out:
         raise HTTPException(status_code=422, detail="No answers submitted.")
 
-    quiz = db.get(models.QuizSession, submission.quiz_id)
-    if quiz is None or quiz.skill_id != skill.skill_id:
-        raise HTTPException(status_code=404, detail="Unknown quiz for this skill.")
+    quiz = _load_quiz_for_play(db, skill, submission.quiz_id, user)
     if quiz.difficulty != submission.difficulty:
         raise HTTPException(
             status_code=422, detail="Submitted difficulty does not match this quiz."
         )
-    if quiz.completed:
-        raise HTTPException(
-            status_code=409, detail="This quiz has already been submitted."
-        )
-    # A quiz served to a logged-in player can only be submitted by that player.
-    # Anonymous sessions stay open so someone who logs in mid-quiz can submit.
-    if quiz.user_id is not None and (user is None or user.user_id != quiz.user_id):
-        raise HTTPException(status_code=403, detail="This quiz belongs to another player.")
+
+    # Loaded up front so a bank that moved under this quiz is reported as such
+    # rather than silently grading whatever questions happen to be left.
+    quiz_ids, by_id = _load_served_questions(db, quiz)
 
     # One answer per question; reject duplicates rather than silently dropping.
     chosen: dict[int, int] = {}
@@ -256,32 +485,61 @@ def submit_game(
             )
         chosen[a.question_id] = a.option_id
 
-    # The submission must answer exactly the questions this quiz served; no
-    # hand-picked substitutes, no partial "perfect" quizzes.
-    expected = set(json.loads(quiz.question_ids))
-    if set(chosen) != expected:
+    expected = set(quiz_ids)
+    if submission.timed_out:
+        # The clock ran out part way through. Score the questions that were
+        # answered and count the rest wrong, rather than binning the attempt.
+        # max_score is still the whole quiz (see `total` below), so this can
+        # never beat answering everything.
+        if not set(chosen) <= expected:
+            raise HTTPException(
+                status_code=422,
+                detail="An answer is not part of this quiz.",
+            )
+    # Otherwise the submission must answer exactly the questions this quiz
+    # served; no hand-picked substitutes, no partial "perfect" quizzes.
+    elif set(chosen) != expected:
         raise HTTPException(
             status_code=422,
             detail="Submit exactly the questions served for this quiz.",
         )
 
-    questions = db.scalars(
-        select(models.Question)
-        .where(models.Question.question_id.in_(list(expected)))
-        .options(selectinload(models.Question.options))
-    ).all()
+    # Anything already graded by /answer is the pick that counts. The player was
+    # told at the time whether it was right, so a submission that quietly swaps
+    # it would let the final score disagree with the one they watched climb.
+    # Questions never graded live are simply taken from the submission, which is
+    # what keeps a dropped grading call from costing anyone their answer.
+    for qid, locked_option in _locked_answers(quiz).items():
+        if qid in chosen and chosen[qid] != locked_option:
+            raise HTTPException(
+                status_code=409,
+                detail="An answer was already graded and cannot be changed.",
+            )
+        # A timed-out submission is allowed to leave out answers the server
+        # already graded. They were still given, so they still count.
+        chosen[qid] = locked_option
+
+    # In the order the quiz served them, so the per-question results line up
+    # with what the player actually saw rather than whatever order the ids
+    # came back from the database in.
+    questions = [by_id[qid] for qid in quiz_ids]
 
     results: list[QuestionResult] = []
     score = 0
     for q in questions:
+        picked = chosen.get(q.question_id)
+        if picked is None:
+            # Only reachable on a timed-out quiz: never answered, so wrong.
+            results.append(QuestionResult(question_id=q.question_id, is_correct=False))
+            continue
         option_ids = {o.option_id for o in q.options}
-        if chosen[q.question_id] not in option_ids:
+        if picked not in option_ids:
             raise HTTPException(
                 status_code=422,
                 detail="An answer references an option that is not on its question.",
             )
         correct_ids = {o.option_id for o in q.options if o.is_correct}
-        is_correct = chosen[q.question_id] in correct_ids
+        is_correct = picked in correct_ids
         score += int(is_correct)
         results.append(QuestionResult(question_id=q.question_id, is_correct=is_correct))
 
@@ -299,6 +557,10 @@ def submit_game(
             status_code=409, detail="This quiz has already been submitted."
         )
 
+    # The 0..10000 display score, computed server-side so a stored attempt and
+    # the number the player saw can never disagree.
+    score_normalized = _normalize(score, total)
+
     # Save only for logged-in players; anonymous play stores no attempt.
     if user is not None:
         db.add(
@@ -308,6 +570,7 @@ def submit_game(
                 difficulty=quiz.difficulty,
                 score=score,
                 max_score=total,
+                time_taken_seconds=submission.elapsed_seconds,
             )
         )
     db.commit()
@@ -321,4 +584,7 @@ def submit_game(
         total_questions=total,
         mastered=mastered,
         results=results,
+        score_normalized=score_normalized,
+        elapsed_seconds=submission.elapsed_seconds,
+        recorded=user is not None,
     )

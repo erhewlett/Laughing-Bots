@@ -24,9 +24,24 @@ SKILL_ALIASES: dict[str, list[str]] = {
     "TypeScript": ["typescript"],
     "C++": [r"c\+\+"],
     "C#": [r"c#"],
-    # Bare "go" is safe with the boundaries below: it rejects "Google",
-    # "going" and "Django" but still catches "experience in Go".
-    "Go": ["go", "golang"],
+    # A bare "go" alias was not safe. The boundaries below reject "Google",
+    # "going" and "Django", but not the ordinary English verb: "ready to go
+    # the extra mile", "go-to-market", "go-getter" all scored as the language.
+    # On the live ingest path that puts a phantom top skill in the cloud with
+    # no question bank behind it, which renders as an unclickable word.
+    # Require the language name or an adjacent context word instead.
+    # The trailing boundary rejects letters, so plurals need an explicit "s?".
+    "Go": [
+        "golang",
+        "go developers?",
+        "go engineers?",
+        "go programming",
+        "go language",
+        "go lang",
+        "go modules?",
+        "go routines?",
+        "goroutines?",
+    ],
     "SQL": ["sql"],
     "PostgreSQL": ["postgresql", "postgres"],
     "MySQL": ["mysql"],
@@ -73,20 +88,46 @@ def _alias_to_regex(alias: str) -> str:
     return r"[\s-]+".join(alias.split(" "))
 
 
-# Pre-compile one word-boundary pattern per canonical skill.
-#
-# The trailing boundary rejects letters, "_", "+" and "#" but deliberately
-# ALLOWS digits, because a trailing digit is a version rather than a different
-# word: "C++17", "Python3" and "Java8" used to match nothing at all. Letters
-# stay excluded so "Java" still does not match "JavaScript" and "SQL" does not
-# match "PostgreSQL".
-_PATTERNS: dict[str, re.Pattern] = {
-    skill: re.compile(
+def _escape_name(name: str) -> str:
+    """Escape a canonical skill name for use as an alias.
+
+    Spaces are left alone so _alias_to_regex can still turn them into a
+    space-or-hyphen match; re.escape would backslash them and break that.
+    """
+    return re.escape(name).replace("\\ ", " ")
+
+
+def _compile_aliases(aliases: list[str]) -> re.Pattern:
+    """Pre-compile one word-boundary pattern for a set of aliases.
+
+    The trailing boundary rejects letters, "_", "+" and "#" but deliberately
+    ALLOWS digits, because a trailing digit is a version rather than a
+    different word: "C++17", "Python3" and "Java8" used to match nothing at
+    all. Letters stay excluded so "Java" still does not match "JavaScript" and
+    "SQL" does not match "PostgreSQL".
+    """
+    return re.compile(
         r"(?<![\w+#])(?:"
         + "|".join(_alias_to_regex(a) for a in aliases)
         + r")(?![A-Za-z_+#])",
         re.IGNORECASE,
     )
+
+
+# Patterns for free text, where a bare skill name can be a false positive.
+_PATTERNS: dict[str, re.Pattern] = {
+    skill: _compile_aliases(aliases) for skill, aliases in SKILL_ALIASES.items()
+}
+
+# Patterns for the structured technology fields only.
+#
+# required_technologies and preferred_technologies name one technology per
+# entry, so the bare canonical name is unambiguous there even where it is not
+# safe in prose. "Go" and "REST" carry only contextual aliases above, which
+# meant a posting listing either of them outright was not counted at all and
+# their demand was undercounted on the live ingest path.
+_TECHNOLOGY_PATTERNS: dict[str, re.Pattern] = {
+    skill: _compile_aliases(aliases + [_escape_name(skill)])
     for skill, aliases in SKILL_ALIASES.items()
 }
 
@@ -102,26 +143,37 @@ def remove_stop_words(text: str) -> str:
     return _STOP_WORD_RE.sub(" ", text)
 
 
-def _gather_text(job: dict) -> str:
-    """Collect the searchable text from a JSearch job object."""
+def _gather_prose(job: dict) -> str:
+    """Free text from a JSearch job object.
+
+    Kept apart from the structured technology lists because the two need
+    different matching: a bare "Go" here is usually the English verb.
+    """
     parts: list[str] = [
         job.get("job_title") or "",
         job.get("job_description") or "",
     ]
-    parts += job.get("required_technologies") or []
-    parts += job.get("preferred_technologies") or []
     highlights = job.get("job_highlights") or {}
     for key in ("Qualifications", "Responsibilities"):
         parts += highlights.get(key) or []
     return remove_stop_words("\n".join(parts))
 
 
+def _gather_technologies(job: dict) -> str:
+    """The structured technology lists, one technology named per entry."""
+    parts: list[str] = list(job.get("required_technologies") or [])
+    parts += job.get("preferred_technologies") or []
+    return remove_stop_words("\n".join(parts))
+
+
 def extract_skills(job: dict) -> dict[str, int]:
     """Return {canonical_skill_name: frequency} for one job posting."""
-    text = _gather_text(job)
+    prose = _gather_prose(job)
+    technologies = _gather_technologies(job)
     counts: dict[str, int] = {}
     for skill, pattern in _PATTERNS.items():
-        n = len(pattern.findall(text))
+        n = len(pattern.findall(prose))
+        n += len(_TECHNOLOGY_PATTERNS[skill].findall(technologies))
         if n:
             counts[skill] = n
     return counts
