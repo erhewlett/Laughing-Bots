@@ -677,6 +677,46 @@ def test_answer_locks_the_pick_so_a_retry_cannot_hunt_for_the_right_option(
     assert retry["answered_count"] == 1       # and it did not count twice
 
 
+def test_answer_refuses_to_grade_a_pick_it_could_not_record(client, db_session, monkeypatch):
+    """Never reveal the answer for a choice that was not committed.
+
+    If every compare-and-set loses, grading anyway would let a client race
+    writes on purpose, read correct_option_id off the response, and then submit
+    that question correctly. Nothing is stored, so answering again is a clean
+    retry.
+    """
+    from app.routers import game as game_router
+
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+
+    # every attempt to persist the pick loses its race
+    monkeypatch.setattr(game_router, "_record_answer", lambda *a, **k: False)
+
+    r = _answer(client, "Python", quiz, 0)
+    assert r.status_code == 409
+    body = r.json()
+    assert "correct_option_id" not in body   # the grade must not leak
+    assert "is_correct" not in body
+
+
+def test_a_pick_that_could_not_be_recorded_stays_unanswered(client, db_session, monkeypatch):
+    """The refusal must not half-record anything, so a retry works normally."""
+    from app.routers import game as game_router
+
+    _seed_questions(db_session, n=10)
+    quiz = _fetch_quiz(client, "Python", "easy")
+
+    monkeypatch.setattr(game_router, "_record_answer", lambda *a, **k: False)
+    assert _answer(client, "Python", quiz, 0).status_code == 409
+
+    # persistence recovers; the same question grades cleanly
+    monkeypatch.undo()
+    body = _answer(client, "Python", quiz, 0).json()
+    assert body["already_answered"] is False
+    assert body["answered_count"] == 1
+
+
 def test_answer_flags_the_last_question(client, db_session):
     _seed_questions(db_session, n=3)
     quiz = _fetch_quiz(client, "Python", "easy")

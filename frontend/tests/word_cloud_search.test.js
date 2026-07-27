@@ -40,6 +40,16 @@ function shouldRunSearch() {
     return true;
 }
 
+/**
+ * What the page does just before it calls the backend: consume the flag so
+ * the search runs once, and drop the previous cloud so a failure cannot
+ * leave it on screen under the new search's title.
+ */
+function startSearch() {
+    localStorage.removeItem(PENDING_KEY);
+    localStorage.removeItem(RESULTS_KEY);
+}
+
 const CLOUD = { words: [{ skill: "Python", weight: 100 }] };
 
 describe("word cloud search gating", () => {
@@ -84,12 +94,37 @@ describe("word cloud search gating", () => {
         expect(shouldRunSearch()).toBe(true);
     });
 
+    test("a failed search does not leave the previous cloud on screen", () => {
+        // cloud from search A is cached, then search B is started and fails.
+        // reloading must not draw A under B's title.
+        localStorage.setItem(RESULTS_KEY, JSON.stringify(CLOUD));
+        localStorage.setItem(PENDING_KEY, "1");
+
+        expect(shouldRunSearch()).toBe(true);
+        startSearch();                       // the request goes out, and fails
+
+        expect(localStorage.getItem(RESULTS_KEY)).toBeNull();
+        expect(shouldRunSearch()).toBe(true); // a reload retries rather than
+                                              // redrawing the unrelated cloud
+    });
+
+    test("a successful search replaces the cached cloud", () => {
+        localStorage.setItem(RESULTS_KEY, JSON.stringify({ words: [{ skill: "Old" }] }));
+        localStorage.setItem(PENDING_KEY, "1");
+
+        startSearch();
+        localStorage.setItem(RESULTS_KEY, JSON.stringify(CLOUD));
+
+        expect(shouldRunSearch()).toBe(false);
+        expect(readStoredResults().words[0].skill).toBe("Python");
+    });
+
     test("repeated reloads never run more than the one real search", () => {
         localStorage.setItem(PENDING_KEY, "1");
         expect(shouldRunSearch()).toBe(true);
 
         // the page consumes the flag and stores what it fetched
-        localStorage.removeItem(PENDING_KEY);
+        startSearch();
         localStorage.setItem(RESULTS_KEY, JSON.stringify(CLOUD));
 
         for (let reload = 0; reload < 5; reload++) {

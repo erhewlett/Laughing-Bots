@@ -376,10 +376,7 @@ def answer_question(
 
     # Lock the pick in before grading it. The retries cover another answer for
     # a different question landing at the same moment, which loses the
-    # compare-and-set without meaning this question was answered twice. Bounded
-    # because the only writer is one player's own quiz page: if the attempts
-    # run out, the answer still grades correctly here and is filled in from the
-    # submission at the end, it just does not get locked.
+    # compare-and-set without meaning this question was answered twice.
     for _ in range(_ANSWER_WRITE_RETRIES):
         if already_answered:
             break
@@ -395,7 +392,19 @@ def answer_question(
         locked = _locked_answers(quiz)
         already_answered = answer.question_id in locked
 
-    graded_option = locked.get(answer.question_id, answer.option_id)
+    if answer.question_id not in locked:
+        # Every attempt lost its compare-and-set, so this pick is not recorded.
+        # Refuse to grade rather than hand back the right answer for a choice
+        # that was never committed. Grading anyway would let a client
+        # deliberately race writes until the retries ran out, read the correct
+        # option off the response, and then submit that question correctly.
+        # Nothing was stored, so simply answering again is a clean retry.
+        raise HTTPException(
+            status_code=409,
+            detail="That answer could not be recorded. Please try again.",
+        )
+
+    graded_option = locked[answer.question_id]
     correct_ids = [o.option_id for o in question.options if o.is_correct]
     correct_count = _grade(locked, list(questions))
     total = len(quiz_ids)

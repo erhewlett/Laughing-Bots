@@ -102,8 +102,13 @@ async function loadWordCloud(wordCloudParameters) {
         }
     }
 
-    // consume the flag first so a failed search does not re-run on reload
+    // consume the flag so this search runs once, and drop the previous cloud
+    // with it. Keeping it meant a search that failed left the old cloud in
+    // storage, so a reload took the cache branch and drew it under the new
+    // search's title. Nothing is recorded when a search fails, so a reload
+    // after one simply tries again rather than duplicating a history row.
     localStorage.removeItem('word_cloud_pending');
+    localStorage.removeItem('word_cloud_results');
 
     // make a wordcloud POST request to the backend
     const response = await fetch('http://localhost:8000/wordcloud', {

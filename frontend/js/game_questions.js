@@ -133,6 +133,17 @@ document.addEventListener("DOMContentLoaded", () => {
     let feedbackShowing = false;
 
     /*
+     * True once the completed quiz has been sent for grading.
+     *
+     * Kept apart from submissionInProgress, which is also raised while a
+     * single answer is being graded. Sharing one flag meant a clock that ran
+     * out mid-grade found it already set, skipped submitting, and then the
+     * grading call returned to a finished game and stopped too, so the quiz
+     * was never sent at all.
+     */
+    let finalSubmitStarted = false;
+
+    /*
      * The running 0-10,000 score, as graded by the backend one answer
      * at a time. The backend is the only thing that decides what is
      * correct, so this is read straight off its response rather than
@@ -599,6 +610,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         submissionInProgress = true;
+        finalSubmitStarted = true;
 
         /*
          * Stop the timer while the quiz is submitted.
@@ -662,6 +674,11 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
             submissionInProgress = false;
+
+            /*
+             * The send failed, so the quiz is not on its way after all.
+             */
+            finalSubmitStarted = false;
 
             /*
              * Allow another go at submitting, but only while the game
@@ -955,10 +972,11 @@ document.addEventListener("DOMContentLoaded", () => {
         setAnswerInputsDisabled(true);
 
         /*
-         * A submission may already be on its way if the clock ran out
-         * on the last question. Do not send a second one.
+         * Only skip when the completed quiz is genuinely already on its
+         * way. An answer being graded right now must not stop this, or a
+         * clock running out mid-grade would leave the quiz unsubmitted.
          */
-        if (submissionInProgress) {
+        if (finalSubmitStarted) {
             return;
         }
 
