@@ -9,14 +9,22 @@ the word-cloud data), so the roadmap is "learn the most in-demand skills first".
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, Path, status
 from sqlalchemy import delete, func, select
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.orm import Session, selectinload
 
 from app import models
 from app.database import get_db
-from app.schemas import RoadmapCreate, RoadmapOut, RoadmapStepOut, StepStatusUpdate
+from app.schemas import (
+    MAX_DB_INT,
+    RoadmapCreate,
+    RoadmapOut,
+    RoadmapStepOut,
+    StepStatusUpdate,
+)
 from app.services import security
 
 router = APIRouter(prefix="/roadmap", tags=["roadmap"])
@@ -134,7 +142,8 @@ def get_my_roadmap(
 
 @router.patch("/steps/{step_id}", response_model=RoadmapStepOut)
 def update_step(
-    step_id: int,
+    # Bounded so an oversized id 422s instead of overflowing SQLite into a 500.
+    step_id: Annotated[int, Path(ge=1, le=MAX_DB_INT)],
     req: StepStatusUpdate,
     user: models.User = Depends(security.get_current_user),
     db: Session = Depends(get_db),

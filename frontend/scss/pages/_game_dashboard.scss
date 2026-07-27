@@ -1,0 +1,108 @@
+// import colors file
+@use '../colors';
+
+.block-around-all-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.boxOne {
+
+    width: 80%;
+    display: block;
+    // justify-content: center;
+    align-items: center;
+
+    .headLiner {
+    margin-bottom: 2em;
+    text-align: center;
+    }
+
+    .theBlock {
+        margin-bottom: 5em;
+        padding: 1em;
+        height: 30em;
+        // width: 70%;
+        // background-color: colors.$smoke;
+        // border: 2px solid colors.$off-black;
+        background: rgba(30, 64, 175, 0.18);
+
+        backdrop-filter: blur(14px);
+
+        -webkit-backdrop-filter: blur(14px);
+
+        border: 1px solid rgba(255, 255, 255, 0.2);
+
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+        border-radius: 20px;
+
+        .displayBlock {
+            padding: 1em;
+            background-color: colors.$off-white;
+            border-radius: 10px;
+            height: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .buttonLayout {
+                margin-top: 2em;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                
+                .easyMode {
+                    margin-bottom: 5em;
+                    height: 3em;
+                    color: colors.$off-white;
+                    border-radius: 5px;
+                    border: 2px solid greenyellow;
+                    background-color: green;
+                    transition: transform 0.3s ease-out, color 0.2s ease-in;
+
+                    &:hover {
+                        transform: translateY(-3px);
+                        color: colors.$platinum;
+                    }
+                }
+
+                .mediumMode {
+                    margin-bottom: 5em;
+                    color: colors.$off-white;
+                    height: 3em;
+                    color: colors.$off-white;
+                    border-radius: 5px;
+                    border: 2px solid rgb(251, 234, 47);
+                    background-color: orange;
+                    transition: transform 0.3s ease-out, color 0.2s ease-in;
+
+                    &:hover {
+                        transform: translateY(-3px);
+                        color: colors.$platinum;
+                    }
+
+                }
+
+                .hardMode {
+                    margin-bottom: 5em;
+                    color: colors.$off-white;
+                    height: 3em;
+                    color: colors.$off-white;
+                    border-radius: 5px;
+                    border: 2px solid orangered;;
+                    background-color: red;
+                    transition: transform 0.3s ease-out, color 0.2s ease-in;
+
+                    &:hover {
+                        transform: translateY(-3px);
+                        color: colors.$platinum;
+                    }
+                }
+
+            }
+        }
+    }
+}

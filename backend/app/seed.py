@@ -54,11 +54,15 @@ def seed() -> None:
         }
         skill_cache: dict[str, models.Skill] = {}
         touched_roles: set[int] = set()
+        # Per-role counter so the date stagger below spreads *within* each role.
+        role_seq: dict[int, int] = {}
         added = updated = 0
 
-        for i, p in enumerate(postings):
+        for p in postings:
             role = _get_or_create_role(db, p["role"])
             touched_roles.add(role.role_id)
+            seq = role_seq.get(role.role_id, 0)
+            role_seq[role.role_id] = seq + 1
 
             posting = existing.get(p["external_id"]) if p["external_id"] else None
             if posting is None:
@@ -78,7 +82,10 @@ def seed() -> None:
             posting.salary_max = p["salary_max"]
             # Stagger over the last ~3 weeks so every row stays inside the
             # 30-day window no matter when this runs. Re-stamped every run.
-            posting.date_posted = now - timedelta(days=i % 21)
+            # Staggering per role (not by fixture index) matters: the fixture is
+            # grouped by role, so a global index gave each role its own age
+            # bucket and roles aged out of the 30-day window one at a time.
+            posting.date_posted = now - timedelta(days=seq % 21)
             posting.source_url = p["source_url"]
             db.flush()
 

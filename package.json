@@ -4,8 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "sass": "sass --watch frontend/scss/style.scss:frontend/css/style.css"
+  },
+  "jest": {
+    "testEnvironment": "jsdom"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +17,8 @@
   "type": "commonjs",
   "dependencies": {
     "bootstrap": "^5.3.8",
-    "sass": "^1.101.0"
+    "sass": "^1.101.0",
+    "wordcloud": "^1.2.3"
   },
   "devDependencies": {
     "jest": "^30.4.2",

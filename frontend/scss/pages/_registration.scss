@@ -1,0 +1,11 @@
+// import colors file
+@use '../colors';
+
+// JobHopper in navbar
+.register-brand,
+.register-brand:visited,
+.register-brand:hover,
+.register-brand:active {
+    color: colors.$sandy-pink;
+    font-size: 22px;
+}
