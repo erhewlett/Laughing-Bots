@@ -144,6 +144,26 @@ document.addEventListener("DOMContentLoaded", () => {
     let finalSubmitStarted = false;
 
     /*
+     * True when a completed quiz failed to send and Submit should try it
+     * again rather than grade another answer.
+     *
+     * The button has one handler, submitCurrentAnswer. Re-enabling it after a
+     * failed submission therefore put the player back in the answer flow: the
+     * last question's radio is still checked (disabled radios still are), so
+     * the same answer was recorded a second time, submittedAnswers ended up
+     * one longer than the quiz, and every attempt after that failed the length
+     * check below - the quiz could never be submitted at all.
+     */
+    let awaitingSubmitRetry = false;
+
+    /*
+     * Whether the submission being retried was a timed-out one. A partial
+     * quiz re-sent without timed_out is rejected with "Submit exactly the
+     * questions served for this quiz."
+     */
+    let pendingTimedOut = false;
+
+    /*
      * The running 0-10,000 score, as graded by the backend one answer
      * at a time. The backend is the only thing that decides what is
      * correct, so this is read straight off its response rather than
@@ -198,10 +218,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     /*
-     * Run submitCurrentAnswer() whenever the Submit
-     * button is clicked.
+     * Submit does one of two jobs depending on where the quiz is: grade the
+     * answer on screen, or re-send a completed quiz whose submission failed.
+     * It used to be wired straight to submitCurrentAnswer, so the retry path
+     * re-entered the answer flow (see awaitingSubmitRetry above).
      */
-    submitAnswerBtn.addEventListener("click", submitCurrentAnswer);
+    submitAnswerBtn.addEventListener("click", () => {
+        if (awaitingSubmitRetry) {
+            clearGameError();
+
+            submitCompletedQuiz({ timedOut: pendingTimedOut });
+
+            return;
+        }
+
+        submitCurrentAnswer();
+    });
 
     /**
      * Displays the current question and answer choices.
@@ -613,6 +645,12 @@ document.addEventListener("DOMContentLoaded", () => {
         finalSubmitStarted = true;
 
         /*
+         * Remembered so a retry re-sends the same kind of submission.
+         */
+        pendingTimedOut = timedOut;
+        awaitingSubmitRetry = false;
+
+        /*
          * Stop the timer while the quiz is submitted.
          */
         clearInterval(timerInterval);
@@ -669,8 +707,8 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
             displayGameError(
-                error.message ||
-                "The quiz could not be submitted."
+                `${error.message || "The quiz could not be submitted."} ` +
+                "Press Submit to try again."
             );
 
             submissionInProgress = false;
@@ -681,13 +719,13 @@ document.addEventListener("DOMContentLoaded", () => {
             finalSubmitStarted = false;
 
             /*
-             * Allow another go at submitting, but only while the game
-             * is still live. Re-enabling the button after the clock
-             * expired would let the player carry on answering.
+             * Allow another go at submitting. Safe to re-enable even after the
+             * clock expired, because Submit now retries the submission rather
+             * than letting the player carry on answering.
              */
-            if (!gameFinished) {
-                submitAnswerBtn.disabled = false;
-            }
+            awaitingSubmitRetry = true;
+
+            submitAnswerBtn.disabled = false;
         }
     }
 

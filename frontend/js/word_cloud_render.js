@@ -39,14 +39,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     // update title
     populateTitle(username, wordCloudParameters);
 
-    const skillResponse = await fetch('http://localhost:8000/game/skills', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    });
-
-    const skillData = await skillResponse.json();
-    const playableSet = new Set(skillData.map(item => item.skill));
-
     try {
+        // this used to sit above the try, so a backend that was down, a 401, or
+        // any response that wasn't an array threw out of the listener and left
+        // the page on "generating your word cloud..." for good, with nothing
+        // said about why. Inside the try it is reported like anything else.
+        const skillResponse = await fetch('http://localhost:8000/game/skills', {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+
+        const skillData = await skillResponse.json();
+        const playableSet = new Set(skillData.map(item => item.skill));
+
         const wordCloudResult = await loadWordCloud(wordCloudParameters);
 
         if (!wordCloudResult) {

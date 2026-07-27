@@ -133,10 +133,16 @@ function renderWordCloudHistory(searches) {
 }
 
 async function handleRerunSearch(searchData) {
-    // save user's search history parameters
+    // save user's search history parameters.
+    //
+    // industry used to be hardcoded to "" here while job_title was passed
+    // straight through. A search saved from the industry field has no
+    // job_title (see renderWordCloudHistory above), so re-running one sent
+    // neither field, the backend rejected it for missing the one it requires,
+    // and that row could never be re-run at all.
     const wordCloudParameters = {
         job_title: searchData.job_title,
-        industry: "", // TEMP: to be removed after upcoming updates to backend
+        industry: searchData.industry,
         location: searchData.location,
         min_salary: searchData.min_salary,
 
@@ -144,29 +150,36 @@ async function handleRerunSearch(searchData) {
         shape: searchData.shape
     };
 
-    // make a wordcloud POST request to the backend
-    const response = await fetch('http://localhost:8000/wordcloud', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(wordCloudParameters)
-    });
+    try {
+        // make a wordcloud POST request to the backend
+        const response = await fetch('http://localhost:8000/wordcloud', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(wordCloudParameters)
+        });
 
-    if (response.ok) {
-        const resultData = await response.json();
+        if (response.ok) {
+            const resultData = await response.json();
 
-        // contains: role, shape, word_count, posting_count, and weighted keywords
-        localStorage.setItem('word_cloud_results', JSON.stringify(resultData));
+            // contains: role, shape, word_count, posting_count, and weighted keywords
+            localStorage.setItem('word_cloud_results', JSON.stringify(resultData));
 
-        // store word cloud parameters for history and context
-        localStorage.setItem('word_cloud_parameters', JSON.stringify(wordCloudParameters));
+            // store word cloud parameters for history and context
+            localStorage.setItem('word_cloud_parameters', JSON.stringify(wordCloudParameters));
 
-        // redirect user to word cloud view page
-        window.location.href = '../html/word_cloud_view_page.html';
-    } else {
-        showErrorMessage("Failed to regenerate word cloud. Please try again.");
+            // redirect user to word cloud view page
+            window.location.href = '../html/word_cloud_view_page.html';
+        } else {
+            showErrorMessage("Failed to regenerate word cloud. Please try again.");
+        }
+    } catch (error) {
+        // without this the promise rejected unhandled and the button simply
+        // did nothing at all when the backend was unreachable
+        console.error("Could not re-run the search:", error);
+        showErrorMessage("Could not reach the server. Please try again.");
     }
 }
 

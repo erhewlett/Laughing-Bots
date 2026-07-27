@@ -146,19 +146,15 @@ registrationForm.addEventListener("submit", async (e)=> {
         shape: shape
     };
 
-    // localStroage set up
-    localStorage.setItem("word_cloud_parameters", JSON.stringify(wordCloudGeneration));
-
-    // a brand new account inherits nothing from whoever used this browser
-    // last. The parameters just set above are this user's own; the cached
-    // cloud is not.
-    localStorage.removeItem('word_cloud_results');
-
-    // the signup form collects search parameters, so registering is itself a
-    // deliberate search and the view page should run it. Set explicitly rather
-    // than leaning on the creation page to do it, because registration does
-    // not always go through the creation page.
-    localStorage.setItem('word_cloud_pending', '1');
+    /*
+     * These three used to be stored here, before the form was validated and
+     * before the account was created. Someone already logged in on this
+     * browser who then abandoned or failed a signup lost their cached cloud
+     * and had a bogus search left staged, which fired and wrote a junk row
+     * into their history the next time they opened the view page. They are
+     * written once the account exists instead - see storeWordCloudSearch()
+     * below, called after the register request succeeds.
+     */
 
     // Combine first and last name, using whichever parts were filled in.
     //
@@ -286,10 +282,14 @@ registrationForm.addEventListener("submit", async (e)=> {
         // valid
         console.log("User registered:", result);
         console.log("Checking token property:", result.access_token);
-        // [CHANGED] added to store access token received after registration in localStorage 
+        // [CHANGED] added to store access token received after registration in localStorage
         if (result.access_token) {
             localStorage.setItem("token", result.access_token);
         }
+
+        // the account exists now, so this signup's search is a real one and
+        // storing it can no longer disturb a session that was already here
+        storeWordCloudSearch(wordCloudGeneration);
 
         alert("Account created successfully.");
 
@@ -316,6 +316,20 @@ registrationForm.addEventListener("submit", async (e)=> {
     }
 
 });
+
+/* Store the search the signup form collected, for the view page to run.
+ *
+ * Only called once the account has actually been created. A brand new account
+ * inherits nothing from whoever used this browser last, so the cached cloud is
+ * dropped while the new parameters go in, and the pending flag marks this as a
+ * deliberate search because registration does not always go via the creation
+ * page.
+ */
+function storeWordCloudSearch(wordCloudGeneration) {
+    localStorage.setItem("word_cloud_parameters", JSON.stringify(wordCloudGeneration));
+    localStorage.removeItem('word_cloud_results');
+    localStorage.setItem('word_cloud_pending', '1');
+}
 
 //the funciton for verifiying all inputs within the registration form are valid inputs
 function verifying_registration(firstName, lastName, userName, confirmUserName, passWord, confirmPassword, jobTitle, location, minSalary, wordCount, shape) {

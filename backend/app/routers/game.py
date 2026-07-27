@@ -204,6 +204,43 @@ def _load_quiz_for_play(
     return quiz
 
 
+def _load_served_questions(
+    db: Session, quiz: models.QuizSession
+) -> tuple[list[int], dict[int, models.Question]]:
+    """The questions this quiz served, in order, keyed by id.
+
+    A QuizSession records its question ids as JSON with no foreign key, so
+    nothing stops the rows underneath it from going away: seed_questions()
+    deletes and re-inserts every question in a bank it reloads, which startup
+    does whenever the fixture fingerprint moves (see app/autoseed.py). Sessions
+    live for SESSION_TTL_HOURS, so a fixture edit plus a restart can leave a
+    quiz someone still has open pointing at ids that no longer exist.
+
+    Reading straight through that gap went wrong in two different ways: it
+    raised a bare KeyError on /answer (a 500), and on /submit it quietly graded
+    a shorter quiz, recording a max_score of 9 and making mastery unreachable
+    because that requires the full QUIZ_SIZE. Both routes now treat a bank that
+    moved as a quiz that can no longer be played, which is recoverable - the
+    player starts a new one and nothing was recorded.
+    """
+    quiz_ids = json.loads(quiz.question_ids)
+    questions = db.scalars(
+        select(models.Question)
+        .where(models.Question.question_id.in_(quiz_ids))
+        .options(selectinload(models.Question.options))
+    ).all()
+    by_id = {q.question_id: q for q in questions}
+    if len(by_id) != len(set(quiz_ids)):
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "The question bank changed while this quiz was open. "
+                "Please start a new quiz."
+            ),
+        )
+    return quiz_ids, by_id
+
+
 def _grade(chosen: dict[int, int], questions: list[models.Question]) -> int:
     """Count how many of the chosen options are correct."""
     correct = 0
@@ -350,18 +387,13 @@ def answer_question(
     skill = _get_skill(db, skill_name)
     quiz = _load_quiz_for_play(db, skill, answer.quiz_id, user)
 
-    quiz_ids = json.loads(quiz.question_ids)
-    if answer.question_id not in set(quiz_ids):
+    quiz_ids, by_id = _load_served_questions(db, quiz)
+    if answer.question_id not in by_id:
         raise HTTPException(
             status_code=422, detail="That question is not part of this quiz."
         )
 
-    questions = db.scalars(
-        select(models.Question)
-        .where(models.Question.question_id.in_(quiz_ids))
-        .options(selectinload(models.Question.options))
-    ).all()
-    by_id = {q.question_id: q for q in questions}
+    questions = [by_id[qid] for qid in quiz_ids]
     question = by_id[answer.question_id]
 
     if not any(o.option_id == answer.option_id for o in question.options):
@@ -440,6 +472,10 @@ def submit_game(
             status_code=422, detail="Submitted difficulty does not match this quiz."
         )
 
+    # Loaded up front so a bank that moved under this quiz is reported as such
+    # rather than silently grading whatever questions happen to be left.
+    quiz_ids, by_id = _load_served_questions(db, quiz)
+
     # One answer per question; reject duplicates rather than silently dropping.
     chosen: dict[int, int] = {}
     for a in submission.answers:
@@ -449,7 +485,7 @@ def submit_game(
             )
         chosen[a.question_id] = a.option_id
 
-    expected = set(json.loads(quiz.question_ids))
+    expected = set(quiz_ids)
     if submission.timed_out:
         # The clock ran out part way through. Score the questions that were
         # answered and count the rest wrong, rather than binning the attempt.
@@ -483,11 +519,10 @@ def submit_game(
         # already graded. They were still given, so they still count.
         chosen[qid] = locked_option
 
-    questions = db.scalars(
-        select(models.Question)
-        .where(models.Question.question_id.in_(list(expected)))
-        .options(selectinload(models.Question.options))
-    ).all()
+    # In the order the quiz served them, so the per-question results line up
+    # with what the player actually saw rather than whatever order the ids
+    # came back from the database in.
+    questions = [by_id[qid] for qid in quiz_ids]
 
     results: list[QuestionResult] = []
     score = 0
