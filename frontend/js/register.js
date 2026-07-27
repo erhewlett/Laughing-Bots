@@ -177,9 +177,14 @@ registrationForm.addEventListener("submit", async (e)=> {
 
     // a brand new account inherits nothing from whoever used this browser
     // last. The parameters just set above are this user's own; the cached
-    // cloud and any half-finished search are not.
+    // cloud is not.
     localStorage.removeItem('word_cloud_results');
-    localStorage.removeItem('word_cloud_pending');
+
+    // the signup form collects search parameters, so registering is itself a
+    // deliberate search and the view page should run it. Set explicitly rather
+    // than leaning on the creation page to do it, because registration does
+    // not always go through the creation page.
+    localStorage.setItem('word_cloud_pending', '1');
 
     // combine first and last name to store name variable if not empty
     if (!firstNameField.value === "" && !lastNameField.value === "") {
