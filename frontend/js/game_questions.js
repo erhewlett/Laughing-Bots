@@ -3,6 +3,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const API_BASE_URL = "http://localhost:8000";
     const MAX_POINTS = 10000;
 
+    /*
+     * How long the correct answer stays on screen before the next
+     * question loads.
+     *
+     * The countdown is paused for this stretch. The player is reading
+     * feedback, not answering, so it would not be fair to charge them
+     * for it, and on hard mode 10 of these would eat a sixth of the
+     * clock.
+     */
+    const FEEDBACK_DELAY_MS = 1500;
+
     // Page elements
     const timeLeftInGame = document.querySelector(".time-left");
     // [CHANGED] ".difficulty-chosen" TO "#difficulty-chosen" (to match the HTML class)
@@ -12,6 +23,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const questionText = document.querySelector("#question-text");
     const choicesContainer = document.querySelector("#choices-container");
     const submitAnswerBtn = document.querySelector("#submit-answer-btn");
+
+    /*
+     * The progress bar is optional. It is not in the required-element
+     * check below, so a page without it still plays.
+     */
+    const progressTrack = document.querySelector(".progress[role='progressbar']");
+    const progressBar = document.querySelector(".progress-bar");
 
     if (
         !timeLeftInGame ||
@@ -68,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
      *
      * Easy: 3 minutes
      * Medium: 2 minutes
-     * Hard: 1 minute
+     * Hard: 90 seconds
      *
      * Difficulty does not change the maximum score.
      * Every mode is normalized to 10,000 points.
@@ -109,6 +127,20 @@ document.addEventListener("DOMContentLoaded", () => {
     let submissionInProgress = false;
 
     /*
+     * True while the correct answer is on screen between questions.
+     * Freezes the countdown (see FEEDBACK_DELAY_MS).
+     */
+    let feedbackShowing = false;
+
+    /*
+     * The running 0-10,000 score, as graded by the backend one answer
+     * at a time. The backend is the only thing that decides what is
+     * correct, so this is read straight off its response rather than
+     * being tallied here.
+     */
+    let liveScore = 0;
+
+    /*
      * This array stores each answer submitted by the player.
      *
      * Example:
@@ -126,12 +158,13 @@ document.addEventListener("DOMContentLoaded", () => {
     playersChoice.textContent = currentSettings.displayName;
 
     /*
-     * The frontend starts at zero points.
-     * The final score is calculated after the backend
-     * grades the completed quiz.
+     * The player starts at zero points. From here the score is
+     * updated after every answer, using the running total the
+     * backend sends back when it grades that answer.
      */
 
-    updateScoreDisplay(0, totalQuestions);
+    renderScore(0);
+    renderProgress(0);
 
     /*
      * Display the first question and start the timer.
@@ -200,6 +233,11 @@ document.addEventListener("DOMContentLoaded", () => {
             label.classList.remove("active");
             label.hidden = false;
         });
+
+        /*
+         * Drop the right/wrong marks from the previous question.
+         */
+        clearAnswerFeedback();
 
         /*
          * Fill the existing radio-button labels with
@@ -294,12 +332,13 @@ document.addEventListener("DOMContentLoaded", () => {
     /**
      * Handles the player's answer when Submit is clicked.
      */
-    function submitCurrentAnswer() {
+    async function submitCurrentAnswer() {
         /*
-         * Prevent answers after the game ends and
-         * prevent double-click submissions.
+         * Prevent answers after the game ends, prevent double-click
+         * submissions, and ignore clicks while the correct answer is
+         * still being shown.
          */
-        if (gameFinished || submissionInProgress) {
+        if (gameFinished || submissionInProgress || feedbackShowing) {
             return;
         }
 
@@ -343,8 +382,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
         /*
          * Storing the player's answer.
+         *
+         * The completed quiz is still submitted in full at the end.
+         * Grading below is what moves the score during play; the
+         * final submission is what records the attempt.
          */
         submittedAnswers.push(answer);
+
+        renderProgress(submittedAnswers.length);
+
+        /*
+         * Have the backend grade this one answer, then show the
+         * player how they did before moving on.
+         */
+        await gradeAnswer(answer);
+
+        /*
+         * Grading is a round trip, so the clock can run out while it
+         * is in flight. If it did, stop here rather than loading
+         * another question on top of the expiry message. The
+         * countdown is frozen while feedback is on screen, so this
+         * only covers the request itself.
+         */
+        if (gameFinished) {
+            return;
+        }
 
         /*
          * Move the question index forward.
@@ -369,14 +431,163 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /**
-     * Sends all answers to the FastAPI backend.
+     * Sends one answer to the backend, shows whether it was right,
+     * and moves the score.
+     *
+     * The backend records the answer before it tells us anything, so
+     * the pick is locked in by the time the player learns whether it
+     * was correct. That is what makes it safe to reveal the right
+     * option here instead of holding everything back until the end.
+     *
+     * A failure here is not fatal. The answer is already in
+     * submittedAnswers, so the completed quiz still grades correctly
+     * at the end; the player just does not get feedback on this one.
      */
-    async function submitCompletedQuiz() {
+    async function gradeAnswer(answer) {
+        let result = null;
+
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/game/${encodeURIComponent(chosenSkill)}/answer`,
+                {
+                    method: "POST",
+
+                    headers: buildRequestHeaders(),
+
+                    body: JSON.stringify({
+                        quiz_id: quizId,
+
+                        question_id: answer.question_id,
+
+                        option_id: answer.option_id
+                    })
+                }
+            );
+
+            result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    result.detail ||
+                    `The answer could not be graded. Status: ${response.status}`
+                );
+            }
+        } catch (error) {
+            console.error("Answer grading failed:", error);
+
+            /*
+             * Keep playing. The score catches up when the completed
+             * quiz is graded.
+             */
+            return;
+        }
+
         /*
-         * The backend requires one answer for every
-         * question that was served.
+         * The running total is the backend's, not ours, so the number
+         * the player watches climb is the number they finish on.
          */
-        if (submittedAnswers.length !== totalQuestions) {
+        liveScore = Number(result.score_normalized ?? liveScore);
+
+        renderScore(liveScore);
+
+        await showAnswerFeedback(result, answer.option_id);
+    }
+
+    /**
+     * Marks the player's pick right or wrong, shows the correct
+     * option, and holds it on screen long enough to read.
+     */
+    async function showAnswerFeedback(result, pickedOptionId) {
+        const correctOptionId = Number(result.correct_option_id);
+
+        answerInputs.forEach((input) => {
+            const optionId = Number(input.dataset.optionId);
+
+            const label = input.closest("label");
+
+            if (!label || Number.isNaN(optionId)) {
+                return;
+            }
+
+            /*
+             * The correct option is always marked. The player's pick
+             * is marked wrong only when it was not the correct one,
+             * so a right answer gets a single check rather than a
+             * check and a cross on the same row.
+             */
+            if (optionId === correctOptionId) {
+                label.classList.add("answer-correct");
+            } else if (optionId === pickedOptionId) {
+                label.classList.add("answer-wrong");
+            }
+        });
+
+        /*
+         * Freeze the countdown while the answer is on screen.
+         */
+        feedbackShowing = true;
+
+        await wait(FEEDBACK_DELAY_MS);
+
+        feedbackShowing = false;
+    }
+
+    /**
+     * Removes the right/wrong marks left by the previous question.
+     */
+    function clearAnswerFeedback() {
+        answerLabels.forEach((label) => {
+            label.classList.remove("answer-correct", "answer-wrong");
+        });
+    }
+
+    /**
+     * Request headers for the game endpoints.
+     *
+     * The token is only attached when there is one. Sending
+     * "Bearer null" while logged out reads as a malformed token.
+     */
+    function buildRequestHeaders() {
+        const headers = {
+            "Content-Type": "application/json",
+
+            Accept: "application/json"
+        };
+
+        const token = localStorage.getItem("token");
+
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
+
+        return headers;
+    }
+
+    /**
+     * Resolves after the given number of milliseconds.
+     */
+    function wait(milliseconds) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, milliseconds);
+        });
+    }
+
+    /**
+     * Sends all answers to the FastAPI backend.
+     *
+     * @param {{timedOut?: boolean}} [options] timedOut submits a partial
+     *        quiz after the clock runs out. The backend grades the
+     *        unanswered questions wrong and keeps the maximum at the
+     *        full quiz.
+     */
+    async function submitCompletedQuiz(options) {
+        const timedOut = Boolean(options && options.timedOut);
+
+        /*
+         * Outside of a timeout the backend requires one answer for
+         * every question that was served.
+         */
+        if (!timedOut && submittedAnswers.length !== totalQuestions) {
 
             displayGameError(
                 `All ${totalQuestions} questions must be answered before submission.`
@@ -387,36 +598,39 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        submissionInProgress = true;
+
         /*
          * Stop the timer while the quiz is submitted.
          */
         clearInterval(timerInterval);
 
         try {
-            // save token
-            const token = localStorage.getItem('token');
             const response = await fetch(
                 `${API_BASE_URL}/game/${encodeURIComponent(chosenSkill)}/submit`,
                 {
                     method: "POST",
 
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-
-                        Accept:
-                            "application/json",
-                        
-                        Authorization:
-                            `Bearer ${token}`
-                    },
+                    headers: buildRequestHeaders(),
 
                     body: JSON.stringify({
                         quiz_id: quizId,
 
                         difficulty: selectedDifficulty,
 
-                        answers: submittedAnswers
+                        answers: submittedAnswers,
+
+                        /*
+                         * Time actually spent on questions. The clock is
+                         * frozen while feedback is on screen, so this does
+                         * not bill the player for reading it.
+                         */
+                        elapsed_seconds: Math.max(
+                            currentSettings.timeInSeconds - remainingTime,
+                            0
+                        ),
+
+                        timed_out: timedOut
                     })
                 }
             );
@@ -447,12 +661,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 "The quiz could not be submitted."
             );
 
-            /*
-             * Allow the player to try submitting
-             * the completed quiz again.
-             */
             submissionInProgress = false;
-            submitAnswerBtn.disabled = false;
+
+            /*
+             * Allow another go at submitting, but only while the game
+             * is still live. Re-enabling the button after the clock
+             * expired would let the player carry on answering.
+             */
+            if (!gameFinished) {
+                submitAnswerBtn.disabled = false;
+            }
         }
     }
 
@@ -516,11 +734,16 @@ document.addEventListener("DOMContentLoaded", () => {
          * 5 correct  = 5,000 points
          * 10 correct = 10,000 points
          */
-        const finalScore =
-            calculateTheScore(
-                correctAnswers,
-                backendTotal
-            );
+        /*
+         * The backend sends the same 0-10,000 figure it has been
+         * returning after every answer, so the final number matches
+         * the one the player watched climb. The local calculation is
+         * kept as a fallback for a response that omits it.
+         */
+        const finalScore = Number(
+            result.score_normalized ??
+            calculateTheScore(correctAnswers, backendTotal)
+        );
 
         const finalPercentage =
             calculateScorePercentage(
@@ -530,10 +753,7 @@ document.addEventListener("DOMContentLoaded", () => {
         /*
          * Update the visible score.
          */
-        updateScoreDisplay(
-            correctAnswers,
-            backendTotal
-        );
+        renderScore(finalScore);
 
         /*
          * Store the complete game result.
@@ -627,11 +847,42 @@ document.addEventListener("DOMContentLoaded", () => {
      */
     function updateScoreDisplay(correctAnswers, questionCount) {
 
-        const score = calculateTheScore(correctAnswers, questionCount);
+        renderScore(calculateTheScore(correctAnswers, questionCount));
+    }
+
+    /**
+     * Moves the progress bar to show how much of the quiz is done.
+     *
+     * The markup carried a bar that nothing ever updated, so it sat
+     * at 0% for the whole game.
+     */
+    function renderProgress(answeredCount) {
+        if (!progressBar || totalQuestions <= 0) {
+            return;
+        }
+
+        const percentComplete = Math.min(
+            Math.round((answeredCount / totalQuestions) * 100),
+            100
+        );
+
+        progressBar.style.width = `${percentComplete}%`;
+
+        if (progressTrack) {
+            progressTrack.setAttribute("aria-valuenow", String(percentComplete));
+        }
+    }
+
+    /**
+     * Writes an already-calculated 0-10,000 score to the page.
+     *
+     * The percentage is that score out of the 10,000 maximum, so one
+     * correct answer out of ten reads as 1,000 pts and 10%.
+     */
+    function renderScore(score) {
 
         const percentage = calculateScorePercentage(score);
 
-        
         pointsInGame.textContent = `${score.toLocaleString("en-US")} pts`;
 
         totalPercentage.textContent = `${percentage}%`;
@@ -644,6 +895,14 @@ document.addEventListener("DOMContentLoaded", () => {
         updateTimerDisplay();
 
         timerInterval = setInterval(() => {
+            /*
+             * The clock does not run while the player is being shown
+             * the correct answer between questions.
+             */
+            if (feedbackShowing) {
+                return;
+            }
+
             remainingTime--;
 
             if (remainingTime <= 0) {
@@ -679,6 +938,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /**
      * Handles an expired timer.
+     *
+     * The answers given before the clock ran out are still worth
+     * points, so the quiz is submitted rather than thrown away.
+     * The backend grades whatever is missing as wrong and keeps the
+     * maximum at the full ten questions, so stopping early is never
+     * better than playing on.
      */
     function handleTimeExpired() {
         clearInterval(timerInterval);
@@ -690,16 +955,20 @@ document.addEventListener("DOMContentLoaded", () => {
         setAnswerInputsDisabled(true);
 
         /*
-         * The current backend requires exactly one
-         * answer for every question served.
-         *
-         * An incomplete quiz cannot be submitted
-         * because unanswered questions do not have
-         * valid option IDs.
+         * A submission may already be on its way if the clock ran out
+         * on the last question. Do not send a second one.
          */
+        if (submissionInProgress) {
+            return;
+        }
+
+        const answered = submittedAnswers.length;
+
         displayGameError(
-            "Time expired. This incomplete quiz cannot be scored. Return to the dashboard to start a new quiz."
+            `Time expired. Scoring the ${answered} question${answered === 1 ? "" : "s"} you answered.`
         );
+
+        submitCompletedQuiz({ timedOut: true });
     }
 
     /**
@@ -713,27 +982,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /**
      * Displays an error message below the Submit button.
+     *
+     * Styling and placement live in the HTML now. This used to add the
+     * classes and re-insert the element on every call, which moved it
+     * down the page each time an error was shown.
      */
     function displayGameError(message) {
-        let errorElement = document.querySelector("#game-display-error");
+        const errorElement = document.querySelector("#game-display-error");
 
-       
-        errorElement.id = "game-display-error";
+        if (!errorElement) {
+            console.error("Game error, with nowhere to show it:", message);
 
-        errorElement.classList.add(
-            "text-danger",
-            "text-center",
-            "mt-2"
-        );
-
-        errorElement.setAttribute(
-            "role",
-            "alert"
-        );
-
-        submitAnswerBtn.parentElement.insertAdjacentElement("afterend", errorElement);
+            return;
+        }
 
         errorElement.textContent = message;
+
+        errorElement.hidden = false;
     }
 
     /**
@@ -744,6 +1009,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (errorElement) {
             errorElement.textContent = "";
+
+            errorElement.hidden = true;
         }
     }
 

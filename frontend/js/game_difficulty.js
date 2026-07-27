@@ -79,15 +79,34 @@ async function startGame(difficulty) {
 
             `${API_BASE_URL}/game/${skillPath}` + `?difficulty=${difficultyPath}`;
 
+        /*
+         * The token has to go out on this request, not just on submit.
+         *
+         * The backend ties the quiz session it creates here to whoever
+         * asked for it, and uses that to avoid repeating the questions
+         * from the player's last quiz on the same skill and difficulty.
+         * Without the header every session was created anonymous, so
+         * that never happened and players saw the same questions again.
+         */
+        const headers = {
+
+            Accept: "application/json"
+
+        };
+
+        const token = localStorage.getItem("token");
+
+        if (token) {
+
+            headers.Authorization = `Bearer ${token}`;
+
+        }
+
         const response = await fetch(requestURL, {
 
             method: "GET",
 
-            headers: {
-
-                Accept: "application/json"
-
-            }
+            headers: headers
 
         });
 

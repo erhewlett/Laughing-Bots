@@ -218,6 +218,49 @@ class GameSubmission(BaseModel):
     # older client that omits it still submits successfully; when present it is
     # persisted so the history and rank pages can show finish times.
     elapsed_seconds: int | None = Field(default=None, ge=0, le=86_400)
+    # Set when the clock ran out mid-quiz. Relaxes the "answer exactly the
+    # questions served" rule to "answer some of them", and everything left
+    # unanswered is graded wrong. max_score stays the full quiz either way, so
+    # running out of time can never score better than answering every question,
+    # and a partial quiz can never reach mastery.
+    timed_out: bool = False
+
+
+class LiveAnswer(BaseModel):
+    """One answer graded the moment the player commits to it."""
+
+    quiz_id: int = Field(ge=1, le=MAX_DB_INT)
+    question_id: int = Field(ge=1, le=MAX_DB_INT)
+    option_id: int = Field(ge=1, le=MAX_DB_INT)
+
+
+class LiveAnswerResult(BaseModel):
+    """Grade for one answer, plus the score so far.
+
+    Returned by POST /game/{skill}/answer so the quiz page can mark the pick
+    right or wrong and move its points counter as the player goes, instead of
+    waiting for the whole quiz to be submitted.
+    """
+
+    question_id: int
+    is_correct: bool
+    # Which option was the right one. Safe to send only because the player's
+    # pick is already recorded and cannot be changed, so this cannot be used to
+    # answer the question they just answered.
+    correct_option_id: int | None = None
+    # True when this question had already been graded and the stored result is
+    # being replayed. The pick does not change; a second try on the same
+    # question cannot be used to hunt for the right option.
+    already_answered: bool = False
+    answered_count: int
+    total_questions: int
+    correct_count: int
+    # Running 0..10000 score, same formula the final result uses, so the number
+    # the player watches climbs to exactly the score they finish with.
+    score_normalized: int
+    # True once every question in the quiz has been answered, meaning the page
+    # can go straight to submitting.
+    quiz_complete: bool
 
 
 class QuestionResult(BaseModel):

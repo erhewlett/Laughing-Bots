@@ -73,6 +73,17 @@ def initialize_database(bind=engine) -> None:
                 text("ALTER TABLE game_attempts ADD COLUMN time_taken_seconds INTEGER")
             )
 
+        # Per-answer grading (POST /game/{skill}/answer) locks each pick here as
+        # it is made. The DEFAULT backfills quizzes that were already in flight,
+        # so an existing database does not come back with NULLs.
+        quiz_columns = {
+            column["name"] for column in inspector.get_columns("quiz_sessions")
+        }
+        if "answers" not in quiz_columns:
+            connection.execute(
+                text("ALTER TABLE quiz_sessions ADD COLUMN answers TEXT DEFAULT '{}'")
+            )
+
         # Older builds allowed multiple roadmaps per user. Keep the newest row
         # before adding the one-roadmap-per-user database invariant.
         roadmap_rows = connection.execute(

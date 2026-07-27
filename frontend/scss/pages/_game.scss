@@ -139,4 +139,40 @@
     label {
         width: 70%;
     }
+
+    // Right/wrong marks shown between questions, once an answer has
+    // been graded. The mark is a CSS escape rather than a literal
+    // character so the source stays plain ASCII: 2713 is a check,
+    // 2717 is a cross.
+    label.answer-correct,
+    label.answer-wrong {
+        justify-content: space-between;
+
+        &::after {
+            font-size: 1.4em;
+            font-weight: bold;
+            line-height: 1;
+            margin-left: 0.75rem;
+        }
+    }
+
+    label.answer-correct {
+        border-color: #198754;
+        background-color: #d1e7dd;
+
+        &::after {
+            content: "\2713";
+            color: #0f5132;
+        }
+    }
+
+    label.answer-wrong {
+        border-color: #dc3545;
+        background-color: #f8d7da;
+
+        &::after {
+            content: "\2717";
+            color: #842029;
+        }
+    }
 }
