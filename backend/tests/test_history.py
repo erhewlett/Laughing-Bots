@@ -125,8 +125,10 @@ def test_last_game_populated_after_play(client, db_session):
 # --- /me/games ---------------------------------------------------------------
 
 
-def _play_quiz(client, headers, skill="Python", difficulty="easy", elapsed=None):
-    """Play one quiz to completion, all answers correct."""
+def _play_quiz(
+    client, headers, skill="Python", difficulty="easy", elapsed=None, wrong=0
+):
+    """Play one quiz to completion; make `wrong` of the answers incorrect."""
     quiz = client.get(
         f"/game/{skill}", params={"difficulty": difficulty}, headers=headers
     ).json()
@@ -134,10 +136,12 @@ def _play_quiz(client, headers, skill="Python", difficulty="easy", elapsed=None)
         {
             "question_id": q["question_id"],
             "option_id": next(
-                o for o in q["options"] if o["option_text"] == "o0"
+                o
+                for o in q["options"]
+                if (o["option_text"] == "o0") == (i >= wrong)
             )["option_id"],
         }
-        for q in quiz["questions"]
+        for i, q in enumerate(quiz["questions"])
     ]
     body = {
         "quiz_id": quiz["quiz_id"],
@@ -174,6 +178,34 @@ def test_games_records_attempt_with_totals(client, db_session):
     assert item["skill"] == "Python" and item["score"] == 3
     # a perfect 3/3 is 100%, so the normalized display score is the full 10000
     assert item["score_normalized"] == 10_000 and item["percentage"] == 100
+
+
+def test_percentage_rounds_the_same_way_the_quiz_page_does(client, db_session):
+    """Python's round() is banker's rounding, the quiz page uses Math.round.
+
+    A 1-of-8 attempt lands exactly on 12.5, where round() gives 12 and
+    Math.round gives 13, so history disagreed with the score the player was
+    shown for the same attempt.
+    """
+    from app.routers.history import _round_half_up
+
+    assert _round_half_up(12.5) == 13      # round(12.5) is 12
+    assert _round_half_up(1 / 8 * 100) == 13
+    # ordinary cases are unchanged
+    assert _round_half_up(12.4) == 12
+    assert _round_half_up(60.0) == 60
+    assert _round_half_up(0.0) == 0
+
+
+def test_games_percentage_matches_a_half_landing_attempt(client, db_session):
+    """End to end: an 8-question bank puts 1 correct exactly on 12.5%."""
+    _seed_easy_questions(db_session, n=8)
+    h = {"Authorization": f"Bearer {_token(client)}"}
+    _play_quiz(client, h, wrong=7)          # 1 of 8 correct
+
+    item = client.get("/me/games", headers=h).json()["attempts"][0]
+    assert item["score"] == 1 and item["max_score"] == 8
+    assert item["percentage"] == 13         # not 12
 
 
 def test_games_persists_elapsed_seconds(client, db_session):

@@ -12263,6 +12263,33 @@ footer {
 .game_question_page label {
   width: 70%;
 }
+.game_question_page label.answer-correct,
+.game_question_page label.answer-wrong {
+  justify-content: space-between;
+}
+.game_question_page label.answer-correct::after,
+.game_question_page label.answer-wrong::after {
+  font-size: 1.4em;
+  font-weight: bold;
+  line-height: 1;
+  margin-left: 0.75rem;
+}
+.game_question_page label.answer-correct {
+  border-color: #198754;
+  background-color: #d1e7dd;
+}
+.game_question_page label.answer-correct::after {
+  content: "✓";
+  color: #0f5132;
+}
+.game_question_page label.answer-wrong {
+  border-color: #dc3545;
+  background-color: #f8d7da;
+}
+.game_question_page label.answer-wrong::after {
+  content: "✗";
+  color: #842029;
+}
 
 .word-cloud-container {
   border: 3px solid #F7E4E0;

@@ -53,11 +53,9 @@
                             type="text"
                             class="form-control"
                             id="firstNameInput"
-                            minlength="4"
                             maxlength="16"
                             pattern="[a-zA-Z0-9]+"
                             aria-describedby="firstNameHelp"
-                            required
                         >
                         <!-- Error message if error found -->
                         <div class="invalid-feedback" id="firstNameError"></div>
@@ -80,11 +78,9 @@
                             type="text"
                             class="form-control"
                             id="lastNameInput"
-                            minlength="4"
                             maxlength="16"
                             pattern="[a-zA-Z0-9]+"
                             aria-describedby="lastNameHelp"
-                            required
                         >
                         <!-- Error message if error found -->
                         <div class="invalid-feedback" id="lastNameError"></div>
@@ -230,7 +226,7 @@
                             id="locationInput"
                             list="locationSuggestions"
                             pattern="[a-zA-Z0-9, \-.']+"
-                            placeholder="e.g. Atlanta, GA"
+                            placeholder="Start typing to see available locations"
                         >
 
                         <datalist id="locationSuggestions"></datalist>

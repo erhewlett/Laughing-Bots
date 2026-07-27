@@ -83,68 +83,42 @@ jobTitles.forEach((job) => {
 // location
 const locationSuggestions = document.querySelector("#locationSuggestions");
 
-// States for the location
-const usaLocations = [
-    "Birmingham, AL",
-    "Anchorage, AK",
-    "Phoenix, AZ",
-    "Little Rock, AR",
-    "Los Angeles, CA",
-    "Denver, CO",
-    "Bridgeport, CT",
-    "Wilmington, DE",
-    "Jacksonville, FL",
-    "Atlanta, GA",
-    "Honolulu, HI",
-    "Boise, ID",
-    "Chicago, IL",
-    "Indianapolis, IN",
-    "Des Moines, IA",
-    "Wichita, KS",
-    "Louisville, KY",
-    "New Orleans, LA",
-    "Portland, ME",
-    "Baltimore, MD",
-    "Boston, MA",
-    "Detroit, MI",
-    "Minneapolis, MN",
-    "Jackson, MS",
-    "Kansas City, MO",
-    "Billings, MT",
-    "Omaha, NE",
-    "Las Vegas, NV",
-    "Manchester, NH",
-    "Newark, NJ",
-    "Albuquerque, NM",
-    "New York City, NY",
-    "Charlotte, NC",
-    "Fargo, ND",
-    "Columbus, OH",
-    "Oklahoma City, OK",
-    "Portland, OR",
-    "Philadelphia, PA",
-    "Providence, RI",
-    "Charleston, SC",
-    "Sioux Falls, SD",
-    "Nashville, TN",
-    "Houston, TX",
-    "Salt Lake City, UT",
-    "Burlington, VT",
-    "Virginia Beach, VA",
-    "Seattle, WA",
-    "Charleston, WV",
-    "Milwaukee, WI",
-    "Cheyenne, WY"
-];
+// Locations come from the backend, which only lists ones that actually have
+// postings behind them. The 50 state capitals hardcoded here before matched
+// nothing at all: the seeded postings are DC-metro and spell the state out
+// ("Alexandria, Virginia"), so every location a new account could pick led to
+// a word cloud request that failed with 422. PR 41 does the same thing for the
+// word cloud creation page.
+let availableLocations = [];
 
-// Cycles through the locations within usaLocations Array
-usaLocations.forEach((location) => {
-    const option = document.createElement("option");
+async function loadLocations() {
+    try {
+        const response = await fetch("http://localhost:8000/locations");
 
-    option.value = location;
+        if (!response.ok) {
+            return;
+        }
 
-    locationSuggestions.appendChild(option);
-});
+        const rows = await response.json();
+
+        availableLocations = rows.map((row) => row.location);
+
+        availableLocations.forEach((location) => {
+            const option = document.createElement("option");
+
+            option.value = location;
+
+            locationSuggestions.appendChild(option);
+        });
+    } catch (error) {
+        // The field is optional, so a failed load just means no suggestions.
+        // The check on submit below stays quiet when the list is unknown
+        // rather than blocking registration on it.
+        console.warn("Available locations could not be loaded.");
+    }
+}
+
+loadLocations();
 
 // The form runs an async await function upon submission
 // Async await works like so: It tells the browser while a function is awaiting the
@@ -172,19 +146,27 @@ registrationForm.addEventListener("submit", async (e)=> {
         shape: shape
     };
 
-    // localStroage set up
-    localStorage.setItem("word_cloud_parameters", JSON.stringify(wordCloudGeneration));
+    /*
+     * These three used to be stored here, before the form was validated and
+     * before the account was created. Someone already logged in on this
+     * browser who then abandoned or failed a signup lost their cached cloud
+     * and had a bogus search left staged, which fired and wrote a junk row
+     * into their history the next time they opened the view page. They are
+     * written once the account exists instead - see storeWordCloudSearch()
+     * below, called after the register request succeeds.
+     */
 
-    // combine first and last name to store name variable if not empty
-    if (!firstNameField.value === "" && !lastNameField.value === "") {
-        const nameInput = `${firstNameField.value.trim()} ${lastNameField.value.trim()}`.trim();
-    } else if (firstNameField.value === "" && !lastNameField.value === "") {
-        nameInput = `${lastNameField.value.trim()}`.trim();
-    } else if (!firstNameField.value === "" && lastNameField.value === "") {
-        nameInput = `${firstNameField.value.trim()}`.trim();
-    } else {
-        nameInput = "";
-    }
+    // Combine first and last name, using whichever parts were filled in.
+    //
+    // This was four branches testing `!field.value === ""`, which is
+    // `(!field.value) === ""`, a boolean compared to a string and so always
+    // false. Every branch fell through to the empty one, and the first branch
+    // declared its result with const inside the block where nothing else could
+    // read it, so the name sent to the backend was always blank and every
+    // account came back from /auth/me with name: null.
+    const nameInput = [firstNameField.value.trim(), lastNameField.value.trim()]
+        .filter(Boolean)
+        .join(" ");
 
     const isValid = verifying_registration(firstNameField,
         lastNameField,
@@ -300,10 +282,14 @@ registrationForm.addEventListener("submit", async (e)=> {
         // valid
         console.log("User registered:", result);
         console.log("Checking token property:", result.access_token);
-        // [CHANGED] added to store access token received after registration in localStorage 
+        // [CHANGED] added to store access token received after registration in localStorage
         if (result.access_token) {
             localStorage.setItem("token", result.access_token);
         }
+
+        // the account exists now, so this signup's search is a real one and
+        // storing it can no longer disturb a session that was already here
+        storeWordCloudSearch(wordCloudGeneration);
 
         alert("Account created successfully.");
 
@@ -330,6 +316,20 @@ registrationForm.addEventListener("submit", async (e)=> {
     }
 
 });
+
+/* Store the search the signup form collected, for the view page to run.
+ *
+ * Only called once the account has actually been created. A brand new account
+ * inherits nothing from whoever used this browser last, so the cached cloud is
+ * dropped while the new parameters go in, and the pending flag marks this as a
+ * deliberate search because registration does not always go via the creation
+ * page.
+ */
+function storeWordCloudSearch(wordCloudGeneration) {
+    localStorage.setItem("word_cloud_parameters", JSON.stringify(wordCloudGeneration));
+    localStorage.removeItem('word_cloud_results');
+    localStorage.setItem('word_cloud_pending', '1');
+}
 
 //the funciton for verifiying all inputs within the registration form are valid inputs
 function verifying_registration(firstName, lastName, userName, confirmUserName, passWord, confirmPassword, jobTitle, location, minSalary, wordCount, shape) {
@@ -738,11 +738,17 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
 
     }
 
-    // Rules to check in order for the form to validate properly
+    // Rules to check in order for the form to validate properly.
+    //
+    // Both name fields are labelled optional on the form, so a blank one has
+    // to pass. They were rejected as "tooShort", which made the labels a lie
+    // and blocked the whole registration. The 4-character floor also ruled out
+    // real names like Ann or Bo, so it only applies once something is typed
+    // and is down to 1.
     function notValidFirstName() {
-        
-        if (firstNameVal.length < 4)
-            return "tooShort";
+
+        if (firstNameVal.length === 0)
+            return "";
         if (firstNameVal.length > 16)
             return "tooLong";
         if (emailPattern.test(firstNameVal))
@@ -751,9 +757,9 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
     }
 
     function notValidLastName() {
-        
-        if (lastNameVal.length < 4)
-            return "tooShort";
+
+        if (lastNameVal.length === 0)
+            return "";
         if (lastNameVal.length > 16)
             return "tooLong";
         if (emailPattern.test(lastNameVal))
@@ -838,10 +844,14 @@ function verifying_registration(firstName, lastName, userName, confirmUserName, 
             return "";
         }
 
-        const locationExists = usaLocations.some((location) => {
-            const storedLocation = location.toLowerCase();
+        // Nothing to check against if the list never loaded. The field is
+        // optional, so an unreachable backend must not block registration.
+        if (availableLocations.length === 0) {
+            return "";
+        }
 
-            return storedLocation === locationValue;
+        const locationExists = availableLocations.some((known) => {
+            return known.toLowerCase() === locationValue;
         });
 
         if (!locationExists) {

@@ -247,6 +247,33 @@ def test_words_flag_playable_skills(client, db_session, auth_headers):
     assert by_skill["SQL"] is False      # no questions seeded
 
 
+def test_playable_ignores_an_unsupported_difficulty(client, db_session, auth_headers):
+    """A stray difficulty must not make a skill look clickable.
+
+    GET /game/skills already drops these, and GET /game/{skill} answers 422 for
+    every difficulty, so flagging the word playable produced a link that could
+    only ever fail.
+    """
+    _seed(db_session)
+    skill = db_session.scalar(
+        select(models.Skill).where(models.Skill.skill_name == "Python")
+    )
+    # a seed typo, the same case test_skills_ignores_unknown_difficulty covers
+    db_session.add(
+        models.Question(
+            skill_id=skill.skill_id, difficulty="meduim", question_text="Q"
+        )
+    )
+    db_session.commit()
+
+    words = client.post(
+        "/wordcloud", json={"job_title": "Data Analyst"}, headers=auth_headers
+    ).json()["words"]
+    by_skill = {w["skill"]: w["playable"] for w in words}
+
+    assert by_skill["Python"] is False
+
+
 def test_response_includes_username(client, db_session, auth_headers):
     """Saves the cloud page a blocking GET /auth/me before it can render."""
     _seed(db_session)
