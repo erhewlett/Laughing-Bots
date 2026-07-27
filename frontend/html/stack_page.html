@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <!--  cascadia code font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <title>JobHopper Stack</title>
+</head>
+<body>
+    <nav class="navbar sticky-top navbar-expand-md col-sm-12">
+        <div class="container-fluid">
+            <a class="navbar-brand register-brand" href="../html/main.html">
+                    JobHopper
+                </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="../html/registration_page.html">Sign Up</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="../html/creators.html">Creators</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="../html/game_rules.html">Game Rules</a>
+                </li>
+            </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid stack-page">
+        <main class="main-body flex-grow-1 d-flex align-items-center">
+            <section class="tech-stack-section">
+                <div class="section-heading">
+                    <h2 class="section-label">JobHopper Technology Stack</h2>
+                    <p>
+                        The tools and technologies that power<br> JobHopper to give this awesome experience:
+                    </p>
+                </div>
+
+                <div class="tech-stack-map">
+                    <!-- Connecting dotted lines -->
+                    <svg
+                        class="connection-lines"
+                        viewBox="0 0 1000 600"
+                        preserveAspectRatio="none"
+                        aria-hidden="true"
+                    >
+                        <!-- Center to upper bubbles -->
+                        <path d="M500 300 C420 220, 320 160, 190 115" />
+                        <path d="M500 300 C480 190, 480 130, 500 85" />
+                        <path d="M500 300 C590 220, 690 165, 820 115" />
+
+                        <!-- Center to side bubbles -->
+                        <path d="M500 300 C365 300, 255 290, 120 300" />
+                        <path d="M500 300 C635 300, 745 290, 880 300" />
+
+                        <!-- Center to lower bubbles -->
+                        <path d="M500 300 C410 385, 315 440, 190 500" />
+                        <path d="M500 300 C500 400, 500 455, 500 535" />
+                        <path d="M500 300 C590 385, 690 445, 820 500" />
+                    </svg>
+
+                    <!-- Python -->
+                    <article class="tech-bubble bubble-python">
+                        <img
+                            src="../assets/python-logo.svg"
+                            alt="Python logo"
+                        >
+                        <span>Python</span>
+                    </article>
+
+                    <!-- JavaScript -->
+                    <article class="tech-bubble bubble-javascript">
+                        <img
+                            src="../assets/javascript-logo.svg"
+                            alt="JavaScript logo"
+                        >
+                        <span>JavaScript</span>
+                    </article>
+
+                    <!-- FastAPI -->
+                    <article class="tech-bubble bubble-fastapi">
+                        <img
+                            src="../assets/fastapi-logo.svg"
+                            alt="FastAPI logo"
+                        >
+                        <span>FastAPI</span>
+                    </article>
+
+                    <!-- Sass -->
+                    <article class="tech-bubble bubble-sass">
+                        <img
+                            src="../assets/sass-logo.svg"
+                            alt="Sass logo"
+                        >
+                        <span>Sass</span>
+                    </article>
+
+                    <!-- JobHopper center -->
+                    <article class="tech-bubble bubble-center">
+                        <img
+                            class="jhLogo"
+                            src="../assets/JobHopper_logo.svg"
+                            alt="JobHopper logo"
+                        >
+                        <strong>JobHopper</strong>
+                    </article>
+
+                    <!-- HTML -->
+                    <article class="tech-bubble bubble-html">
+                        <img
+                            src="../assets/html-logo.svg"
+                            alt="HTML logo"
+                        >
+                        <span>HTML</span>
+                    </article>
+
+                    <!-- Bootstrap -->
+                    <article class="tech-bubble bubble-bootstrap">
+                        <img
+                            src="../assets/bootstrap-logo.svg"
+                            alt="Bootstrap logo"
+                        >
+                        <span>Bootstrap</span>
+                    </article>
+
+                    <!-- ChatGPT -->
+                    <article class="tech-bubble bubble-chatgpt">
+                        <img
+                            src="../assets/chatgpt-logo.svg"
+                            alt="ChatGPT logo"
+                        >
+                        <span>ChatGPT</span>
+                    </article>
+
+                    <!-- Claude Code -->
+                    <article class="tech-bubble bubble-claude">
+                        <img
+                            src="../assets/claude-logo.svg"
+                            alt="Claude Code logo"
+                        >
+                        <span>Claude Code</span>
+                    </article>
+                </div>
+            </section>
+        </main>
+    </div>
+    <!-- footer -->
+    <footer class="text-white text-center fixed py-3">
+        <div class="container">
+            Created by the Laughing Bots
+        </div>
+    </footer>    
+</body>
+</html>

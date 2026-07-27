@@ -12304,4 +12304,229 @@ footer {
   overflow: hidden;
 }
 
+.stack-page .main-body {
+  justify-content: center;
+  margin-bottom: 4em;
+}
+.stack-page .tech-stack-section {
+  padding: 5rem 1.5rem;
+  overflow: hidden;
+  background: radial-gradient(circle at center, rgba(189, 29, 85, 0.418), transparent 45%), #1c7b82;
+  color: #ffffff;
+  border-radius: 10px;
+}
+.stack-page .section-heading {
+  max-width: 700px;
+  margin: 0 auto 3rem;
+  text-align: center;
+}
+.stack-page .section-heading .section-label {
+  margin-bottom: 0.5rem;
+  color: #e42eea;
+  font-weight: 700;
+  letter-spacing: 0.18rem;
+  text-transform: uppercase;
+}
+.stack-page .section-heading h2 {
+  margin-bottom: 1rem;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+}
+.stack-page .section-heading p {
+  color: rgba(255, 255, 255, 0.7);
+}
+.stack-page .tech-stack-map {
+  position: relative;
+  width: min(100%, 1000px);
+  min-height: 600px;
+  margin: 0 auto;
+}
+.stack-page .connection-lines {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.stack-page .connection-lines path {
+  fill: none;
+  stroke: rgba(145, 255, 253, 0.32);
+  stroke-width: 9;
+  stroke-linecap: round;
+  stroke-dasharray: 2 24;
+  animation: move-dots 14s linear infinite;
+}
+.stack-page .tech-bubble {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  width: 145px;
+  aspect-ratio: 1;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04));
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transform: translate(-50%, -50%);
+  animation: floating-bubble 5s ease-in-out infinite;
+  transition: transform 250ms ease, border-color 250ms ease, box-shadow 250ms ease, background-color 250ms ease;
+}
+.stack-page .tech-bubble::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: inherit;
+  pointer-events: none;
+}
+.stack-page .tech-bubble::after {
+  content: "";
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  width: 30%;
+  height: 18%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  filter: blur(6px);
+  transform: rotate(-25deg);
+  pointer-events: none;
+}
+.stack-page .tech-bubble img {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.25));
+}
+.stack-page .tech-bubble .jhLogo {
+  width: 106px;
+  height: 106px;
+}
+.stack-page .tech-bubble span,
+.stack-page .tech-bubble strong {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+}
+.stack-page .tech-bubble:hover {
+  z-index: 3;
+  border-color: rgba(255, 255, 255, 0.45);
+  background: linear-gradient(145deg, rgba(156, 145, 255, 0.3), rgba(255, 255, 255, 0.08));
+  box-shadow: 0 25px 55px rgba(0, 0, 0, 0.45), 0 0 35px rgba(156, 145, 255, 0.3);
+  transform: translate(-50%, -50%) scale(1.12);
+}
+.stack-page .bubble-center {
+  top: 50%;
+  left: 50%;
+  width: 180px;
+  background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.22), transparent 30%), linear-gradient(145deg, rgba(255, 92, 255, 0.75), rgba(53, 39, 159, 0.75));
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.45), 0 0 50px rgba(112, 92, 255, 0.3);
+}
+.stack-page .bubble-center .center-icon {
+  display: grid;
+  place-items: center;
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 1.25rem;
+  letter-spacing: 0.08rem;
+}
+.stack-page .bubble-python {
+  top: 18%;
+  left: 19%;
+  animation-delay: -1s;
+}
+.stack-page .bubble-javascript {
+  top: 13%;
+  left: 50%;
+  animation-delay: -2.5s;
+}
+.stack-page .bubble-fastapi {
+  top: 18%;
+  left: 82%;
+  animation-delay: -0.5s;
+}
+.stack-page .bubble-sass {
+  top: 50%;
+  left: 12%;
+  animation-delay: -3.5s;
+}
+.stack-page .bubble-html {
+  top: 50%;
+  left: 88%;
+  animation-delay: -1.75s;
+}
+.stack-page .bubble-bootstrap {
+  top: 83%;
+  left: 19%;
+  animation-delay: -2.25s;
+}
+.stack-page .bubble-chatgpt {
+  top: 88%;
+  left: 50%;
+  animation-delay: -4s;
+}
+.stack-page .bubble-claude {
+  top: 83%;
+  left: 82%;
+  animation-delay: -3s;
+}
+@keyframes floating-bubble {
+  0%, 100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -12px;
+  }
+}
+@keyframes move-dots {
+  to {
+    stroke-dashoffset: -260;
+  }
+}
+@media (max-width: 767px) {
+  .stack-page .tech-stack-map {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+    min-height: auto;
+  }
+  .stack-page .connection-lines {
+    display: none;
+  }
+  .stack-page .tech-bubble {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: min(100%, 150px);
+    margin: 0 auto;
+    transform: none;
+  }
+  .stack-page .tech-bubble:hover {
+    transform: scale(1.08);
+  }
+  .stack-page .bubble-center {
+    grid-column: 1/-1;
+    grid-row: 1;
+    width: 175px;
+  }
+}
+@media (max-width: 420px) {
+  .stack-page .tech-stack-map {
+    grid-template-columns: 1fr;
+  }
+  .stack-page .bubble-center {
+    grid-column: auto;
+  }
+}
+
 /*# sourceMappingURL=style.css.map */
