@@ -15,7 +15,12 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app import models
-from app.schemas import SearchRequest, WordCloudResponse, WordCloudWord
+from app.schemas import (
+    DIFFICULTY_VALUES,
+    SearchRequest,
+    WordCloudResponse,
+    WordCloudWord,
+)
 from app.services import security
 from app.utils import utcnow_naive
 
@@ -203,11 +208,19 @@ def generate_wordcloud(
     # Which of these skills can actually start a quiz. One small query here
     # saves the cloud page a whole round trip to GET /game/skills, which it
     # currently awaits before this request even starts.
+    #
+    # The difficulty filter has to match the one GET /game/skills applies.
+    # Without it a skill whose only questions carry a typo'd difficulty came
+    # back playable, so the cloud rendered it as clickable and every quiz
+    # request for it then failed with a 422.
     playable = set(
         db.scalars(
             select(models.Skill.skill_name)
             .join(models.Question, models.Question.skill_id == models.Skill.skill_id)
-            .where(models.Skill.skill_name.in_([row.skill_name for row in df_rows]))
+            .where(
+                models.Skill.skill_name.in_([row.skill_name for row in df_rows]),
+                models.Question.difficulty.in_(DIFFICULTY_VALUES),
+            )
             .distinct()
         )
     )

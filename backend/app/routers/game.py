@@ -45,6 +45,7 @@ from sqlalchemy.orm import Session, selectinload
 from app import models
 from app.database import get_db
 from app.schemas import (
+    DIFFICULTY_VALUES,
     AnswerOptionOut,
     Difficulty,
     GameQuestions,
@@ -65,7 +66,9 @@ QUIZ_SIZE = 10
 SESSION_TTL_HOURS = 24  # replay guards are retained for one day
 # Attempts to write one answer before giving up, see answer_question.
 _ANSWER_WRITE_RETRIES = 3
-_DIFFICULTY_RANK = {"easy": 0, "medium": 1, "hard": 2}
+# Easiest first. Derived from the same tuple the word cloud's playable check
+# filters on, so the two cannot disagree about what counts as a real difficulty.
+_DIFFICULTY_RANK = {name: i for i, name in enumerate(DIFFICULTY_VALUES)}
 
 
 def _get_skill(db: Session, skill_name: str) -> models.Skill:

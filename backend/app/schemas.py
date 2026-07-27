@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
+from typing import Literal, get_args
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -174,6 +174,12 @@ class UserOut(BaseModel):
 # --------------------------------------------------------------------------
 
 Difficulty = Literal["easy", "medium", "hard"]
+
+# The difficulties a quiz can actually be served at, easiest first. Anything
+# else sitting in the questions table is bad data (a seed typo, say) and must
+# not be treated as playable. Derived from the Literal so the routes that
+# filter on it and the schema that validates it cannot drift apart.
+DIFFICULTY_VALUES: tuple[str, ...] = get_args(Difficulty)
 
 
 class SkillQuizzes(BaseModel):

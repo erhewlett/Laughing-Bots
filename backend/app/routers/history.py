@@ -8,6 +8,8 @@ here is a convenience from the saved GameAttempt.
 """
 from __future__ import annotations
 
+import math
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import Float, cast, func, select
 from sqlalchemy.orm import Session, joinedload
@@ -25,6 +27,17 @@ from app.schemas import (
 from app.services import security
 
 router = APIRouter(prefix="/me", tags=["history"])
+
+
+def _round_half_up(value: float) -> int:
+    """Round .5 away from zero, the way the quiz page's Math.round does.
+
+    Python's built-in round() is banker's rounding, so round(12.5) is 12 while
+    JavaScript's Math.round(12.5) is 13. On a bank smaller than a full quiz
+    that split the two apart: a 1-of-8 attempt showed 13% on the game page and
+    came back as 12% here for the same attempt.
+    """
+    return math.floor(value + 0.5)
 
 
 @router.get("/recent", response_model=RecentActivity)
@@ -110,9 +123,11 @@ def game_history(
             score=a.score,
             max_score=a.max_score,
             score_normalized=(
-                round(a.score / a.max_score * 10_000) if a.max_score else 0
+                _round_half_up(a.score / a.max_score * 10_000) if a.max_score else 0
             ),
-            percentage=round(a.score / a.max_score * 100) if a.max_score else 0,
+            percentage=(
+                _round_half_up(a.score / a.max_score * 100) if a.max_score else 0
+            ),
             mastered=(
                 a.difficulty == "hard"
                 and a.max_score == FULL_QUIZ
