@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Page elements
     const timeLeftInGame = document.querySelector(".time-left");
-    // [CHANGED] ".difficulty-chosen" TO "#difficulty-chosen" (to match the HTML class)
+    // [CHANGED] ".difficulty-chosen" TO "#difficulty-chosen" (to match the HTML id)
     const playersChoice = document.querySelector("#difficulty-chosen");
     const pointsInGame = document.querySelector(".points-added");
     const totalPercentage = document.querySelector(".score-percentage");
@@ -373,93 +373,99 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /**
-     * Handles the player's answer when Submit is clicked.
+     * Handles one submitted answer.
      */
     async function submitCurrentAnswer() {
-        /*
-         * Prevent answers after the game ends, prevent double-click
-         * submissions, and ignore clicks while the correct answer is
-         * still being shown.
-         */
-        if (gameFinished || submissionInProgress || feedbackShowing) {
+
+        if (
+            gameFinished ||
+            submissionInProgress ||
+            feedbackShowing
+        ) {
             return;
         }
 
-        /*
-         * Find the selected radio input.
-         */
         const selectedAnswer = choicesContainer.querySelector(
             "input[name='answerChoice']:checked"
         );
 
-        /*
-         * Prevent an empty answer from being submitted.
-         */
         if (!selectedAnswer) {
-            displayGameError("Please select an answer before submitting.");
+            displayGameError(
+                "Please select an answer before submitting."
+            );
 
             submitAnswerBtn.disabled = true;
 
             return;
         }
 
-        /*
-         * Immediately disable Submit and the answer
-         * inputs so the user cannot double-click or
-         * change the answer during submission.
-         */
         submissionInProgress = true;
         submitAnswerBtn.disabled = true;
 
         setAnswerInputsDisabled(true);
 
-        /*
-         * Creating the answer object expected by
-         * the backend.
-         */
-        const answer = {
-            question_id: Number(selectedAnswer.dataset.questionId),
+        clearGameError();
 
-            option_id: Number(selectedAnswer.dataset.optionId)
+        const answer = {
+            question_id: Number(
+                selectedAnswer.dataset.questionId
+            ),
+
+            option_id: Number(
+                selectedAnswer.dataset.optionId
+            )
         };
 
         /*
-         * Storing the player's answer.
-         *
-         * The completed quiz is still submitted in full at the end.
-         * Grading below is what moves the score during play; the
-         * final submission is what records the attempt.
-         */
-        submittedAnswers.push(answer);
-
-        renderProgress(submittedAnswers.length);
+        * Ask the backend to record and grade this answer.
+        */
+        const liveResult = await gradeAnswer(answer);
 
         /*
-         * Have the backend grade this one answer, then show the
-         * player how they did before moving on.
-         */
-        await gradeAnswer(answer);
+        * If the backend could not record the answer,
+        * allow the player to try again.
+        */
+        if (!liveResult) {
 
-        /*
-         * Grading is a round trip, so the clock can run out while it
-         * is in flight. If it did, stop here rather than loading
-         * another question on top of the expiry message. The
-         * countdown is frozen while feedback is on screen, so this
-         * only covers the request itself.
-         */
-        if (gameFinished) {
+            submissionInProgress = false;
+
+            setAnswerInputsDisabled(false);
+
+            submitAnswerBtn.disabled = false;
+
             return;
         }
 
         /*
-         * Move the question index forward.
-         */
-        currentQuestionIndex++;
+        * Only store the answer locally after the backend
+        * confirms it has been recorded.
+        */
+        if (
+            !submittedAnswers.some(
+                (submittedAnswer) =>
+                    submittedAnswer.question_id === answer.question_id
+            )
+        ) {
+            submittedAnswers.push(answer);
+        }
 
         /*
-         * Display another question if questions remain.
-         */
-        if (currentQuestionIndex <totalQuestions) {
+        * The backend tells us how many questions have been
+        * answered, so use that instead of our local count.
+        */
+        renderProgress(liveResult.answered_count);
+
+        /*
+        * The score has already been updated by gradeAnswer().
+        */
+
+        if (gameFinished) {
+            return;
+        }
+
+        currentQuestionIndex++;
+
+        if (currentQuestionIndex < totalQuestions) {
 
             displayQuestion();
 
@@ -467,12 +473,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         /*
-         * All questions have been answered, so send
-         * the completed quiz to the backend.
-         */
-        submitCompletedQuiz();
-    }
+        * The backend tells us when every question has been
+        * answered.
+        */
+        if (liveResult.quiz_complete) {
 
+            submitCompletedQuiz();
+
+            return;
+        }
+
+        /*
+        * Fallback.
+        */
+        if (submittedAnswers.length === totalQuestions) {
+            submitCompletedQuiz();
+        }
+    }
     /**
      * Sends one answer to the backend, shows whether it was right,
      * and moves the score.
@@ -485,102 +502,186 @@ document.addEventListener("DOMContentLoaded", () => {
      * A failure here is not fatal. The answer is already in
      * submittedAnswers, so the completed quiz still grades correctly
      * at the end; the player just does not get feedback on this one.
-     */
+     
+    
+    * Sends one answer to the live-answer endpoint.
+    *
+    * The backend records the answer, determines whether
+    * it is correct, and returns the current normalized
+    * score from 0 through 10,000.
+
+    */
+
     async function gradeAnswer(answer) {
-        let result = null;
 
         try {
+
             const response = await fetch(
+
                 `${API_BASE_URL}/game/${encodeURIComponent(chosenSkill)}/answer`,
+
                 {
                     method: "POST",
 
                     headers: buildRequestHeaders(),
 
                     body: JSON.stringify({
+
                         quiz_id: quizId,
 
                         question_id: answer.question_id,
 
                         option_id: answer.option_id
+
                     })
+
                 }
+
             );
 
-            result = await response.json();
+            const result = await response.json();
 
             if (!response.ok) {
+
                 throw new Error(
+                    
                     result.detail ||
+
                     `The answer could not be graded. Status: ${response.status}`
+
                 );
+
             }
-        } catch (error) {
-            console.error("Answer grading failed:", error);
 
             /*
-             * Keep playing. The score catches up when the completed
-             * quiz is graded.
-             */
-            return;
+
+            * Use the backend's official running score
+
+            */
+
+            liveScore = Number(result.score_normalized ?? liveScore);
+
+            /*
+
+            * Update points and percentage immediately
+
+            */
+
+            renderScore(liveScore);
+
+            /*
+
+            * The backend also returns answered_count,
+
+            * which is more authoritative than the local
+
+            * array length.
+
+            */
+
+            renderProgress(Number(result.answered_count ?? submittedAnswers.length));
+
+            /*
+
+            * Display the Bootstrap validation feedback.
+
+            */
+
+            await showAnswerFeedback(result, answer.option_id);
+
+            return result;
+
+        } catch (error) {
+
+            console.error("Answer grading failed:", error);
+
+            displayGameError(
+
+                error.message ||
+
+                "The answer could not be graded. Please try again."
+
+            );
+
+            return null;
+
         }
 
-        /*
-         * The running total is the backend's, not ours, so the number
-         * the player watches climb is the number they finish on.
-         */
-        liveScore = Number(result.score_normalized ?? liveScore);
-
-        renderScore(liveScore);
-
-        await showAnswerFeedback(result, answer.option_id);
     }
-
     /**
      * Marks the player's pick right or wrong, shows the correct
      * option, and holds it on screen long enough to read.
      */
     async function showAnswerFeedback(result, pickedOptionId) {
+
         const correctOptionId = Number(result.correct_option_id);
 
         answerInputs.forEach((input) => {
+
             const optionId = Number(input.dataset.optionId);
 
-            const label = input.closest("label");
+            if (Number.isNaN(optionId)) {
 
-            if (!label || Number.isNaN(optionId)) {
                 return;
+
             }
 
-            /*
-             * The correct option is always marked. The player's pick
-             * is marked wrong only when it was not the correct one,
-             * so a right answer gets a single check rather than a
-             * check and a cross on the same row.
-             */
-            if (optionId === correctOptionId) {
-                label.classList.add("answer-correct");
-            } else if (optionId === pickedOptionId) {
-                label.classList.add("answer-wrong");
+            //The player selected the correct answer.
+
+            if (result.is_correct && optionId === pickedOptionId) {
+
+                input.classList.add("is-valid");
+
+                input.setAttribute("aria-invalid", "false");
+
+                return;
+
             }
+
+            //The player selected an incorrect answer.
+
+            if (!result.is_correct && optionId === pickedOptionId) {
+
+                input.classList.add("is-invalid");
+
+                input.setAttribute("aria-invalid", "true");
+
+                return;
+
+            }
+
+            // Reveal the answer to the player if their answer ends up incorrect
+
+            if (!result.is_correct && optionId === correctOptionId) {
+
+                input.classList.add("is-valid");
+
+                input.setAttribute("aria-invalid", "false");
+
+            }
+
         });
 
-        /*
-         * Freeze the countdown while the answer is on screen.
-         */
+        // This will prevent the timer from continuing its countdown during the delay
+
         feedbackShowing = true;
 
         await wait(FEEDBACK_DELAY_MS);
 
         feedbackShowing = false;
+
     }
 
-    /**
-     * Removes the right/wrong marks left by the previous question.
-     */
+    
+    //Removes the right/wrong marks left by the previous question.
+    
     function clearAnswerFeedback() {
-        answerLabels.forEach((label) => {
-            label.classList.remove("answer-correct", "answer-wrong");
+        answerInputs.forEach((input) => {
+
+            input.classList.remove("is-valid", "is-invalid");
+
+            input.removeAttribute("aria-invalid");
+
         });
     }
 
@@ -743,28 +844,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         submitAnswerBtn.disabled = true;
 
-        /*
-         * The exact property names depend on the
-         * GameResult schema returned by your backend.
-         *
-         * These fallbacks support common names such as:
-         *
-         * correct_count
-         * score
-         * total_questions
-         * max_score
-         * 
-         * class GameResult(BaseModel):
-    skill: str
-    difficulty: Difficulty
-    score: int              # number correct
-    max_score: int          # number of questions (10 for a full quiz)
-    correct_count: int
-    total_questions: int
-    mastered: bool          # perfect score on a hard quiz
-    results: list[QuestionResult]
-         * 
-         */
+       
         const correctAnswers = Number(
             result.correct_count ??
             result.score ??
