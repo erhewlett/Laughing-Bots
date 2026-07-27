@@ -120,3 +120,177 @@ def test_last_game_populated_after_play(client, db_session):
     last = client.get("/me/recent", headers=h).json()["last_game"]
     assert last is not None and last["skill"] == "Python" and last["score"] == 3
     assert last["difficulty"] == "easy"
+
+
+# --- /me/games ---------------------------------------------------------------
+
+
+def _play_quiz(client, headers, skill="Python", difficulty="easy", elapsed=None):
+    """Play one quiz to completion, all answers correct."""
+    quiz = client.get(
+        f"/game/{skill}", params={"difficulty": difficulty}, headers=headers
+    ).json()
+    answers = [
+        {
+            "question_id": q["question_id"],
+            "option_id": next(
+                o for o in q["options"] if o["option_text"] == "o0"
+            )["option_id"],
+        }
+        for q in quiz["questions"]
+    ]
+    body = {
+        "quiz_id": quiz["quiz_id"],
+        "difficulty": difficulty,
+        "answers": answers,
+    }
+    if elapsed is not None:
+        body["elapsed_seconds"] = elapsed
+    return client.post(f"/game/{skill}/submit", json=body, headers=headers)
+
+
+def test_games_requires_auth(client):
+    assert client.get("/me/games").status_code == 401
+
+
+def test_games_empty_for_new_user(client, db_session):
+    h = {"Authorization": f"Bearer {_token(client)}"}
+    body = client.get("/me/games", headers=h).json()
+    assert body["total_attempts"] == 0
+    assert body["attempts"] == [] and body["bests"] == []
+    assert body["mastered_skills"] == []
+
+
+def test_games_records_attempt_with_totals(client, db_session):
+    _seed_easy_questions(db_session, n=3)
+    h = {"Authorization": f"Bearer {_token(client)}"}
+    _play_quiz(client, h)
+
+    body = client.get("/me/games", headers=h).json()
+
+    assert body["total_attempts"] == 1
+    assert body["total_correct"] == 3 and body["total_questions"] == 3
+    item = body["attempts"][0]
+    assert item["skill"] == "Python" and item["score"] == 3
+    # a perfect 3/3 is 100%, so the normalized display score is the full 10000
+    assert item["score_normalized"] == 10_000 and item["percentage"] == 100
+
+
+def test_games_persists_elapsed_seconds(client, db_session):
+    """The quiz page's timer value survives into history."""
+    _seed_easy_questions(db_session, n=3)
+    h = {"Authorization": f"Bearer {_token(client)}"}
+    r = _play_quiz(client, h, elapsed=42)
+
+    assert r.json()["elapsed_seconds"] == 42
+    assert client.get("/me/games", headers=h).json()["attempts"][0][
+        "elapsed_seconds"
+    ] == 42
+
+
+def test_games_elapsed_seconds_optional(client, db_session):
+    """A client that omits the timer still submits and still records."""
+    _seed_easy_questions(db_session, n=3)
+    h = {"Authorization": f"Bearer {_token(client)}"}
+    r = _play_quiz(client, h)
+
+    assert r.status_code == 200 and r.json()["elapsed_seconds"] is None
+    assert client.get("/me/games", headers=h).json()["attempts"][0][
+        "elapsed_seconds"
+    ] is None
+
+
+def test_games_bests_group_by_skill_and_difficulty(client, db_session):
+    _seed_easy_questions(db_session, n=3)
+    h = {"Authorization": f"Bearer {_token(client)}"}
+    _play_quiz(client, h)
+    _play_quiz(client, h)
+
+    bests = client.get("/me/games", headers=h).json()["bests"]
+
+    assert len(bests) == 1
+    assert bests[0]["skill"] == "Python" and bests[0]["attempts"] == 2
+    assert bests[0]["best_score"] == 3
+
+
+def test_games_only_returns_own_attempts(client, db_session):
+    _seed_easy_questions(db_session, n=3)
+    # usernames are alphanumeric-only per the register schema
+    mine = {"Authorization": f"Bearer {_token(client, 'playerA')}"}
+    theirs = {"Authorization": f"Bearer {_token(client, 'playerB')}"}
+    _play_quiz(client, mine)
+
+    assert client.get("/me/games", headers=theirs).json()["total_attempts"] == 0
+    assert client.get("/me/games", headers=mine).json()["total_attempts"] == 1
+
+
+def test_games_limit_is_bounded(client, db_session):
+    h = {"Authorization": f"Bearer {_token(client)}"}
+    assert client.get("/me/games", params={"limit": 0}, headers=h).status_code == 422
+    assert client.get("/me/games", params={"limit": 500}, headers=h).status_code == 422
+
+
+def test_recent_includes_identity(client, db_session):
+    """Lets the user info page drop its separate GET /auth/me call."""
+    h = {"Authorization": f"Bearer {_token(client, 'identity')}"}
+    body = client.get("/me/recent", headers=h).json()
+
+    assert body["username"] == "identity"
+
+
+def test_games_best_pair_comes_from_one_attempt(client, db_session):
+    """best_score/max_score must describe a single real attempt.
+
+    Taking MAX(score) and MAX(max_score) independently reported "5/10" for a
+    player whose attempts were 3/3 and 5/10, a ratio nobody scored.
+    """
+    h = {"Authorization": f"Bearer {_token(client, 'pairs')}"}
+    uid = client.get("/auth/me", headers=h).json()["user_id"]
+    skill = models.Skill(skill_name="Python")
+    db_session.add(skill)
+    db_session.flush()
+    for score, max_score in ((3, 3), (5, 10)):
+        db_session.add(
+            models.GameAttempt(
+                user_id=uid,
+                skill_id=skill.skill_id,
+                difficulty="hard",
+                score=score,
+                max_score=max_score,
+            )
+        )
+    db_session.commit()
+
+    best = client.get("/me/games", headers=h).json()["bests"][0]
+
+    # 3/3 is the better ratio, so that is the pair reported
+    assert (best["best_score"], best["max_score"]) == (3, 3)
+    assert best["attempts"] == 2
+
+
+def test_games_mastery_survives_a_later_short_quiz(client, db_session):
+    """A perfect full hard quiz still counts as mastered.
+
+    Ratio ties are broken toward the longer quiz so a later perfect 3/3 cannot
+    hide an earlier perfect 10/10.
+    """
+    h = {"Authorization": f"Bearer {_token(client, 'master')}"}
+    uid = client.get("/auth/me", headers=h).json()["user_id"]
+    skill = models.Skill(skill_name="Python")
+    db_session.add(skill)
+    db_session.flush()
+    for score, max_score in ((10, 10), (3, 3)):
+        db_session.add(
+            models.GameAttempt(
+                user_id=uid,
+                skill_id=skill.skill_id,
+                difficulty="hard",
+                score=score,
+                max_score=max_score,
+            )
+        )
+    db_session.commit()
+
+    body = client.get("/me/games", headers=h).json()
+
+    assert body["mastered_skills"] == ["Python"]

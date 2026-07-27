@@ -143,3 +143,86 @@ def test_me_token_for_deleted_user_401(client, db_session):
     db_session.commit()
     r = client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 401  # valid signature, but the user no longer exists
+
+
+# --- register returns a usable token ----------------------------------------
+
+
+def test_register_returns_token_and_user(client):
+    """One call, not register-then-login with a failure window between."""
+    r = client.post(
+        "/auth/register", json={"username": "onecall", "password": "password123"}
+    )
+
+    assert r.status_code == 201
+    body = r.json()
+    # original UserOut fields still present for callers that only read user data
+    assert body["username"] == "onecall" and body["user_id"] >= 1
+    assert body["token_type"] == "bearer" and body["access_token"]
+
+
+def test_register_token_authenticates_immediately(client):
+    """The returned token works without a separate login round trip."""
+    token = client.post(
+        "/auth/register", json={"username": "straight", "password": "password123"}
+    ).json()["access_token"]
+
+    me = client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
+
+    assert me.status_code == 200 and me.json()["username"] == "straight"
+
+
+# --- one predictable error shape ---------------------------------------------
+
+
+def test_validation_errors_return_string_detail(client):
+    """422 detail is a string, like every HTTPException we raise.
+
+    FastAPI's default sends a list of error objects, which callers that do
+    alert(body.detail) render as "[object Object]".
+    """
+    # valid username so password is the first field that fails
+    r = client.post("/auth/register", json={"username": "validname"})
+
+    assert r.status_code == 422
+    assert isinstance(r.json()["detail"], str)
+    assert "password" in r.json()["detail"]
+
+
+def test_validation_error_detail_names_the_field(client):
+    r = client.post(
+        "/auth/register", json={"username": "validname", "password": "short"}
+    )
+
+    assert r.status_code == 422
+    assert r.json()["detail"].startswith("password:")
+
+
+def test_login_rejects_unbounded_input(client):
+    """A huge password must not reach bcrypt.
+
+    Register bounds both fields; login only checked presence, so a multi-
+    megabyte string was accepted and hashed.
+    """
+    r = client.post(
+        "/auth/login", json={"username": "someone", "password": "x" * 100_000}
+    )
+    assert r.status_code == 422
+
+
+def test_login_does_not_leak_the_password_policy(client):
+    """A wrong-length but plausible password still returns 401, not 422.
+
+    The 8-20 policy lives on register. Answering 422 here would tell an
+    attacker the policy without them holding an account.
+    """
+    client.post(
+        "/auth/register", json={"username": "policy", "password": "password123"}
+    )
+    short = client.post("/auth/login", json={"username": "policy", "password": "x"})
+    long_ = client.post(
+        "/auth/login", json={"username": "policy", "password": "y" * 200}
+    )
+
+    assert short.status_code == 401
+    assert long_.status_code == 401

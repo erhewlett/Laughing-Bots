@@ -1,6 +1,6 @@
 """Auth endpoints: register, login, current user.
 
-  POST /auth/register  {username, password, email?, name?}  -> 201 UserOut
+  POST /auth/register  {username, password, email?, name?}  -> 201 user + token
   POST /auth/login     {username, password}                 -> 200 {access_token}
   GET  /auth/me        (Bearer token)                       -> 200 UserOut
 
@@ -16,14 +16,22 @@ from sqlalchemy.orm import Session
 
 from app import models
 from app.database import get_db
-from app.schemas import LoginRequest, RegisterRequest, TokenResponse, UserOut
+from app.schemas import (
+    LoginRequest,
+    RegisterRequest,
+    RegisterResponse,
+    TokenResponse,
+    UserOut,
+)
 from app.services import security
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
-def register(req: RegisterRequest, db: Session = Depends(get_db)) -> models.User:
+@router.post(
+    "/register", response_model=RegisterResponse, status_code=status.HTTP_201_CREATED
+)
+def register(req: RegisterRequest, db: Session = Depends(get_db)) -> RegisterResponse:
     err = security.validate_username(req.username)
     if err:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, err)
@@ -51,7 +59,14 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)) -> models.User
             status.HTTP_409_CONFLICT, "Username or email is already in use."
         )
     db.refresh(user)
-    return user
+    return RegisterResponse(
+        user_id=user.user_id,
+        username=user.username,
+        name=user.name,
+        target_role=user.target_role,
+        target_location=user.target_location,
+        access_token=security.create_access_token(user.user_id),
+    )
 
 
 @router.post("/login", response_model=TokenResponse)

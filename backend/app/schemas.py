@@ -53,6 +53,10 @@ class WordCloudWord(BaseModel):
     skill: str
     count: int      # document frequency: how many postings mention this skill
     weight: int     # sqrt-scaled 1..100, drives font size in the cloud
+    # True when this skill has quiz questions, i.e. clicking it can start a
+    # game. Lets the cloud page decide what is clickable straight from this
+    # response instead of making a second call to GET /game/skills.
+    playable: bool = False
 
 
 class WordCloudResponse(BaseModel):
@@ -64,6 +68,10 @@ class WordCloudResponse(BaseModel):
     # still feed the cloud but are not reported as confirmed matches.
     posting_count: int
     words: list[WordCloudWord]
+    # The requesting user's username. This route already requires a logged-in
+    # user, so echoing it costs nothing and lets the cloud page render its
+    # title without separately awaiting GET /auth/me first.
+    username: str = ""
 
 
 class RoleOut(BaseModel):
@@ -110,17 +118,45 @@ class RegisterRequest(BaseModel):
         return v
 
 
+# A sanity bound on login fields. Deliberately far above the real 4-16 and
+# 8-20 policies: the point is to stop an unbounded string reaching bcrypt, not
+# to enforce the policy here. Anything a real user could type still returns 401
+# rather than 422, so the policy stays unleaked.
+LOGIN_FIELD_MAX = 1024
+
+
 class LoginRequest(BaseModel):
     # Login only checks presence (requirement: username/password not empty).
     # The 8-20 policy lives on register, not here, so a wrong-length attempt
     # returns 401, not 422, and does not leak the policy.
-    username: str = Field(min_length=1)
-    password: str = Field(min_length=1)
+    username: str = Field(min_length=1, max_length=LOGIN_FIELD_MAX)
+    password: str = Field(min_length=1, max_length=LOGIN_FIELD_MAX)
 
 
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class RegisterResponse(BaseModel):
+    """Register returns the new user AND a usable token.
+
+    Registering then immediately logging in was two calls with a failure window
+    between them: the account existed but the caller had no token, so the next
+    page bounced to sign-in. Returning the token makes the signed-in path a
+    single request. All the original UserOut fields are still present, so
+    callers that only read user data are unaffected.
+    """
+
+    user_id: int
+    username: str
+    name: str | None = None
+    target_role: str | None = None
+    target_location: str | None = None
+    access_token: str
+    token_type: str = "bearer"
+
+    model_config = {"from_attributes": True}
 
 
 class UserOut(BaseModel):
@@ -174,7 +210,14 @@ class SubmittedAnswer(BaseModel):
 class GameSubmission(BaseModel):
     quiz_id: int = Field(ge=1, le=MAX_DB_INT)
     difficulty: Difficulty
-    answers: list[SubmittedAnswer]
+    # A quiz is 10 questions. submit_game already rejects any answer set that
+    # is not exactly the questions it served, but that check runs after the
+    # whole list is parsed, so bound it here too. Generous on purpose.
+    answers: list[SubmittedAnswer] = Field(max_length=100)
+    # How long the player took, sent by the quiz page's timer. Optional so an
+    # older client that omits it still submits successfully; when present it is
+    # persisted so the history and rank pages can show finish times.
+    elapsed_seconds: int | None = Field(default=None, ge=0, le=86_400)
 
 
 class QuestionResult(BaseModel):
@@ -191,6 +234,16 @@ class GameResult(BaseModel):
     total_questions: int
     mastered: bool          # perfect score on a hard quiz
     results: list[QuestionResult]
+    # The 0..10000 display score. The quiz page computes this same number
+    # client-side; returning it from the server means a history or rank page
+    # reading stored attempts shows the same figure the player saw.
+    score_normalized: int = 0
+    elapsed_seconds: int | None = None
+    # False when the quiz was played without a token, meaning it was graded but
+    # NOT saved to history. Anonymous play is supported on purpose, so this is
+    # not an error - but a caller that forgot its Authorization header used to
+    # get a clean 200 and silently record nothing. This makes that visible.
+    recorded: bool = False
 
 
 # --------------------------------------------------------------------------
@@ -249,3 +302,52 @@ class RecentSearch(BaseModel):
 class RecentActivity(BaseModel):
     last_game: LastGame | None
     recent_searches: list[RecentSearch]
+    # Identity of the requesting user. This route already requires a token, so
+    # including it lets the user info page skip its separate GET /auth/me.
+    username: str = ""
+    name: str | None = None
+    email: str | None = None
+
+
+# --------------------------------------------------------------------------
+# Game history (powers a results/history page and a rank system)
+# --------------------------------------------------------------------------
+class GameHistoryItem(BaseModel):
+    attempt_id: int
+    skill: str
+    difficulty: str | None
+    score: int
+    max_score: int
+    score_normalized: int       # 0..10000, matches what the player saw
+    percentage: int             # 0..100, convenience for display
+    mastered: bool              # perfect score on a full hard quiz
+    elapsed_seconds: int | None
+    date_taken: datetime
+
+
+class SkillBest(BaseModel):
+    """Best result a player has recorded for one skill/difficulty pair."""
+
+    skill: str
+    difficulty: str | None
+    best_score: int
+    max_score: int
+    attempts: int
+
+
+class GameHistory(BaseModel):
+    total_attempts: int
+    # Sum of correct answers over all attempts, and of questions asked. Enough
+    # to drive an overall accuracy figure or a rank threshold.
+    total_correct: int
+    total_questions: int
+    mastered_skills: list[str]  # skills with a perfect full hard quiz
+    bests: list[SkillBest]
+    attempts: list[GameHistoryItem]
+
+
+class LocationOut(BaseModel):
+    """A location that actually has fresh postings, for search dropdowns."""
+
+    location: str
+    posting_count: int
