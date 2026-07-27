@@ -310,11 +310,16 @@ registrationForm.addEventListener("submit", async (e)=> {
 
         // valid
         console.log("User registered:", result);
+        console.log("Checking token property:", result.access_token);
+        // [CHANGED] added to store access token received after registration in localStorage 
+        if (result.access_token) {
+            localStorage.setItem("token", result.access_token);
+        }
 
         alert("Account created successfully.");
 
         // Form destination after a successful validation
-        window.location.href = 'word_cloud_creation_page.html';
+        window.location.href = 'word_cloud_view_page.html';
         console.log('Form validated');
 
     } catch (error) {

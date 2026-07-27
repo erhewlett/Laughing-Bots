@@ -5,6 +5,10 @@ import { getUsername } from "./utils.js";
 document.addEventListener('DOMContentLoaded', async () => {
     // this page needs a session, same guard the other logged-in pages use.
     // without it a signed-out visit fell through to the parse below and threw.
+    //
+    // this replaces the token console.log from rose-debugging-2: it checks the
+    // same thing and acts on it, and printing a token to the console is worth
+    // avoiding anyway.
     if (!localStorage.getItem('token')) {
         window.location.href = '../html/sign_in_page.html';
         return;
