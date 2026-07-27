@@ -114,6 +114,31 @@ describe("the clock running out", () => {
     });
 });
 
+describe("whether a failed submission is worth retrying", () => {
+    test("a request that never reached the backend is", () => {
+        expect(flow.submitFailureIsRetryable(null)).toBe(true);
+    });
+
+    test("a server error is", () => {
+        expect(flow.submitFailureIsRetryable(500)).toBe(true);
+        expect(flow.submitFailureIsRetryable(502)).toBe(true);
+    });
+
+    test("a quiz whose question bank moved is not", () => {
+        // the backend returns 409 and will keep returning it, so retrying
+        // just loops the player through the same error
+        expect(flow.submitFailureIsRetryable(409)).toBe(false);
+    });
+
+    test("answers that do not match the quiz served are not", () => {
+        expect(flow.submitFailureIsRetryable(422)).toBe(false);
+    });
+
+    test("an expired session is not", () => {
+        expect(flow.submitFailureIsRetryable(401)).toBe(false);
+    });
+});
+
 describe("recording answers", () => {
     test("records a new answer", () => {
         const answers = [];

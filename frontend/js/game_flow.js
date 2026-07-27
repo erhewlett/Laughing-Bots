@@ -84,6 +84,27 @@
     }
 
     /**
+     * True when a failed submission is worth pressing Submit over again.
+     *
+     * A dropped connection or a server that fell over is worth retrying with
+     * the same answers. A refusal is not: the backend rejects a submission it
+     * will keep rejecting - the quiz was already submitted (409), the question
+     * bank moved under it (409), or the answers do not match what it served
+     * (422). Offering a retry there just loops the player through the same
+     * error, so the page says what happened and stops.
+     *
+     * @param {number|null} status HTTP status, or null when the request never
+     *        got a response at all
+     */
+    function submitFailureIsRetryable(status) {
+        if (!status) {
+            return true; // never reached the backend
+        }
+
+        return status < 400 || status >= 500;
+    }
+
+    /**
      * Record one answer, refusing a second answer for the same question.
      *
      * The backend rejects a duplicate question_id outright ("A question was
@@ -111,6 +132,7 @@
         acceptsAnswerSelection,
         clockRuns,
         expiryShouldSubmit,
+        submitFailureIsRetryable,
         recordAnswer,
     };
 

@@ -779,10 +779,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 await response.json();
 
             if (!response.ok) {
-                throw new Error(
+                const failure = new Error(
                     result.detail ||
                     `The quiz could not be submitted. Status: ${response.status}`
                 );
+
+                failure.status = response.status;
+
+                throw failure;
             }
 
             /*
@@ -796,19 +800,34 @@ document.addEventListener("DOMContentLoaded", () => {
                 error
             );
 
+            const message = error.message || "The quiz could not be submitted.";
+
+            if (!flow.submitFailureIsRetryable(error.status)) {
+                /*
+                 * The backend refused this submission and will keep refusing
+                 * it - the quiz was already submitted, its questions moved, or
+                 * the answers do not match what it served. Say so and stop,
+                 * rather than looping the player through the same error.
+                 */
+                phase = flow.PHASE.FINISHED;
+
+                displayGameError(message);
+
+                submitAnswerBtn.disabled = true;
+
+                return;
+            }
+
             /*
-             * The send failed, so the quiz is not on its way after all. The
-             * answers are all still here, so the player can re-send them:
-             * the phase says the Submit button now retries the submission
-             * instead of grading another answer. Getting that wrong is what
-             * used to leave a quiz permanently unsubmittable.
+             * The send failed on the way there, so the quiz is not on its way
+             * after all. The answers are all still here, so the player can
+             * re-send them: the phase says the Submit button now retries the
+             * submission instead of grading another answer. Getting that wrong
+             * is what used to leave a quiz permanently unsubmittable.
              */
             phase = flow.PHASE.SUBMIT_FAILED;
 
-            displayGameError(
-                `${error.message || "The quiz could not be submitted."} ` +
-                "Press Submit to try again."
-            );
+            displayGameError(`${message} Press Submit to try again.`);
 
             submitAnswerBtn.disabled = false;
         }
