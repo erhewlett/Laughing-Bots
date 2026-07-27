@@ -3,10 +3,24 @@
 import { getUsername } from "./utils.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // this page needs a session, same guard the other logged-in pages use.
+    // without it a signed-out visit fell through to the parse below and threw.
+    if (!localStorage.getItem('token')) {
+        window.location.href = '../html/sign_in_page.html';
+        return;
+    }
+
+    // get data from local storage. a bad/missing value used to throw here,
+    // above the try below, so the page hung on "generating..." forever.
+    const storedParameters = readStoredParameters();
+
+    if (!storedParameters) {
+        window.location.href = '../html/word_cloud_creation_page.html';
+        return;
+    }
+
     const username = await getUsername()
 
-    // get data from local storage
-    const storedParameters = JSON.parse(localStorage.getItem('word_cloud_parameters'));
     const wordCloudParameters = {
         job_title: storedParameters.job_title || "",
         industry: "", // temp fix for backend
@@ -28,29 +42,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const skillData = await skillResponse.json();
     const playableSet = new Set(skillData.map(item => item.skill));
 
-    // make a request to backend for word cloud
     try {
-        // make a wordcloud POST request to the backend
-        const response = await fetch('http://localhost:8000/wordcloud', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(wordCloudParameters)
-        });
+        const wordCloudResult = await loadWordCloud(wordCloudParameters);
 
-        const wordCloudResult = await response.json();
-
-        if (response.status === 422) {
-            showErrorMessage(wordCloudResult.detail || "Not enough job information to generate a word cloud. Please try updating your seach parameters.")
-            document.getElementById('generating-word-cloud-text').style.display = 'none';
+        if (!wordCloudResult) {
             return;
-        }
-
-        if (!response.ok) {
-            const errorMessage = wordCloudResult.detail || `Error ${response.status}: Failed to generate word cloud.`;
-            throw new Error(errorMessage);
         }
 
         // on success: hide loading text
@@ -58,9 +54,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // prepare result data (from backend)
         const formattedResults = wordCloudResult.words.map(item => [item.skill, item.weight]);
-        
+
         // RENDER WORD CLOUD
-        console.log(wordCloudParameters.shape)
         renderWordCloud(formattedResults, wordCloudParameters.shape, playableSet);
 
     } catch (error) {
@@ -68,6 +63,83 @@ document.addEventListener('DOMContentLoaded', async () => {
         showErrorMessage(error.message);
     }
 });
+
+
+// read the search parameters the creation page (or a rerun) left for us,
+// returning null when there is nothing usable to render
+function readStoredParameters() {
+    try {
+        const parsed = JSON.parse(localStorage.getItem('word_cloud_parameters'));
+        return parsed && typeof parsed === 'object' ? parsed : null;
+    } catch (error) {
+        console.warn('Stored word cloud parameters could not be read.');
+        return null;
+    }
+}
+
+
+/* Returns the cloud to draw, or null when an error was already shown.
+ *
+ * The backend records a Search row on every POST /wordcloud, so posting on
+ * each page load meant a refresh silently added another entry to the user's
+ * history. Only five are kept, so refreshing a few times wiped the real ones.
+ *
+ * A search is a deliberate act now: whoever starts one sets word_cloud_pending
+ * (the creation form) or leaves the results behind for us (Search Again on the
+ * profile page). A plain reload finds neither and just redraws what is stored.
+ */
+async function loadWordCloud(wordCloudParameters) {
+    const pending = localStorage.getItem('word_cloud_pending');
+
+    if (!pending) {
+        const cached = readStoredResults();
+        if (cached) {
+            return cached;
+        }
+    }
+
+    // consume the flag first so a failed search does not re-run on reload
+    localStorage.removeItem('word_cloud_pending');
+
+    // make a wordcloud POST request to the backend
+    const response = await fetch('http://localhost:8000/wordcloud', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(wordCloudParameters)
+    });
+
+    const wordCloudResult = await response.json();
+
+    if (response.status === 422) {
+        showErrorMessage(wordCloudResult.detail || "Not enough job information to generate a word cloud. Please try updating your seach parameters.")
+        document.getElementById('generating-word-cloud-text').style.display = 'none';
+        return null;
+    }
+
+    if (!response.ok) {
+        const errorMessage = wordCloudResult.detail || `Error ${response.status}: Failed to generate word cloud.`;
+        throw new Error(errorMessage);
+    }
+
+    localStorage.setItem('word_cloud_results', JSON.stringify(wordCloudResult));
+
+    return wordCloudResult;
+}
+
+
+// the cloud from the last real search, or null if there isn't a usable one
+function readStoredResults() {
+    try {
+        const parsed = JSON.parse(localStorage.getItem('word_cloud_results'));
+        return parsed && Array.isArray(parsed.words) ? parsed : null;
+    } catch (error) {
+        console.warn('Stored word cloud results could not be read.');
+        return null;
+    }
+}
 
 
 // UI functions
