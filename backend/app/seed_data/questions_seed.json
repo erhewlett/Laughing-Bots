@@ -21233,29 +21233,6 @@
     {
       "skill": "TypeScript",
       "difficulty": "medium",
-      "question_text": "What does the readonly modifier do to a property?",
-      "options": [
-        {
-          "text": "Prevents the property from being reassigned after it is initially set",
-          "correct": true
-        },
-        {
-          "text": "Makes the property invisible at runtime",
-          "correct": false
-        },
-        {
-          "text": "Converts the property into a function",
-          "correct": false
-        },
-        {
-          "text": "Deletes the property after first use",
-          "correct": false
-        }
-      ]
-    },
-    {
-      "skill": "TypeScript",
-      "difficulty": "medium",
       "question_text": "What is a union type in TypeScript, such as string | number?",
       "options": [
         {
@@ -22567,29 +22544,6 @@
     {
       "skill": "Node.js",
       "difficulty": "medium",
-      "question_text": "What is middleware in the context of an Express.js application?",
-      "options": [
-        {
-          "text": "Functions with access to the request and response objects that can execute code, modify them, or end the request-response cycle",
-          "correct": true
-        },
-        {
-          "text": "A database connection pooler",
-          "correct": false
-        },
-        {
-          "text": "A CSS framework",
-          "correct": false
-        },
-        {
-          "text": "A testing library",
-          "correct": false
-        }
-      ]
-    },
-    {
-      "skill": "Node.js",
-      "difficulty": "medium",
       "question_text": "What is the difference between process.nextTick() and setImmediate() in Node.js?",
       "options": [
         {
@@ -22728,29 +22682,6 @@
     {
       "skill": "Node.js",
       "difficulty": "hard",
-      "question_text": "What is backpressure in the context of Node.js streams?",
-      "options": [
-        {
-          "text": "A signal that a writable stream's internal buffer is full, indicating the readable stream should slow down or pause",
-          "correct": true
-        },
-        {
-          "text": "A feature that speeds up stream throughput automatically",
-          "correct": false
-        },
-        {
-          "text": "An error that only occurs with HTTP streams",
-          "correct": false
-        },
-        {
-          "text": "A security vulnerability in older Node versions",
-          "correct": false
-        }
-      ]
-    },
-    {
-      "skill": "Node.js",
-      "difficulty": "hard",
       "question_text": "How does Node's cluster module help scale an application across multiple CPU cores?",
       "options": [
         {
@@ -22767,29 +22698,6 @@
         },
         {
           "text": "It replaces the need for a load balancer in all cases",
-          "correct": false
-        }
-      ]
-    },
-    {
-      "skill": "Agile",
-      "difficulty": "easy",
-      "question_text": "What is a 'sprint' in Scrum?",
-      "options": [
-        {
-          "text": "A fixed, time-boxed period during which a specific set of work is completed",
-          "correct": true
-        },
-        {
-          "text": "A one-time meeting to plan the entire project",
-          "correct": false
-        },
-        {
-          "text": "A tool for tracking bugs",
-          "correct": false
-        },
-        {
-          "text": "A type of code review",
           "correct": false
         }
       ]
@@ -22836,29 +22744,6 @@
         },
         {
           "text": "A bug report",
-          "correct": false
-        }
-      ]
-    },
-    {
-      "skill": "Agile",
-      "difficulty": "easy",
-      "question_text": "What is the purpose of a daily stand-up meeting?",
-      "options": [
-        {
-          "text": "A short daily check-in for the team to share progress, plans, and blockers",
-          "correct": true
-        },
-        {
-          "text": "A formal performance review",
-          "correct": false
-        },
-        {
-          "text": "A meeting to renegotiate the project budget",
-          "correct": false
-        },
-        {
-          "text": "A customer sales pitch",
           "correct": false
         }
       ]
@@ -23204,29 +23089,6 @@
         },
         {
           "text": "Azure DNS",
-          "correct": false
-        }
-      ]
-    },
-    {
-      "skill": "Azure",
-      "difficulty": "easy",
-      "question_text": "What is a 'Resource Group' in Azure?",
-      "options": [
-        {
-          "text": "A logical container that holds related Azure resources for a solution",
-          "correct": true
-        },
-        {
-          "text": "A physical data center",
-          "correct": false
-        },
-        {
-          "text": "A billing currency",
-          "correct": false
-        },
-        {
-          "text": "A type of virtual machine",
           "correct": false
         }
       ]
@@ -26040,29 +25902,6 @@
     {
       "skill": "Git",
       "difficulty": "medium",
-      "question_text": "What is a merge conflict, and when does it occur?",
-      "options": [
-        {
-          "text": "It occurs when Git cannot automatically reconcile changes made to the same lines of a file being merged, requiring manual resolution",
-          "correct": true
-        },
-        {
-          "text": "It occurs every time you run git commit",
-          "correct": false
-        },
-        {
-          "text": "It's a synonym for a failed push due to network issues",
-          "correct": false
-        },
-        {
-          "text": "It only happens when using git rebase, never git merge",
-          "correct": false
-        }
-      ]
-    },
-    {
-      "skill": "Git",
-      "difficulty": "medium",
       "question_text": "What does git stash do?",
       "options": [
         {
@@ -26631,29 +26470,6 @@
         },
         {
           "text": "k8sadmin",
-          "correct": false
-        }
-      ]
-    },
-    {
-      "skill": "Kubernetes",
-      "difficulty": "easy",
-      "question_text": "What is a Kubernetes 'Node'?",
-      "options": [
-        {
-          "text": "A worker machine (physical or virtual) that runs pods",
-          "correct": true
-        },
-        {
-          "text": "A single container",
-          "correct": false
-        },
-        {
-          "text": "A configuration file",
-          "correct": false
-        },
-        {
-          "text": "A type of network policy",
           "correct": false
         }
       ]
@@ -28287,29 +28103,6 @@
         },
         {
           "text": "PostgreSQL does not use logging and instead recovers from periodic file snapshots only",
-          "correct": false
-        }
-      ]
-    },
-    {
-      "skill": "REST",
-      "difficulty": "easy",
-      "question_text": "What does REST stand for?",
-      "options": [
-        {
-          "text": "Representational State Transfer",
-          "correct": true
-        },
-        {
-          "text": "Remote End State Transfer",
-          "correct": false
-        },
-        {
-          "text": "Representational System Transfer",
-          "correct": false
-        },
-        {
-          "text": "Remote Execution State Transfer",
           "correct": false
         }
       ]

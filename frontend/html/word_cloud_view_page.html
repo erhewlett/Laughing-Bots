@@ -14,6 +14,7 @@
 
         <!-- Served from the repo, not a CDN: the demo has to render offline. -->
         <script src="../js/vendor/wordcloud2.js"></script>
+        <link rel="icon" href="../assets/JobHopper_logo.svg" type="image/svg+xml">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <link rel="stylesheet" href="../css/style.css">
 
@@ -53,33 +54,9 @@
             <!-- selection prompt -->
             <p class="text-center">Select any word to enter the Q&A game page.</p>
 
-            <!-- the postings the cloud above was counted from -->
-            <h4 class="mt-5 mb-3 bg-primary text-center text-white p-3 rounded-2">
-                The Postings Behind This Cloud
-            </h4>
-
-            <p id="postings-summary" class="text-muted text-center mb-4">Loading postings ...</p>
-
-            <div class="table-responsive">
-                <table class="table table-hover table-striped-columns align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th scope="col" class="p-3">Job Title</th>
-                            <th scope="col" class="p-3">Company</th>
-                            <th scope="col" class="p-3">Location</th>
-                            <th scope="col" class="p-3">Salary</th>
-                            <th scope="col" class="p-3 text-center">Posted</th>
-                            <th scope="col" class="p-3 text-center">Listing</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="postings-body">
-                        <tr>
-                            <td class="p-3 text-center" colspan="6">No available data yet</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <!-- The job postings live on the roadmap page, not here. This page
+                 is the cloud and the route into the game; a table of listings
+                 under it pulled attention away from both. -->
 
             <!-- removed: user is directed to game upon clicking on a word - implemented in word_cloud_render.js -->
             <!-- enter game button 

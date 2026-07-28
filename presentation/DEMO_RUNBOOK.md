@@ -78,7 +78,7 @@ Sign out, or open a private window. Part 1 depends on starting signed out.
 
 - [ ] Backend running **without `--reload`**, `/health` returns ok
 - [ ] Frontend on port 5500
-- [ ] Word cloud renders as a picture, and the postings table under it has rows
+- [ ] Word cloud renders as a picture, and the roadmap page lists postings
 - [ ] DB Browser open on `jobhopper.db`, Browse Data tab
 - [ ] Signed out / private window
 - [ ] Editor, terminal and file explorer closed or on another desktop
@@ -104,7 +104,7 @@ this," sign in with the backup account, and carry on. Do not investigate.
 
 ---
 
-## Part 2 — Role 2: the registered user  ·  3:00  ·  Slide 12
+## Part 2 — Role 2: the registered user  ·  2:45  ·  Slide 12
 
 > **You must finish all ten questions.** The score is only written to the
 > database when the quiz is submitted, and submission happens on the tenth
@@ -116,23 +116,22 @@ this," sign in with the backup account, and carry on. Do not investigate.
 | # | Do | Say |
 |---|----|-----|
 | 1 | You are on the word cloud registration just generated. Point at the two or three biggest words | "The big words are the ones in the most postings. That's a count, not an opinion." |
-| 2 | Scroll down to **The Postings Behind This Cloud** and rest on it for a beat | "And here's what it counted. Real listings, with the company, the location and a link out. The cloud isn't our opinion about the market, it's arithmetic on these rows." |
-| 3 | Scroll back up. Hover a skill so the cursor changes | "Any skill we have questions for is clickable." |
-| 4 | Click a big skill → difficulty screen → choose **Easy** | "Three difficulties, three timers. Easy gives us three minutes — enough to finish." |
-| 5 | Answer question 1 **correctly** | "It tells me immediately — and it can, because my answer was already locked in on the server before I was told, so knowing it now can't change it." |
-| 6 | Answer question 2 **wrong on purpose** | "And there's the other case. It shows the right answer, and the clock pauses while I read it." |
-| 7 | Say you'll speed up, then click through questions 3–10 without narrating each one | "I'll speed through the rest." |
-| 8 | The Submit button is replaced by a return button. Click it | "That's the quiz graded and saved." |
-| 9 | Profile: *Recent Game History* now has the score, *Recent Word Clouds* has the search | "We didn't refresh anything. That's the database answering." |
-| 10 | Click **My Skill Roadmap** | "Same data, asked a different way. These are the eight skills most in demand for that role, in order." |
-| 11 | Set one step to **In progress**, then go back and forward to show it stuck | "Progress is per user and it's saved. Nothing here is in the browser." |
-| 12 | Point at **Practise** on any row | "And each one drops straight into the quiz for that skill." |
-| 13 | Back to the profile, click **Search Again** on a saved cloud | "Every search is saved, and re-runnable." |
+| 2 | Hover a skill so the cursor changes | "Any skill we have questions for is clickable." |
+| 3 | Click a big skill → difficulty screen → choose **Easy** | "Three difficulties, three timers. Easy gives us three minutes — enough to finish." |
+| 4 | Answer question 1 **correctly** | "It tells me immediately — and it can, because my answer was already locked in on the server before I was told, so knowing it now can't change it." |
+| 5 | Answer question 2 **wrong on purpose** | "And there's the other case. It shows the right answer, and the clock pauses while I read it." |
+| 6 | Say you'll speed up, then click through questions 3–10 without narrating each one | "I'll speed through the rest." |
+| 7 | The Submit button is replaced by a return button. Click it | "That's the quiz graded and saved." |
+| 8 | Profile: *Recent Game History* now has the score, *Recent Word Clouds* has the search | "We didn't refresh anything. That's the database answering." |
+| 9 | Click **My Skill Roadmap** | "Same data, asked a different way. These are the eight skills most in demand for that role, in order." |
+| 10 | Set one step to **In progress**, then go back and forward to show it stuck | "Progress is per user and it's saved. Nothing here is in the browser." |
+| 11 | Point at **Practise** on any row, then scroll to **Jobs Hiring For This Role** | "Each one drops straight into the quiz. And underneath, the postings the ranking came from — company, location, a link out. The order isn't our opinion, it's what these listings ask for most." |
+| 12 | Back to the profile, click **Search Again** on a saved cloud | "Every search is saved, and re-runnable." |
 
-Timing: steps 5–7 are where takes run long. Answering ten on Easy takes about
+Timing: steps 4–6 are where takes run long. Answering ten on Easy takes about
 sixty seconds if you don't read the questions aloud. Practise it once.
 
-Steps 10–12 are the roadmap and they are quick, but if the whole video is
+Steps 9–11 are the roadmap and they are quick, but if the whole video is
 running long they are the safest thing to drop — the roadmap also appears on
 the summary slide, so cutting them costs a demonstration and not a
 requirement.
@@ -154,7 +153,7 @@ points on its own — do not rush it, and do not narrate the mouse.
 | 2 | Browse Data → **searches**. Scroll to the last row | "There's the search from ninety seconds ago — the role, the salary, the shape, the timestamp, and a user_id pointing at the account we made on camera." |
 | 3 | Browse Data → **game_attempts** | "And the quiz: skill, difficulty, score, seconds taken. Every attempt, not just the last one — that's what the history table on the profile was reading." |
 | 4 | Browse Data → **users**, `password_hash` column | "That's a bcrypt hash. We couldn't tell you that user's password if we wanted to — we never stored it." |
-| 5 | Browse Data → **job_postings** | "And these are the listings you saw under the cloud, sitting in the file." |
+| 5 | Browse Data → **job_postings** | "And these are the listings from the roadmap page, sitting in the file. Everything the cloud counts, it counts from here." |
 | 6 | Browse Data → **job_skills** or **skills** | "And this is where the cloud comes from — a count per skill, not a list we typed." |
 | 7 | Browse Data → **roadmap_steps** | "The roadmap too. One row per step, with the progress we set on camera." |
 | 8 | Close | "Everything you saw on screen came out of this file." |

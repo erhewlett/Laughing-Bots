@@ -3,7 +3,7 @@
 > Generated from the speaker notes inside `JobHopper_Final_Presentation.pptx`.
 > Edit the notes in `scripts/make_deck.py`, rebuild the deck, then re-run `scripts/make_script.py`.
 
-**Estimated total: 14:29**  (target 14:00, hard ceiling 15:00 — the assignment caps the video at 15 minutes; the rubric penalises going over 20.)
+**Estimated total: 14:31**  (target 14:00, hard ceiling 15:00 — the assignment caps the video at 15 minutes; the rubric penalises going over 20.)
 
 Speaking estimate assumes 140 words per minute, which is an unhurried presenting pace. The three demo slides are timed from the runbook rather than from word count.
 
@@ -25,7 +25,7 @@ Speaking estimate assumes 140 words per minute, which is an unhurried presenting
 | 12 | Demo 2 — the registered user | 2:15 | 11:57 |
 | 13 | Demo 3 — it really is a database | 1:10 | 13:07 |
 | 14 | Summary — achieved vs changed | 0:51 | 13:59 |
-| 15 | Close | 0:30 | 14:29 |
+| 15 | Close | 0:32 | 14:31 |
 
 ## Who speaks
 
@@ -128,7 +128,7 @@ account exists or not. The server decides every score, never the browser. And
 
 The whole system on one page.
 
-Top: the browser. Eleven HTML pages, Bootstrap, Sass, plain JavaScript modules -
+Top: the browser. Twelve HTML pages, Bootstrap, Sass, plain JavaScript modules -
 no framework, no build step. It talks to exactly one thing, our API, and
 anything tied to an account carries a signed token.
 
@@ -364,12 +364,12 @@ got ahead of the app, which is on us.
 
 ## Slide 15 — Close
 
-**Clock:** `12:30 - 13:00`  ·  **Speaker:** SPEAKER 1   -   close  ·  **Est. length:** 0:30
+**Clock:** `12:30 - 13:00`  ·  **Speaker:** SPEAKER 1   -   close  ·  **Est. length:** 0:32
 
 Three things next. Rank the roadmap by what you're weak at, not just by what the
-ingest; the pipeline isn't the limit, the skill vocabulary is. And the one we
-actually want: close the loop, so the skills you keep getting wrong become the
-ones your cloud puts in front of you.
+market wants. Widen the ingest; the pipeline isn't the limit, the skill
+vocabulary is. And the one we actually want: close the loop, so the skills you
+keep getting wrong become the ones your cloud puts in front of you.
 
 Right now the two halves of the app share a database. They should share a memory.
 

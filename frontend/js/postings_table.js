@@ -1,12 +1,15 @@
 // The job postings behind a search, as a table.
 //
-// Shared by the word cloud page and the roadmap page. Both are answering the
-// same question in different words - "where did these skills come from?" - so
-// they show the same listings from the same endpoint rather than each growing
-// their own slightly different version.
+// Used by the roadmap page, where the listings explain why the steps are
+// ordered the way they are. It was briefly on the word cloud page too, but a
+// table of jobs under the cloud competed with the cloud itself and with the
+// route into the game, which are what that page is for.
 //
-// The markup it fills is a plain Bootstrap table with a summary line above it;
-// both pages carry an identical copy, so only the element ids differ.
+// Kept as its own module rather than folded into roadmap_page.js because the
+// endpoint takes a whole search, not just a role, so this is reusable the day
+// another page wants to show the same evidence.
+//
+// The markup it fills is a plain Bootstrap table with a summary line above it.
 
 const API_BASE = 'http://localhost:8000';
 

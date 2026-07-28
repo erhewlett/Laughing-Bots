@@ -8,7 +8,7 @@
 <text x="112" y="274" font-family="DejaVu Sans" font-size="22" fill="#6B7787">Runs in the browser - no framework, no build step</text>
 <rect x="112" y="300" width="318.0" height="74" rx="37.0" fill="#FFFFFF" stroke="#3F5C99" stroke-width="2.5"/>
 <text x="136" y="336" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">HTML5</text>
-<text x="136" y="360" font-family="DejaVu Sans" font-size="18" fill="#6B7787">11 pages, semantic markup</text>
+<text x="136" y="360" font-family="DejaVu Sans" font-size="18" fill="#6B7787">12 pages, semantic markup</text>
 <rect x="448.0" y="300" width="253.2" height="74" rx="37.0" fill="#FFFFFF" stroke="#3F5C99" stroke-width="2.5"/>
 <text x="472.0" y="336" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">Bootstrap 5.3</text>
 <text x="472.0" y="360" font-family="DejaVu Sans" font-size="18" fill="#6B7787">grid, navbar, forms</text>
@@ -35,7 +35,7 @@
 <text x="112" y="654" font-family="DejaVu Sans" font-size="22" fill="#6B7787">FastAPI on Uvicorn - every rule lives here, never in the browser</text>
 <rect x="112" y="678" width="382.8" height="74" rx="37.0" fill="#FFFFFF" stroke="#1F7A6B" stroke-width="2.5"/>
 <text x="136" y="714" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">FastAPI + Uvicorn</text>
-<text x="136" y="738" font-family="DejaVu Sans" font-size="18" fill="#6B7787">16 endpoints, auto OpenAPI docs</text>
+<text x="136" y="738" font-family="DejaVu Sans" font-size="18" fill="#6B7787">17 endpoints, auto OpenAPI docs</text>
 <rect x="512.8" y="678" width="436.8" height="74" rx="37.0" fill="#FFFFFF" stroke="#1F7A6B" stroke-width="2.5"/>
 <text x="536.8" y="714" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">Pydantic v2</text>
 <text x="536.8" y="738" font-family="DejaVu Sans" font-size="18" fill="#6B7787">validates every request and response</text>
@@ -103,7 +103,7 @@
 <text x="1792" y="654" font-family="DejaVu Sans" font-size="22" fill="#6B7787">Every merge had to pass this</text>
 <rect x="1792" y="662" width="10" height="46" rx="5" fill="#5B6472"/>
 <text x="1820" y="688" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">pytest</text>
-<text x="1820" y="716" font-family="DejaVu Sans" font-size="20" fill="#6B7787">209 backend tests</text>
+<text x="1820" y="716" font-family="DejaVu Sans" font-size="20" fill="#6B7787">222 backend tests</text>
 <rect x="1792" y="732" width="10" height="46" rx="5" fill="#5B6472"/>
 <text x="1820" y="758" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">Jest + jsdom</text>
 <text x="1820" y="786" font-family="DejaVu Sans" font-size="20" fill="#6B7787">28 frontend tests</text>
@@ -112,7 +112,7 @@
 <text x="1820" y="856" font-family="DejaVu Sans" font-size="20" fill="#6B7787">both suites run on every pull request</text>
 <rect x="1792" y="872" width="10" height="46" rx="5" fill="#5B6472"/>
 <text x="1820" y="898" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">Pull requests</text>
-<text x="1820" y="926" font-family="DejaVu Sans" font-size="20" fill="#6B7787">44 merged into main, reviewed first</text>
+<text x="1820" y="926" font-family="DejaVu Sans" font-size="20" fill="#6B7787">48 merged into main, reviewed first</text>
 <rect x="1750" y="1050" width="600" height="250" rx="20" fill="#FFFFFF" stroke="#C9D2DE" stroke-width="2"/>
 <path d="M1750,1280 L1750,1070 Q1750,1050 1770,1050 L1764,1050 L1764,1300 L1770,1300 Q1750,1300 1750,1280 Z" fill="#3F5C99"/>
 <rect x="1750" y="1050" width="14" height="250" fill="#3F5C99"/>
@@ -122,7 +122,7 @@
 <text x="1828" y="1158" font-family="DejaVu Sans" font-size="22" font-weight="bold" fill="#1B2430">Figma</text>
 <text x="1828" y="1182" font-family="DejaVu Sans" font-size="18" fill="#6B7787">designs agreed before anyone implemented them</text>
 <circle cx="1802" cy="1202" r="8" fill="#3F5C99"/>
-<text x="1828" y="1210" font-family="DejaVu Sans" font-size="22" font-weight="bold" fill="#1B2430">189 commits, 44 pull requests</text>
+<text x="1828" y="1210" font-family="DejaVu Sans" font-size="22" font-weight="bold" fill="#1B2430">198 commits, 48 pull requests</text>
 <text x="1828" y="1234" font-family="DejaVu Sans" font-size="18" fill="#6B7787">one feature branch per task</text>
 <circle cx="1802" cy="1254" r="8" fill="#3F5C99"/>
 <text x="1828" y="1262" font-family="DejaVu Sans" font-size="22" font-weight="bold" fill="#1B2430">Pinned dependency versions</text>

@@ -1,7 +1,9 @@
 // js for word_cloud_view_page.html
 
 import { getUsername } from "./utils.js";
-import { loadPostings, formatMoney } from "./postings_table.js";
+// Only the money formatter. The postings table itself belongs to the roadmap
+// page; this page just needs to render a salary in the title.
+import { formatMoney } from "./postings_table.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     // this page needs a session, same guard the other logged-in pages use.
@@ -66,11 +68,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // RENDER WORD CLOUD
         await renderWordCloud(formattedResults, wordCloudParameters.shape, playableSet);
-
-        // The listings the cloud was counted from. Deliberately after the
-        // cloud and not awaited alongside it: this is supporting evidence, and
-        // it must not hold up or break the thing it is evidence for.
-        loadPostings({ search: wordCloudParameters });
 
     } catch (error) {
         console.error("Error:", error);
