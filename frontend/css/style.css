@@ -11997,6 +11997,8 @@ footer {
   align-items: center;
 }
 .theCreators img {
+  width: 200px;
+  height: 200px;
   border-radius: 10px;
 }
 .theCreators .faveOne {
