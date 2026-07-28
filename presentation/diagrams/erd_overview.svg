@@ -56,7 +56,7 @@
 <rect x="1644" y="624" width="672" height="68" rx="10" fill="#F4F7FB" stroke="#C9D2DE" stroke-width="2"/>
 <rect x="1644" y="624" width="10" height="68" rx="5" fill="#9A4F70"/>
 <text x="1676" y="669" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">game_attempts</text>
-<text x="1644" y="878" font-family="DejaVu Sans" font-size="22" fill="#6B7787">1,260 questions; a session records what was served, an</text>
+<text x="1644" y="878" font-family="DejaVu Sans" font-size="22" fill="#6B7787">1,251 questions; a session records what was served, an</text>
 <text x="1644" y="908" font-family="DejaVu Sans" font-size="22" fill="#6B7787">attempt records the score.</text>
 <rect x="70" y="1000" width="2280" height="188" rx="18" fill="#FFFFFF" stroke="#C9D2DE" stroke-width="2"/>
 <text x="106" y="1056" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">The two joins that make it one system</text>

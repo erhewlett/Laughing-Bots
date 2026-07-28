@@ -939,8 +939,8 @@ password if we wanted to - we never stored it."
          "is saved to the account.\n\n"
          "▸  The prep roadmap ranks a role's skills by demand and tracks "
          "progress through them.\n\n"
-         "▸  The question bank beat its target: 15 per skill per difficulty, "
-         "which is 1,260 questions across 28 skills.\n\n"
+         "▸  The question bank beat its target: about 15 per skill per difficulty, "
+         "which is 1,251 questions across 28 skills.\n\n"
          "▸  250 automated tests, run on every pull request."),
         (AMBER, "Altered or cut",
          "▸  Users were originally going to type in any role. External API "
@@ -965,7 +965,7 @@ The honest accounting.
 
 On the left, what worked. Everything you just saw, plus a question bank that beat
 its own target - we aimed for ten per skill per difficulty and shipped fifteen,
-so 1,260 questions. And 250 tests on every pull request.
+so more than 1,250 questions. And 250 tests on every pull request.
 
 On the right, what changed. The top two are the same story: the external API
 limited what we could reliably fetch, so typing any role became four supported

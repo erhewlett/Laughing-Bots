@@ -88,7 +88,7 @@ Every figure in the deck was taken from the repository, not estimated:
 |---|---|
 | 14 tables | `backend/app/models.py` |
 | 16 API endpoints | the six routers in `backend/app/routers/` plus `/health` |
-| 1,260 quiz questions (28 skills × 3 × 15) | `backend/app/seed_data/questions_seed.json` |
+| 1,251 quiz questions (28 skills × 3 difficulties) | `backend/app/seed_data/questions_seed.json` |
 | 40 postings across 4 roles | `backend/app/seed_data/jobhopper_seed.json` |
 | 11 HTML pages | `frontend/html/` |
 | 250 tests (222 backend, 28 frontend) | `python -m pytest` and `npm test`, both run green |

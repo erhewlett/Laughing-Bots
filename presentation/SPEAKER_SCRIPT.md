@@ -3,7 +3,7 @@
 > Generated from the speaker notes inside `JobHopper_Final_Presentation.pptx`.
 > Edit the notes in `scripts/make_deck.py`, rebuild the deck, then re-run `scripts/make_script.py`.
 
-**Estimated total: 14:31**  (target 14:00, hard ceiling 15:00 — the assignment caps the video at 15 minutes; the rubric penalises going over 20.)
+**Estimated total: 14:32**  (target 14:00, hard ceiling 15:00 — the assignment caps the video at 15 minutes; the rubric penalises going over 20.)
 
 Speaking estimate assumes 140 words per minute, which is an unhurried presenting pace. The three demo slides are timed from the runbook rather than from word count.
 
@@ -24,8 +24,8 @@ Speaking estimate assumes 140 words per minute, which is an unhurried presenting
 | 11 | Demo 1 — the visitor | 1:30 | 9:42 |
 | 12 | Demo 2 — the registered user | 2:15 | 11:57 |
 | 13 | Demo 3 — it really is a database | 1:10 | 13:07 |
-| 14 | Summary — achieved vs changed | 0:51 | 13:59 |
-| 15 | Close | 0:32 | 14:31 |
+| 14 | Summary — achieved vs changed | 0:52 | 14:00 |
+| 15 | Close | 0:32 | 14:32 |
 
 ## Who speaks
 
@@ -42,7 +42,7 @@ The assignment does not require everyone to speak, but the rubric rewards a pres
 
 - **Look up.** Five rubric points ride on looking at the audience rather than reading. Learn the first and last sentence of each slide by heart; improvise the middle.
 - **No code on screen.** The assignment forbids showing code segments. The ERD, the architecture diagram and the database browser are all fine — an editor, a terminal or a source file is not.
-- **Say the numbers.** 14 tables, 1,260 questions, 40 postings, 250 tests. Specifics are what make a claim land.
+- **Say the numbers.** 14 tables, 1,251 questions, 40 postings, 250 tests. Specifics are what make a claim land.
 - **Do not narrate the mouse.** Say what a thing means, not where you are clicking.
 - **If something breaks on camera**, say what should have happened and move on. Do not debug live; stop the recording and re-take instead.
 
@@ -346,13 +346,13 @@ password if we wanted to - we never stored it."
 
 ## Slide 14 — Summary — achieved vs changed
 
-**Clock:** `11:20 - 12:10`  ·  **Speaker:** SPEAKER 1  ·  **Est. length:** 0:51
+**Clock:** `11:20 - 12:10`  ·  **Speaker:** SPEAKER 1  ·  **Est. length:** 0:52
 
 The honest accounting.
 
 On the left, what worked. Everything you just saw, plus a question bank that beat
 its own target - we aimed for ten per skill per difficulty and shipped fifteen,
-so 1,260 questions. And 250 tests on every pull request.
+so more than 1,250 questions. And 250 tests on every pull request.
 
 On the right, what changed. The top two are the same story: the external API
 limited what we could reliably fetch, so typing any role became four supported

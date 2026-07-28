@@ -514,7 +514,7 @@ def render_overview() -> str:
         (1610, QUIZ, "Q&amp;A game engine",
          "The quiz built on those same skills",
          ["questions", "answer_options", "quiz_sessions", "game_attempts"],
-         "1,260 questions; a session records what was served, an attempt records the score."),
+         "1,251 questions; a session records what was served, an attempt records the score."),
     ]
 
     PANEL_TOP, PANEL_H, HEAD = 210, 730, 112
