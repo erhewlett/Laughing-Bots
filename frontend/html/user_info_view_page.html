@@ -55,6 +55,14 @@
                         Generate New Word Cloud!
                     </button>
 
+                    <button
+                        id="view-roadmap-btn"
+                        type="button"
+                        class="btn btn-info col-6 fw-semibold p-4 text-dark rounded-4 ms-5 mt-3"
+                        >
+                        My Skill Roadmap
+                    </button>
+
                 </div>
                 
             </div>
@@ -76,18 +84,20 @@
                         <table class="table table-hover table-striped-columns align-middle">
                             <thead class="table-light">
                                 <tr>
-                                    <th scope="col" class="p-3 text-center w-50">Game Keyword</th>
-                                    <th scope="col" class="p-3 text-center w-50">Game Score</th>
+                                    <th scope="col" class="p-3 text-center">Game Keyword</th>
+                                    <th scope="col" class="p-3 text-center">Difficulty</th>
+                                    <th scope="col" class="p-3 text-center">Game Score</th>
+                                    <th scope="col" class="p-3 text-center">Played</th>
                                 </tr>
-                            </thead> 
-                        
+                            </thead>
 
-                            <tbody>
+                            <!-- Filled from GET /me/games. Every attempt is
+                                 stored, so show the recent ones rather than
+                                 just the last. -->
+                            <tbody id="game-history-body">
                                 <tr>
-                                    <td class="p-3 text-center" id="recent-game-keyword">No available data yet</td>
-                                    <td class="p-3 text-center" id="recent-game-score">No available data yet</td>
+                                    <td class="p-3 text-center" colspan="4">No available data yet</td>
                                 </tr>
-
                             </tbody>
                         </table>
                     </div>

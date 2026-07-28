@@ -18,6 +18,9 @@ frontend/style.css.map
 .env
 *.env
 !.env.example
+# Local token-signing key, generated on first run when SECRET_KEY is unset
+# (see backend/app/services/security.py).
+.dev_secret
 
 # Databases (built locally on first run, see app/autoseed.py)
 *.db

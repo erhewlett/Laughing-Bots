@@ -20,12 +20,13 @@ async def lifespan(app: FastAPI):
     initialize_database()
     autoseed()
     if settings.secret_is_default:
-        # Auth signs tokens with a random per-process key when SECRET_KEY is
-        # unset (see services/security.py). Tokens will not survive a restart.
+        # Auth signs tokens with the key cached in backend/.dev_secret when
+        # SECRET_KEY is unset (see services/security.py). Sessions survive a
+        # restart, but the key is local to this checkout.
         print(
-            "\n*** WARNING: SECRET_KEY is unset; login tokens use a random "
-            "per-process key and reset on restart. Set SECRET_KEY in "
-            "backend/.env for stable sessions. ***\n"
+            "\n*** SECRET_KEY is unset; login tokens are signed with the "
+            "development key in backend/.dev_secret. Fine for local work. "
+            "Set SECRET_KEY in backend/.env before deploying anywhere. ***\n"
         )
     yield
 

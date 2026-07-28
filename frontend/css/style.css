@@ -12299,9 +12299,9 @@ footer {
 
 .word-cloud-container {
   border: 3px solid #F7E4E0;
-  padding: 2rem;
-  width: 1200px;
-  height: 1200px;
+  padding: 0;
+  width: min(1200px, 100%, 68vh);
+  aspect-ratio: 1/1;
   margin: 0 auto;
   overflow: hidden;
 }

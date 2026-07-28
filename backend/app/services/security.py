@@ -2,14 +2,17 @@
 
 Passwords are bcrypt-hashed; only the hash is stored (User.password_hash).
 Access tokens are signed JWTs (HS256, 24h). If SECRET_KEY is left at the
-default placeholder, a random per-process key is used instead so tokens are
-never signed with a publicly known value (they will not survive a restart;
-set SECRET_KEY in backend/.env for stable sessions).
+default placeholder, a key generated on first run is used instead, so tokens
+are never signed with a publicly known value. That key is cached in
+backend/.dev_secret (gitignored) so it survives a restart: the server is
+normally run with --reload, and re-deriving the key on every reload signed
+everyone out the moment any file was saved.
 """
 from __future__ import annotations
 
 import secrets
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import bcrypt
 import jwt
@@ -32,7 +35,35 @@ PASSWORD_MAX_BYTES = 72  # bcrypt rejects inputs longer than this; validated at 
 bearer = HTTPBearer(auto_error=False)
 
 # Used only when SECRET_KEY is the default placeholder (see module docstring).
-_EPHEMERAL_SECRET = secrets.token_hex(32)
+_DEV_SECRET_FILE = Path(__file__).resolve().parent.parent.parent / ".dev_secret"
+
+
+def _load_dev_secret() -> str:
+    """Read the cached development key, generating it on first run.
+
+    Falls back to a per-process key if the file cannot be read or written -
+    a read-only checkout still boots, it just signs everyone out on restart
+    the way it did before this was cached.
+    """
+    try:
+        cached = _DEV_SECRET_FILE.read_text(encoding="utf-8").strip()
+        if cached:
+            return cached
+    except OSError:
+        pass
+
+    generated = secrets.token_hex(32)
+    try:
+        _DEV_SECRET_FILE.write_text(generated, encoding="utf-8")
+        # Same reasoning as an ssh private key: it signs sessions, so keep it
+        # off other accounts on a shared machine.
+        _DEV_SECRET_FILE.chmod(0o600)
+    except OSError:
+        pass
+    return generated
+
+
+_EPHEMERAL_SECRET = _load_dev_secret()
 
 
 def _secret() -> str:

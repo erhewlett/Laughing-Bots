@@ -1,6 +1,7 @@
 // js for word_cloud_view_page.html
 
 import { getUsername } from "./utils.js";
+import { loadPostings, formatMoney } from "./postings_table.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     // this page needs a session, same guard the other logged-in pages use.
@@ -64,7 +65,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const formattedResults = wordCloudResult.words.map(item => [item.skill, item.weight]);
 
         // RENDER WORD CLOUD
-        renderWordCloud(formattedResults, wordCloudParameters.shape, playableSet);
+        await renderWordCloud(formattedResults, wordCloudParameters.shape, playableSet);
+
+        // The listings the cloud was counted from. Deliberately after the
+        // cloud and not awaited alongside it: this is supporting evidence, and
+        // it must not hold up or break the thing it is evidence for.
+        loadPostings({ search: wordCloudParameters });
 
     } catch (error) {
         console.error("Error:", error);
@@ -175,9 +181,9 @@ function populateTitle(username, wrdCloudParams) {
         title += ` in ${wrdCloudParams.location}`;
     }
 
-    // populate min salary
+    // populate min salary - as money, not as the raw number the field held
     if (wrdCloudParams.min_salary && wrdCloudParams.min_salary !== "") {
-        title += ` with a minimum salary of ${wrdCloudParams.min_salary}`;
+        title += ` with a minimum salary of ${formatMoney(wrdCloudParams.min_salary)}`;
     }
 
     titleElement.textContent = title;
@@ -195,23 +201,87 @@ function showErrorMessage(message) {
     }
 }
 
+// The box the cloud was drawn into back when its size was hard-coded. The
+// type sizes below were picked against this, so they are scaled by however
+// much smaller the real box turns out to be (see _wordCloudRender.scss).
+const REFERENCE_BOX_PX = 1200;
+const REFERENCE_GRID_PX = 12;
+
+// The cloud font, which arrives from Google Fonts after the page does.
+const CLOUD_FONT = 'Cascadia Code';
+
+// wordcloud2 reserves space using the canvas text metrics, then paints the
+// word as DOM text. The two disagree by a few pixels per word, and on the
+// outermost words that difference lands past the edge of the box, where
+// `overflow: hidden` shears the last letter off. Drawing a touch smaller than
+// the space claimed absorbs the difference; it is not noticeable, and a
+// clipped word on the demo screen is.
+const CLOUD_FIT_MARGIN = 0.95;
+
+
+/* Don't lay the cloud out until the font it is measured in has arrived.
+ *
+ * wordcloud2 measures every word on a canvas to decide where it fits. Ask it
+ * before the webfont has loaded and it measures the fallback, lays the cloud
+ * out to those widths, and then the real font paints wider than the space
+ * reserved for it - so the words on the right ran past the edge of the box and
+ * were cut off by `overflow: hidden`, and a couple were dropped as "not
+ * fitting" when they would have fit.
+ */
+async function waitForCloudFont() {
+    if (!document.fonts) return;              // older browser: render as before
+    try {
+        await document.fonts.load(`16px "${CLOUD_FONT}"`);
+        await document.fonts.ready;
+    } catch (error) {
+        // A font that never loads is not a reason to skip the cloud; it just
+        // renders in the fallback, which is what used to happen every time.
+        console.warn('Cloud font did not load; rendering with the fallback.');
+    }
+}
+
 // render word cloud
-function renderWordCloud(data, shape, playableSet) {
+async function renderWordCloud(data, shape, playableSet) {
     const container = document.getElementById('word-cloud-box');
     const myColors = ['#8BA6E9', '#7E96C4', '#D7B7BC'];
+
+    // The library is served from js/vendor, so this only trips if that file
+    // failed to load. Say so, rather than throwing "WordCloud is not defined"
+    // out of the caller and leaving the page on "generating...".
+    if (typeof WordCloud !== 'function') {
+        showErrorMessage(
+            'The word cloud library did not load. Reload the page, and check that ' +
+            'js/vendor/wordcloud2.js is being served.'
+        );
+        return;
+    }
+
+    await waitForCloudFont();
+
+    // Scale the type to the box we actually got. Without this the words keep
+    // their old sizes and a smaller box simply drops the ones that no longer
+    // fit, which thins the cloud out on a laptop screen.
+    const style = window.getComputedStyle(container);
+    const usableWidth =
+        container.clientWidth
+        - parseFloat(style.paddingLeft)
+        - parseFloat(style.paddingRight);
+    const scale = usableWidth > 0 ? usableWidth / REFERENCE_BOX_PX : 1;
 
     WordCloud(container, {
         list: data,
         shape: shape,
-        gridSize: 12,
-        weightFactor: 1,
-        fontFamily: 'Cascadia Code',
+        gridSize: Math.max(4, Math.round(REFERENCE_GRID_PX * scale)),
+        weightFactor: scale * CLOUD_FIT_MARGIN,
+        fontFamily: CLOUD_FONT,
         color: () => {
             return myColors[Math.floor(Math.random() * myColors.length)];
         },
         backgroundColor: '#ffffff',
         ellipticity: 1.0,
-        origin: [600, 600],
+        // No origin: the default is the middle of the element. The old
+        // [600, 600] was the middle of the old fixed box, which sat 32px right
+        // of centre once the padding was taken off.
 
         click: (item) => {
             const word = item[0];
