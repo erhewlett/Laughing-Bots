@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2420" height="1460" viewBox="0 0 2420 1460"><rect width="2420" height="1460" fill="#F4F7FB"/>
+<text x="70" y="80" font-family="DejaVu Sans" font-size="52" font-weight="bold" fill="#1B2430">JobHopper technology stack</text>
+<text x="70" y="128" font-family="DejaVu Sans" font-size="28" fill="#6B7787">A browser talking to one Python API, which owns the only connection to the database.</text>
+<rect x="70" y="190" width="1620" height="300" rx="20" fill="#FFFFFF" stroke="#C9D2DE" stroke-width="2"/>
+<path d="M70,470 L70,210 Q70,190 90,190 L84,190 L84,490 L90,490 Q70,490 70,470 Z" fill="#3F5C99"/>
+<rect x="70" y="190" width="14" height="300" fill="#3F5C99"/>
+<text x="112" y="240" font-family="DejaVu Sans" font-size="34" font-weight="bold" fill="#3F5C99">Presentation layer</text>
+<text x="112" y="274" font-family="DejaVu Sans" font-size="22" fill="#6B7787">Runs in the browser - no framework, no build step</text>
+<rect x="112" y="300" width="318.0" height="74" rx="37.0" fill="#FFFFFF" stroke="#3F5C99" stroke-width="2.5"/>
+<text x="136" y="336" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">HTML5</text>
+<text x="136" y="360" font-family="DejaVu Sans" font-size="18" fill="#6B7787">11 pages, semantic markup</text>
+<rect x="448.0" y="300" width="253.2" height="74" rx="37.0" fill="#FFFFFF" stroke="#3F5C99" stroke-width="2.5"/>
+<text x="472.0" y="336" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">Bootstrap 5.3</text>
+<text x="472.0" y="360" font-family="DejaVu Sans" font-size="18" fill="#6B7787">grid, navbar, forms</text>
+<rect x="719.2" y="300" width="328.8" height="74" rx="37.0" fill="#FFFFFF" stroke="#3F5C99" stroke-width="2.5"/>
+<text x="743.2" y="336" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">Sass</text>
+<text x="743.2" y="360" font-family="DejaVu Sans" font-size="18" fill="#6B7787">compiled to one stylesheet</text>
+<rect x="112" y="394" width="393.0" height="74" rx="37.0" fill="#FFFFFF" stroke="#3F5C99" stroke-width="2.5"/>
+<text x="136" y="430" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">JavaScript (ES modules)</text>
+<text x="136" y="454" font-family="DejaVu Sans" font-size="18" fill="#6B7787">page controllers, no framework</text>
+<rect x="523.0" y="394" width="228.0" height="74" rx="37.0" fill="#FFFFFF" stroke="#3F5C99" stroke-width="2.5"/>
+<text x="547.0" y="430" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">wordcloud.js</text>
+<text x="547.0" y="454" font-family="DejaVu Sans" font-size="18" fill="#6B7787">canvas rendering</text>
+<line x1="580.0" y1="490" x2="580.0" y2="554" stroke="#3F5C99" stroke-width="4"/>
+<path d="M567.0,552 L580.0,570 L593.0,552 Z" fill="#3F5C99"/>
+<line x1="567.0" y1="490" x2="593.0" y2="490" stroke="#3F5C99" stroke-width="4" stroke-linecap="round"/>
+<text x="614.0" y="538.0" font-family="DejaVu Sans" font-size="23" fill="#6B7787">HTTP + JSON  ·  Authorization: Bearer &lt;JWT&gt;  ·  CORS allow-list  ·  gzip</text>
+<rect x="70" y="570" width="1620" height="400" rx="20" fill="#FFFFFF" stroke="#C9D2DE" stroke-width="2"/>
+<path d="M70,950 L70,590 Q70,570 90,570 L84,570 L84,970 L90,970 Q70,970 70,950 Z" fill="#1F7A6B"/>
+<rect x="70" y="570" width="14" height="400" fill="#1F7A6B"/>
+<text x="112" y="620" font-family="DejaVu Sans" font-size="34" font-weight="bold" fill="#1F7A6B">Application layer</text>
+<text x="112" y="654" font-family="DejaVu Sans" font-size="22" fill="#6B7787">FastAPI on Uvicorn - every rule lives here, never in the browser</text>
+<rect x="112" y="678" width="382.8" height="74" rx="37.0" fill="#FFFFFF" stroke="#1F7A6B" stroke-width="2.5"/>
+<text x="136" y="714" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">FastAPI + Uvicorn</text>
+<text x="136" y="738" font-family="DejaVu Sans" font-size="18" fill="#6B7787">16 endpoints, auto OpenAPI docs</text>
+<rect x="512.8" y="678" width="436.8" height="74" rx="37.0" fill="#FFFFFF" stroke="#1F7A6B" stroke-width="2.5"/>
+<text x="536.8" y="714" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">Pydantic v2</text>
+<text x="536.8" y="738" font-family="DejaVu Sans" font-size="18" fill="#6B7787">validates every request and response</text>
+<text x="112" y="794" font-family="DejaVu Sans" font-size="21" font-weight="bold" fill="#6B7787">ROUTERS</text>
+<rect x="270" y="770" width="105.6" height="56" rx="28.0" fill="#FFFFFF" stroke="#1F7A6B" stroke-width="2.5"/>
+<text x="294" y="807" font-family="DejaVu Sans" font-size="24" font-weight="bold" fill="#1B2430">auth</text>
+<rect x="393.6" y="770" width="177.6" height="56" rx="28.0" fill="#FFFFFF" stroke="#1F7A6B" stroke-width="2.5"/>
+<text x="417.6" y="807" font-family="DejaVu Sans" font-size="24" font-weight="bold" fill="#1B2430">wordcloud</text>
+<rect x="589.2" y="770" width="105.6" height="56" rx="28.0" fill="#FFFFFF" stroke="#1F7A6B" stroke-width="2.5"/>
+<text x="613.2" y="807" font-family="DejaVu Sans" font-size="24" font-weight="bold" fill="#1B2430">game</text>
+<rect x="712.8000000000001" y="770" width="148.8" height="56" rx="28.0" fill="#FFFFFF" stroke="#1F7A6B" stroke-width="2.5"/>
+<text x="736.8000000000001" y="807" font-family="DejaVu Sans" font-size="24" font-weight="bold" fill="#1B2430">roadmap</text>
+<rect x="879.6000000000001" y="770" width="148.8" height="56" rx="28.0" fill="#FFFFFF" stroke="#1F7A6B" stroke-width="2.5"/>
+<text x="903.6000000000001" y="807" font-family="DejaVu Sans" font-size="24" font-weight="bold" fill="#1B2430">history</text>
+<rect x="1046.4" y="770" width="105.6" height="56" rx="28.0" fill="#FFFFFF" stroke="#1F7A6B" stroke-width="2.5"/>
+<text x="1070.4" y="807" font-family="DejaVu Sans" font-size="24" font-weight="bold" fill="#1B2430">meta</text>
+<text x="112" y="884" font-family="DejaVu Sans" font-size="21" font-weight="bold" fill="#6B7787">SERVICES</text>
+<rect x="270" y="860" width="361.2" height="74" rx="37.0" fill="#FFFFFF" stroke="#1F7A6B" stroke-width="2.5"/>
+<text x="294" y="896" font-family="DejaVu Sans" font-size="24" font-weight="bold" fill="#1B2430">security</text>
+<text x="294" y="920" font-family="DejaVu Sans" font-size="18" fill="#6B7787">bcrypt hashing + PyJWT tokens</text>
+<rect x="649.2" y="860" width="372.0" height="74" rx="37.0" fill="#FFFFFF" stroke="#1F7A6B" stroke-width="2.5"/>
+<text x="673.2" y="896" font-family="DejaVu Sans" font-size="24" font-weight="bold" fill="#1B2430">keywords</text>
+<text x="673.2" y="920" font-family="DejaVu Sans" font-size="18" fill="#6B7787">skill extraction from postings</text>
+<rect x="1039.2" y="860" width="292.79999999999995" height="74" rx="37.0" fill="#FFFFFF" stroke="#1F7A6B" stroke-width="2.5"/>
+<text x="1063.2" y="896" font-family="DejaVu Sans" font-size="24" font-weight="bold" fill="#1B2430">ingest / autoseed</text>
+<text x="1063.2" y="920" font-family="DejaVu Sans" font-size="18" fill="#6B7787">keeps the data fresh</text>
+<line x1="580.0" y1="970" x2="580.0" y2="1034" stroke="#1F7A6B" stroke-width="4"/>
+<path d="M567.0,1032 L580.0,1050 L593.0,1032 Z" fill="#1F7A6B"/>
+<line x1="567.0" y1="970" x2="593.0" y2="970" stroke="#1F7A6B" stroke-width="4" stroke-linecap="round"/>
+<text x="614.0" y="1018.0" font-family="DejaVu Sans" font-size="23" fill="#6B7787">SQLAlchemy session per request  ·  parameterised queries only</text>
+<rect x="70" y="1050" width="1620" height="250" rx="20" fill="#FFFFFF" stroke="#C9D2DE" stroke-width="2"/>
+<path d="M70,1280 L70,1070 Q70,1050 90,1050 L84,1050 L84,1300 L90,1300 Q70,1300 70,1280 Z" fill="#9A4F70"/>
+<rect x="70" y="1050" width="14" height="250" fill="#9A4F70"/>
+<text x="112" y="1100" font-family="DejaVu Sans" font-size="34" font-weight="bold" fill="#9A4F70">Data layer</text>
+<text x="112" y="1134" font-family="DejaVu Sans" font-size="22" fill="#6B7787">One SQLite file, created and migrated by the app itself</text>
+<rect x="112" y="1166" width="393.59999999999997" height="74" rx="37.0" fill="#FFFFFF" stroke="#9A4F70" stroke-width="2.5"/>
+<text x="136" y="1202" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">SQLAlchemy 2.0 ORM</text>
+<text x="136" y="1226" font-family="DejaVu Sans" font-size="18" fill="#6B7787">typed models, no raw SQL strings</text>
+<rect x="523.5999999999999" y="1166" width="264.0" height="74" rx="37.0" fill="#FFFFFF" stroke="#9A4F70" stroke-width="2.5"/>
+<text x="547.5999999999999" y="1202" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">SQLite</text>
+<text x="547.5999999999999" y="1226" font-family="DejaVu Sans" font-size="18" fill="#6B7787">backend/jobhopper.db</text>
+<rect x="805.5999999999999" y="1166" width="285.6" height="74" rx="37.0" fill="#FFFFFF" stroke="#9A4F70" stroke-width="2.5"/>
+<text x="829.5999999999999" y="1202" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">14 tables</text>
+<text x="829.5999999999999" y="1226" font-family="DejaVu Sans" font-size="18" fill="#6B7787">with composite indexes</text>
+<rect x="1750" y="190" width="600" height="300" rx="20" fill="#FFFFFF" stroke="#C9D2DE" stroke-width="2"/>
+<path d="M1750,470 L1750,210 Q1750,190 1770,190 L1764,190 L1764,490 L1770,490 Q1750,490 1750,470 Z" fill="#B0742C"/>
+<rect x="1750" y="190" width="14" height="300" fill="#B0742C"/>
+<text x="1792" y="240" font-family="DejaVu Sans" font-size="34" font-weight="bold" fill="#B0742C">Where the data comes from</text>
+<text x="1792" y="274" font-family="DejaVu Sans" font-size="22" fill="#6B7787">Real postings, not invented rows</text>
+<circle cx="1806" cy="300" r="9" fill="#B0742C"/>
+<text x="1834" y="308" font-family="DejaVu Sans" font-size="24" font-weight="bold" fill="#1B2430">JSearch API (RapidAPI)</text>
+<text x="1834" y="335" font-family="DejaVu Sans" font-size="19" fill="#6B7787">live job-posting search</text>
+<line x1="1806" y1="310" x2="1806" y2="350" stroke="#B0742C" stroke-width="3" stroke-dasharray="5 6"/>
+<circle cx="1806" cy="360" r="9" fill="#B0742C"/>
+<text x="1834" y="368" font-family="DejaVu Sans" font-size="24" font-weight="bold" fill="#1B2430">ingest pipeline</text>
+<text x="1834" y="395" font-family="DejaVu Sans" font-size="19" fill="#6B7787">extracts skills, de-dupes on external_id</text>
+<line x1="1806" y1="370" x2="1806" y2="410" stroke="#B0742C" stroke-width="3" stroke-dasharray="5 6"/>
+<circle cx="1806" cy="420" r="9" fill="#B0742C"/>
+<text x="1834" y="428" font-family="DejaVu Sans" font-size="24" font-weight="bold" fill="#1B2430">seed fixture (JSON)</text>
+<text x="1834" y="455" font-family="DejaVu Sans" font-size="19" fill="#6B7787">40 postings shared by all four of us</text>
+<rect x="1750" y="570" width="600" height="400" rx="20" fill="#FFFFFF" stroke="#C9D2DE" stroke-width="2"/>
+<path d="M1750,950 L1750,590 Q1750,570 1770,570 L1764,570 L1764,970 L1770,970 Q1750,970 1750,950 Z" fill="#5B6472"/>
+<rect x="1750" y="570" width="14" height="400" fill="#5B6472"/>
+<text x="1792" y="620" font-family="DejaVu Sans" font-size="34" font-weight="bold" fill="#5B6472">How we kept it working</text>
+<text x="1792" y="654" font-family="DejaVu Sans" font-size="22" fill="#6B7787">Every merge had to pass this</text>
+<rect x="1792" y="662" width="10" height="46" rx="5" fill="#5B6472"/>
+<text x="1820" y="688" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">pytest</text>
+<text x="1820" y="716" font-family="DejaVu Sans" font-size="20" fill="#6B7787">209 backend tests</text>
+<rect x="1792" y="732" width="10" height="46" rx="5" fill="#5B6472"/>
+<text x="1820" y="758" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">Jest + jsdom</text>
+<text x="1820" y="786" font-family="DejaVu Sans" font-size="20" fill="#6B7787">28 frontend tests</text>
+<rect x="1792" y="802" width="10" height="46" rx="5" fill="#5B6472"/>
+<text x="1820" y="828" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">GitHub Actions</text>
+<text x="1820" y="856" font-family="DejaVu Sans" font-size="20" fill="#6B7787">both suites run on every pull request</text>
+<rect x="1792" y="872" width="10" height="46" rx="5" fill="#5B6472"/>
+<text x="1820" y="898" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">Pull requests</text>
+<text x="1820" y="926" font-family="DejaVu Sans" font-size="20" fill="#6B7787">44 merged into main, reviewed first</text>
+<rect x="1750" y="1050" width="600" height="250" rx="20" fill="#FFFFFF" stroke="#C9D2DE" stroke-width="2"/>
+<path d="M1750,1280 L1750,1070 Q1750,1050 1770,1050 L1764,1050 L1764,1300 L1770,1300 Q1750,1300 1750,1280 Z" fill="#3F5C99"/>
+<rect x="1750" y="1050" width="14" height="250" fill="#3F5C99"/>
+<text x="1792" y="1100" font-family="DejaVu Sans" font-size="34" font-weight="bold" fill="#3F5C99">Team workflow</text>
+<text x="1792" y="1134" font-family="DejaVu Sans" font-size="22" fill="#6B7787">Four people, one main branch</text>
+<circle cx="1802" cy="1170" r="8" fill="#3F5C99"/>
+<text x="1828" y="1178" font-family="DejaVu Sans" font-size="23" font-weight="bold" fill="#1B2430">189 commits, 44 pull requests</text>
+<text x="1828" y="1204" font-family="DejaVu Sans" font-size="19" fill="#6B7787">one feature branch per task</text>
+<circle cx="1802" cy="1232" r="8" fill="#3F5C99"/>
+<text x="1828" y="1240" font-family="DejaVu Sans" font-size="23" font-weight="bold" fill="#1B2430">Pinned dependency versions</text>
+<text x="1828" y="1266" font-family="DejaVu Sans" font-size="19" fill="#6B7787">all four machines resolve the same set</text>
+<rect x="70" y="1340" width="2310" height="86" rx="16" fill="#FFFFFF" stroke="#C9D2DE" stroke-width="2"/>
+<text x="104" y="1376" font-family="DejaVu Sans" font-size="24" font-weight="bold" fill="#1B2430">The rule that shaped the whole design:</text>
+<text x="104" y="1408" font-family="DejaVu Sans" font-size="23" fill="#6B7787">the browser never touches the database, and it never decides anything it could be lied to about — scoring, ownership and validation all happen in the API.</text>
+</svg>
