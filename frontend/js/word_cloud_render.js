@@ -1,6 +1,7 @@
 // js for word_cloud_view_page.html
 
 import { getUsername } from "./utils.js";
+import { loadPostings, formatMoney } from "./postings_table.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     // this page needs a session, same guard the other logged-in pages use.
@@ -65,6 +66,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // RENDER WORD CLOUD
         await renderWordCloud(formattedResults, wordCloudParameters.shape, playableSet);
+
+        // The listings the cloud was counted from. Deliberately after the
+        // cloud and not awaited alongside it: this is supporting evidence, and
+        // it must not hold up or break the thing it is evidence for.
+        loadPostings({ search: wordCloudParameters });
 
     } catch (error) {
         console.error("Error:", error);
@@ -157,18 +163,6 @@ function readStoredResults() {
 
 // UI functions
 
-// "90000" -> "$90,000". Falls back to the value as given if it isn't a number,
-// so a malformed stored search still renders a title instead of "$NaN".
-function formatSalary(value) {
-    const amount = Number(value);
-    if (!Number.isFinite(amount)) return value;
-    return amount.toLocaleString('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        maximumFractionDigits: 0,
-    });
-}
-
 // populate title
 function populateTitle(username, wrdCloudParams) {
     const titleElement = document.getElementById('word-cloud-title');
@@ -189,7 +183,7 @@ function populateTitle(username, wrdCloudParams) {
 
     // populate min salary - as money, not as the raw number the field held
     if (wrdCloudParams.min_salary && wrdCloudParams.min_salary !== "") {
-        title += ` with a minimum salary of ${formatSalary(wrdCloudParams.min_salary)}`;
+        title += ` with a minimum salary of ${formatMoney(wrdCloudParams.min_salary)}`;
     }
 
     titleElement.textContent = title;
