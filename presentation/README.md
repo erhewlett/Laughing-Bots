@@ -76,6 +76,6 @@ Every figure in the deck was taken from the repository, not estimated:
 | 1,260 quiz questions (28 skills × 3 × 15) | `backend/app/seed_data/questions_seed.json` |
 | 40 postings across 4 roles | `backend/app/seed_data/jobhopper_seed.json` |
 | 11 HTML pages | `frontend/html/` |
-| 237 tests (209 backend, 28 frontend) | `python -m pytest` and `npm test`, both run green |
+| 250 tests (222 backend, 28 frontend) | `python -m pytest` and `npm test`, both run green |
 | The demo click path | driven end to end against the running app |
 | 189 commits, 44 merged pull requests | `git log` |

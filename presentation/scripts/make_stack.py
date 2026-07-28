@@ -115,7 +115,7 @@ def render() -> str:
     p.append(band(MAIN_X, y, MAIN_W, 300, CLIENT, "Presentation layer",
                   "Runs in the browser - no framework, no build step"))
     p.append(chip_row(MAIN_X + 42, y + 110, [
-        ("HTML5", "11 pages, semantic markup"),
+        ("HTML5", "12 pages, semantic markup"),
         ("Bootstrap 5.3", "grid, navbar, forms"),
         ("Sass", "compiled to one stylesheet"),
     ], CLIENT))
@@ -134,7 +134,7 @@ def render() -> str:
     p.append(band(MAIN_X, y, MAIN_W, 400, API, "Application layer",
                   "FastAPI on Uvicorn - every rule lives here, never in the browser"))
     p.append(chip_row(MAIN_X + 42, y + 108, [
-        ("FastAPI + Uvicorn", "16 endpoints, auto OpenAPI docs"),
+        ("FastAPI + Uvicorn", "17 endpoints, auto OpenAPI docs"),
         ("Pydantic v2", "validates every request and response"),
     ], API))
     p.append(

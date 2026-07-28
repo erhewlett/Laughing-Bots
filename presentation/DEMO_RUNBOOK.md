@@ -28,8 +28,11 @@ another desktop or minimise.
 cd backend
 python -m venv venv && source venv/bin/activate   # first time only
 pip install -r requirements.txt                   # first time only
-uvicorn app.main:app --reload
+uvicorn app.main:app
 ```
+
+**No `--reload`.** It restarts the server on any file change, and a restart in
+the middle of a take is a restart. Nothing needs it here.
 
 The database builds itself on first start. Confirm it is up by opening
 `http://localhost:8000/health` once — you should get `{"status":"ok"}` — then
@@ -37,28 +40,28 @@ close that tab.
 
 ### 2. Serve the frontend on port 5500
 
-The API's allowed origins default to `http://localhost:5500` and
-`http://127.0.0.1:5500`, which is VS Code's Live Server default. Open
-`frontend/html/main.html` with **Live Server**.
+The API only accepts requests from `http://localhost:5500` and
+`http://127.0.0.1:5500`. If you serve the pages from any other port, or open
+them straight off disk, the browser blocks every API call and the demo fails
+silently.
 
-If you serve it from any other port, the browser will block every API call and
-the demo will fail silently. Either use 5500 or set `FRONTEND_ORIGINS` in
-`backend/.env` to whatever you are actually using.
+Either open `frontend/html/main.html` with VS Code's **Live Server**, which
+defaults to 5500, or run this from the repo root, which needs nothing installed:
 
-### 3. Check your internet connection
+```bash
+python3 -m http.server 5500 --directory frontend
+```
 
-The word cloud library is loaded from a CDN (`cdn.jsdelivr.net`), not from the
-repo. **No internet means no word cloud, and no word cloud means no demo** —
-the page renders the words as plain text with a `WordCloud is not defined`
-error where the picture should be.
+Then go to `http://localhost:5500/html/main.html`.
 
-Load the word cloud page once before you record. If you see a real cloud, you
-are fine. If you are recording somewhere with a captive portal or flaky wifi,
-either fix that first or point the script tag in
-`frontend/html/word_cloud_view_page.html` at the copy already in
-`node_modules/wordcloud/src/wordcloud2.js` — that is a one-line change to the
-app, so it is the team's call, not something to do five minutes before
-recording.
+### 3. Load each page once before you record
+
+The word cloud library is committed in `frontend/js/vendor/`, so the cloud
+renders with no internet connection. Bootstrap and the Cascadia Code font still
+come from a CDN, so without a connection the pages work but look plain.
+
+Click through the whole demo path once anyway. A page that has been loaded once
+is a page that will not surprise you.
 
 ### 4. Open the database in a GUI
 
@@ -73,9 +76,9 @@ Sign out, or open a private window. Part 1 depends on starting signed out.
 
 ### 6. Pre-flight checklist
 
-- [ ] Backend running, `/health` returns ok
+- [ ] Backend running **without `--reload`**, `/health` returns ok
 - [ ] Frontend on port 5500
-- [ ] Internet up — word cloud renders as a picture, not as an error
+- [ ] Word cloud renders as a picture, and the postings table under it has rows
 - [ ] DB Browser open on `jobhopper.db`, Browse Data tab
 - [ ] Signed out / private window
 - [ ] Editor, terminal and file explorer closed or on another desktop
@@ -101,7 +104,7 @@ this," sign in with the backup account, and carry on. Do not investigate.
 
 ---
 
-## Part 2 — Role 2: the registered user  ·  2:15  ·  Slide 12
+## Part 2 — Role 2: the registered user  ·  3:00  ·  Slide 12
 
 > **You must finish all ten questions.** The score is only written to the
 > database when the quiz is submitted, and submission happens on the tenth
@@ -113,17 +116,26 @@ this," sign in with the backup account, and carry on. Do not investigate.
 | # | Do | Say |
 |---|----|-----|
 | 1 | You are on the word cloud registration just generated. Point at the two or three biggest words | "The big words are the ones in the most postings. That's a count, not an opinion." |
-| 2 | Hover a skill so the cursor changes | "Any skill we have questions for is clickable." |
-| 3 | Click a big skill → difficulty screen → choose **Easy** | "Three difficulties, three timers. Easy gives us three minutes — enough to finish." |
-| 4 | Answer question 1 **correctly** | "It tells me immediately — and it can, because my answer was already locked in on the server before I was told, so knowing it now can't change it." |
-| 5 | Answer question 2 **wrong on purpose** | "And there's the other case. It shows the right answer, and the clock pauses while I read it." |
-| 6 | Say you'll speed up, then click through questions 3–10 without narrating each one | "I'll speed through the rest." |
-| 7 | The Submit button is replaced by a return button. Click it | "That's the quiz graded and saved." |
-| 8 | Profile: *Recent Game History* now has the score, *Recent Word Clouds* has the search | "We didn't refresh anything. That's the database answering." |
-| 9 | Click **Search Again** on a saved cloud | "Every search is saved, and re-runnable." |
+| 2 | Scroll down to **The Postings Behind This Cloud** and rest on it for a beat | "And here's what it counted. Real listings, with the company, the location and a link out. The cloud isn't our opinion about the market, it's arithmetic on these rows." |
+| 3 | Scroll back up. Hover a skill so the cursor changes | "Any skill we have questions for is clickable." |
+| 4 | Click a big skill → difficulty screen → choose **Easy** | "Three difficulties, three timers. Easy gives us three minutes — enough to finish." |
+| 5 | Answer question 1 **correctly** | "It tells me immediately — and it can, because my answer was already locked in on the server before I was told, so knowing it now can't change it." |
+| 6 | Answer question 2 **wrong on purpose** | "And there's the other case. It shows the right answer, and the clock pauses while I read it." |
+| 7 | Say you'll speed up, then click through questions 3–10 without narrating each one | "I'll speed through the rest." |
+| 8 | The Submit button is replaced by a return button. Click it | "That's the quiz graded and saved." |
+| 9 | Profile: *Recent Game History* now has the score, *Recent Word Clouds* has the search | "We didn't refresh anything. That's the database answering." |
+| 10 | Click **My Skill Roadmap** | "Same data, asked a different way. These are the eight skills most in demand for that role, in order." |
+| 11 | Set one step to **In progress**, then go back and forward to show it stuck | "Progress is per user and it's saved. Nothing here is in the browser." |
+| 12 | Point at **Practise** on any row | "And each one drops straight into the quiz for that skill." |
+| 13 | Back to the profile, click **Search Again** on a saved cloud | "Every search is saved, and re-runnable." |
 
-Timing: steps 4–6 are where takes run long. Answering ten on Easy takes about
+Timing: steps 5–7 are where takes run long. Answering ten on Easy takes about
 sixty seconds if you don't read the questions aloud. Practise it once.
+
+Steps 10–12 are the roadmap and they are quick, but if the whole video is
+running long they are the safest thing to drop — the roadmap also appears on
+the summary slide, so cutting them costs a demonstration and not a
+requirement.
 
 Note: you cannot open `word_cloud_view_page.html` directly — it needs a search
 first and will send you to the creation page. Reach it by registering, by
@@ -140,10 +152,12 @@ points on its own — do not rush it, and do not narrate the mouse.
 |---|----|-----|
 | 1 | Show the table list in the sidebar | "There are our fourteen tables — the same fourteen you just saw in the ERD. That diagram isn't a drawing of what we planned; it's what's actually in the file." |
 | 2 | Browse Data → **searches**. Scroll to the last row | "There's the search from ninety seconds ago — the role, the salary, the shape, the timestamp, and a user_id pointing at the account we made on camera." |
-| 3 | Browse Data → **game_attempts** | "And the quiz: skill, difficulty, score, seconds taken." |
+| 3 | Browse Data → **game_attempts** | "And the quiz: skill, difficulty, score, seconds taken. Every attempt, not just the last one — that's what the history table on the profile was reading." |
 | 4 | Browse Data → **users**, `password_hash` column | "That's a bcrypt hash. We couldn't tell you that user's password if we wanted to — we never stored it." |
-| 5 | Browse Data → **job_skills** or **skills** | "And this is where the cloud comes from — a count per skill, not a list we typed." |
-| 6 | Close | "Everything you saw on screen came out of this file." |
+| 5 | Browse Data → **job_postings** | "And these are the listings you saw under the cloud, sitting in the file." |
+| 6 | Browse Data → **job_skills** or **skills** | "And this is where the cloud comes from — a count per skill, not a list we typed." |
+| 7 | Browse Data → **roadmap_steps** | "The roadmap too. One row per step, with the progress we set on camera." |
+| 8 | Close | "Everything you saw on screen came out of this file." |
 
 DB Browser will list **fifteen** tables, not fourteen. The extra one is
 `sqlite_stat1`, which SQLite creates for its own query statistics — it is not

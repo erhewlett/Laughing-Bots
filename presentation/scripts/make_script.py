@@ -143,7 +143,7 @@ def main() -> None:
         "- **No code on screen.** The assignment forbids showing code "
         "segments. The ERD, the architecture diagram and the database browser "
         "are all fine — an editor, a terminal or a source file is not.",
-        "- **Say the numbers.** 14 tables, 1,260 questions, 40 postings, 237 "
+        "- **Say the numbers.** 14 tables, 1,260 questions, 40 postings, 250 "
         "tests. Specifics are what make a claim land.",
         "- **Do not narrate the mouse.** Say what a thing means, not where you "
         "are clicking.",

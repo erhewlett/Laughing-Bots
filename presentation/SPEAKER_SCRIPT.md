@@ -42,7 +42,7 @@ The assignment does not require everyone to speak, but the rubric rewards a pres
 
 - **Look up.** Five rubric points ride on looking at the audience rather than reading. Learn the first and last sentence of each slide by heart; improvise the middle.
 - **No code on screen.** The assignment forbids showing code segments. The ERD, the architecture diagram and the database browser are all fine — an editor, a terminal or a source file is not.
-- **Say the numbers.** 14 tables, 1,260 questions, 40 postings, 237 tests. Specifics are what make a claim land.
+- **Say the numbers.** 14 tables, 1,260 questions, 40 postings, 250 tests. Specifics are what make a claim land.
 - **Do not narrate the mouse.** Say what a thing means, not where you are clicking.
 - **If something breaks on camera**, say what should have happened and move on. Do not debug live; stop the recording and re-take instead.
 
@@ -120,7 +120,7 @@ every query goes through the ORM, parameterised, never built by string.
 The bottom row we held ourselves to as we built. Passwords bcrypt-hashed and
 never returned, and a failed login gives the same generic message whether the
 account exists or not. The server decides every score, never the browser. And
-237 tests, with nothing merging until both suites pass.
+250 tests, with nothing merging until both suites pass.
 
 ## Slide 6 — Technology stack diagram
 
@@ -132,7 +132,7 @@ Top: the browser. Eleven HTML pages, Bootstrap, Sass, plain JavaScript modules -
 no framework, no build step. It talks to exactly one thing, our API, and
 anything tied to an account carries a signed token.
 
-The middle band is where every rule lives: FastAPI, sixteen endpoints, Pydantic
+The middle band is where every rule lives: FastAPI, seventeen endpoints, Pydantic
 validating every request and response, and underneath it the services - hashing
 and tokens, skill extraction, and the ingest that keeps our data current. Note
 on the right that our postings are real, pulled from a live job-search API.
@@ -160,7 +160,7 @@ by construction.
 On the front end, Figma first. We designed every screen before anyone built it,
 which kept four people from producing four different-looking pages. Bootstrap
 gave us a responsive grid on day one, and Sass gave us one shared palette across
-eleven pages.
+twelve pages.
 
 And GitHub Actions - the cheapest way to stop four people breaking each other's
 work.
@@ -352,7 +352,7 @@ The honest accounting.
 
 On the left, what worked. Everything you just saw, plus a question bank that beat
 its own target - we aimed for ten per skill per difficulty and shipped fifteen,
-so 1,260 questions. And 237 tests on every pull request.
+so 1,260 questions. And 250 tests on every pull request.
 
 On the right, what changed. The top two are the same story: the external API
 limited what we could reliably fetch, so typing any role became four supported
@@ -366,7 +366,7 @@ got ahead of the app, which is on us.
 
 **Clock:** `12:30 - 13:00`  ·  **Speaker:** SPEAKER 1   -   close  ·  **Est. length:** 0:30
 
-Three things next. Ship the roadmap screen - the API is already there. Widen the
+Three things next. Rank the roadmap by what you're weak at, not just by what the
 ingest; the pipeline isn't the limit, the skill vocabulary is. And the one we
 actually want: close the loop, so the skills you keep getting wrong become the
 ones your cloud puts in front of you.

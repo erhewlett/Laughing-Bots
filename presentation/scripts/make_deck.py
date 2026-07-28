@@ -12,6 +12,7 @@ Regenerate with:  python presentation/scripts/make_deck.py
 """
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from PIL import ImageFont
@@ -47,19 +48,47 @@ FONT = "Calibri"
 LINE = 1.22        # single-spaced line height, as a multiple of font size
 EMU_PT = 12700
 
-_TTF = {
-    False: "/usr/share/fonts/truetype/crosextra/Carlito-Regular.ttf",
-    True: "/usr/share/fonts/truetype/crosextra/Carlito-Bold.ttf",
-}
+# Carlito, because it has the same glyph advances as Calibri: we lay the slides
+# out by measuring Carlito and set the text in Calibri, and the two agree.
+# Substituting any other font silently changes every measurement here, so a
+# missing Carlito is an error rather than a fallback.
+#
+# Searched in order; set JOBHOPPER_DECK_FONT_DIR to a directory holding
+# Carlito-Regular.ttf and Carlito-Bold.ttf to override. The path used to be a
+# single Debian one, so nobody on a Mac could regenerate the deck at all.
+_FONT_DIRS = [
+    os.environ.get("JOBHOPPER_DECK_FONT_DIR", ""),
+    "/usr/share/fonts/truetype/crosextra",                       # Debian/Ubuntu
+    "/usr/share/fonts/carlito",                                  # Fedora/Arch
+    "/Library/Fonts", "/Library/Fonts/Microsoft",                # macOS, system
+    str(Path.home() / "Library/Fonts"),                          # macOS, user
+    "/Applications/LibreOffice.app/Contents/Resources/fonts/truetype",
+]
+_FONT_FILES = {False: "Carlito-Regular.ttf", True: "Carlito-Bold.ttf"}
 _CACHE: dict = {}
 _WARN: list[str] = []
+
+
+def _font_path(bold: bool) -> str:
+    name = _FONT_FILES[bold]
+    for directory in _FONT_DIRS:
+        if directory and (Path(directory) / name).is_file():
+            return str(Path(directory) / name)
+    raise SystemExit(
+        f"Cannot find {name}. The slide layout is measured in Carlito, which is\n"
+        f"metric-compatible with Calibri, so it cannot be swapped for another font.\n"
+        f"Install it (Debian/Ubuntu: 'apt install fonts-crosextra-carlito'; macOS:\n"
+        f"download Carlito from Google Fonts into ~/Library/Fonts), or point\n"
+        f"JOBHOPPER_DECK_FONT_DIR at a directory containing it.\n"
+        f"Looked in: {', '.join(d for d in _FONT_DIRS if d)}"
+    )
 
 
 # ------------------------------------------------------------ measurement --
 def _face(size_pt: float, bold: bool):
     key = (round(size_pt * 4), bold)
     if key not in _CACHE:
-        _CACHE[key] = ImageFont.truetype(_TTF[bold], int(round(size_pt * 4)))
+        _CACHE[key] = ImageFont.truetype(_font_path(bold), int(round(size_pt * 4)))
     return _CACHE[key]
 
 
@@ -530,7 +559,7 @@ score can never disagree.
          "The server decides every score, never the browser, and a finished "
          "quiz cannot be replayed.", None),
         (SLATE, "Reliability",
-         "237 automated tests - 209 backend, 28 front end - and nothing merges "
+         "250 automated tests - 222 backend, 28 front end - and nothing merges "
          "until both suites pass.", None),
     ], 3, title_size=19, body_size=13.5)
     check("s5", end)
@@ -548,7 +577,7 @@ every query goes through the ORM, parameterised, never built by string.
 The bottom row we held ourselves to as we built. Passwords bcrypt-hashed and
 never returned, and a failed login gives the same generic message whether the
 account exists or not. The server decides every score, never the browser. And
-237 tests, with nothing merging until both suites pass.
+250 tests, with nothing merging until both suites pass.
 """)
 
     # 6 ----------------------------------------------------- stack diagram
@@ -564,7 +593,7 @@ Top: the browser. Eleven HTML pages, Bootstrap, Sass, plain JavaScript modules -
 no framework, no build step. It talks to exactly one thing, our API, and
 anything tied to an account carries a signed token.
 
-The middle band is where every rule lives: FastAPI, sixteen endpoints, Pydantic
+The middle band is where every rule lives: FastAPI, seventeen endpoints, Pydantic
 validating every request and response, and underneath it the services - hashing
 and tokens, skill extraction, and the ingest that keeps our data current. Note
 on the right that our postings are real, pulled from a live job-search API.
@@ -623,7 +652,7 @@ by construction.
 On the front end, Figma first. We designed every screen before anyone built it,
 which kept four people from producing four different-looking pages. Bootstrap
 gave us a responsive grid on day one, and Sass gave us one shared palette across
-eleven pages.
+twelve pages.
 
 And GitHub Actions - the cheapest way to stop four people breaking each other's
 work.
@@ -908,9 +937,11 @@ password if we wanted to - we never stored it."
          "user's own search parameters.\n\n"
          "▸  The Q&A game runs on a timer with live scoring, and every result "
          "is saved to the account.\n\n"
+         "▸  The prep roadmap ranks a role's skills by demand and tracks "
+         "progress through them.\n\n"
          "▸  The question bank beat its target: 15 per skill per difficulty, "
          "which is 1,260 questions across 28 skills.\n\n"
-         "▸  237 automated tests, run on every pull request."),
+         "▸  250 automated tests, run on every pull request."),
         (AMBER, "Altered or cut",
          "▸  Users were originally going to type in any role. External API "
          "limitations reduced that to 4 supported roles.\n\n"
@@ -918,8 +949,6 @@ password if we wanted to - we never stored it."
          "enough postings to build a cloud from.\n\n"
          "▸  Maximum salary was removed rather than shipped as a filter that "
          "quietly did nothing.\n\n"
-         "▸  The prep roadmap has a finished, tested API but no screen - we "
-         "chose to finish the quiz instead.\n\n"
          "▸  Named ranks are on the rules page, but scoring currently ends at a "
          "normalised number."),
     ]
@@ -936,7 +965,7 @@ The honest accounting.
 
 On the left, what worked. Everything you just saw, plus a question bank that beat
 its own target - we aimed for ten per skill per difficulty and shipped fifteen,
-so 1,260 questions. And 237 tests on every pull request.
+so 1,260 questions. And 250 tests on every pull request.
 
 On the right, what changed. The top two are the same story: the external API
 limited what we could reliably fetch, so typing any role became four supported
@@ -960,9 +989,9 @@ got ahead of the app, which is on us.
     put(tf, "WHERE WE'D TAKE IT NEXT", 14, bold=True, color=TEAL, first=True)
 
     nx = [
-        (BLUE, "Ship the roadmap screen",
-         "The API is already built and tested. The shortest distance between "
-         "where we are and a noticeably more useful app."),
+        (BLUE, "Rank the roadmap by what you're weak at",
+         "It orders skills by market demand today. It should also weigh what "
+         "your quiz scores say you don't know yet."),
         (TEAL, "Widen the ingest",
          "Four roles was enough to prove the idea. The pipeline isn't the "
          "limit — the vocabulary of skills we match against is."),
@@ -994,10 +1023,10 @@ got ahead of the app, which is on us.
     notes(s, """
 [12:30 - 13:00]   SPEAKER 1   -   close
 
-Three things next. Ship the roadmap screen - the API is already there. Widen the
-ingest; the pipeline isn't the limit, the skill vocabulary is. And the one we
-actually want: close the loop, so the skills you keep getting wrong become the
-ones your cloud puts in front of you.
+Three things next. Rank the roadmap by what you're weak at, not just by what the
+market wants. Widen the ingest; the pipeline isn't the limit, the skill
+vocabulary is. And the one we actually want: close the loop, so the skills you
+keep getting wrong become the ones your cloud puts in front of you.
 
 Right now the two halves of the app share a database. They should share a memory.
 
