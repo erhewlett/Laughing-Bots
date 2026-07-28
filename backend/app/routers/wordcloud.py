@@ -9,7 +9,8 @@ from __future__ import annotations
 import math
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import ValidationError
 from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import Session
 
@@ -17,6 +18,9 @@ from app.database import get_db
 from app import models
 from app.schemas import (
     DIFFICULTY_VALUES,
+    MAX_DB_INT,
+    JobPostingOut,
+    JobPostingsResponse,
     SearchRequest,
     WordCloudResponse,
     WordCloudWord,
@@ -150,6 +154,69 @@ def _salary_verified_filter(req: SearchRequest):
     return or_(
         models.JobPosting.salary_max >= req.min_salary,
         models.JobPosting.salary_min >= req.min_salary,
+    )
+
+
+@router.get("/postings", response_model=JobPostingsResponse)
+def list_postings(
+    job_title: str | None = Query(default=None, max_length=150),
+    industry: str | None = Query(default=None, max_length=100),
+    location: str | None = Query(default=None, max_length=100),
+    min_salary: int | None = Query(default=None, ge=0, le=MAX_DB_INT),
+    limit: int = Query(default=10, ge=1, le=50),
+    db: Session = Depends(get_db),
+    user: models.User = Depends(security.get_current_user),
+) -> JobPostingsResponse:
+    """The job postings a word cloud was built from.
+
+    Deliberately the same resolution and the same filters as POST /wordcloud -
+    it builds the identical SearchRequest and reuses _match_role and
+    _posting_filters - so this is the evidence for that cloud rather than a
+    second, similar-looking search that might disagree with it.
+
+    Newest first, because "what is being asked for right now" is the question
+    a job seeker is actually asking.
+    """
+    # Round-trip through SearchRequest so the query string is validated exactly
+    # the way the cloud's body is, including "job_title or industry required".
+    try:
+        req = SearchRequest(
+            job_title=job_title,
+            industry=industry,
+            location=location,
+            min_salary=min_salary,
+        )
+    except ValidationError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail="Provide at least one of 'job_title' or 'industry'.",
+        ) from exc
+
+    role = _match_role(db, req)
+    if role is None:
+        raise HTTPException(
+            status_code=404,
+            detail="No matching role found for that job title/industry.",
+        )
+
+    filters = _posting_filters(role.role_id, req)
+
+    total = db.scalar(
+        select(func.count()).select_from(models.JobPosting).where(*filters)
+    )
+    rows = db.scalars(
+        select(models.JobPosting)
+        .where(*filters)
+        # job_id breaks ties: seeded postings share a date, and without a
+        # second key the "newest 10" came back in a different order per call.
+        .order_by(models.JobPosting.date_posted.desc(), models.JobPosting.job_id.desc())
+        .limit(limit)
+    ).all()
+
+    return JobPostingsResponse(
+        role=role.role_name,
+        total=total or 0,
+        postings=[JobPostingOut.model_validate(row) for row in rows],
     )
 
 

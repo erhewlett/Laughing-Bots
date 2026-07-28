@@ -364,6 +364,13 @@ document.addEventListener("DOMContentLoaded", () => {
             choiceText.textContent = option.option_text;
 
             /*
+             * Name the radio after the answer it selects. The label wraps the
+             * input, but a screen reader still read every option as plain
+             * "radio" because the text arrives after the page does.
+             */
+            currentInput.setAttribute("aria-label", option.option_text);
+
+            /*
              * Store the question and option IDs
              * inside the radio input.
              */

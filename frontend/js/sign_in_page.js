@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // display error UI to user
             const errorMessageDiv = document.getElementById('error-message');
-            errorMessageDiv.textContent = 'An error occured during sign in. Please try again later.';
+            errorMessageDiv.textContent = 'An error occurred during sign in. Please try again later.';
             errorMessageDiv.style.display = 'block';
         }
     });

@@ -1,12 +1,27 @@
 @use '../colors';
 
 // word cloud container
+//
+// Square, and sized to whichever runs out first: the column it sits in, or the
+// height of the window. It used to be a flat 1200px x 1200px, which is taller
+// than any laptop screen and wider than the .container it lives in below the
+// xxl breakpoint - so the cloud was clipped on the right and never fully on
+// screen at once. That is the one thing this page exists to show.
+//
+// 68vh leaves room for the header and titles above and the prompt below.
+// word_cloud_render.js reads the rendered size back and scales the type to
+// match, so the cloud fills whatever square it ends up with.
 .word-cloud-container {
     border: 3px solid #F7E4E0;
-    padding: 2rem;
 
-    width: 1200px;
-    height: 1200px;
+    // No padding. wordcloud2 measures the element's full width but positions
+    // each word from the padding box, so any padding here shifts the whole
+    // cloud right by that much and clips it against the far edge. The border
+    // gives the frame the padding used to.
+    padding: 0;
+
+    width: min(1200px, 100%, 68vh);
+    aspect-ratio: 1 / 1;
     margin: 0 auto;
 
     overflow: hidden;

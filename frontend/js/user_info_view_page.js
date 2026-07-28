@@ -1,5 +1,9 @@
 // javascript for JobHopper user info view page
 
+// How many past games the history table shows. The word cloud table beside it
+// holds three, so this is deliberately a little longer without running away.
+const GAME_HISTORY_ROWS = 5;
+
 // initialization
 async function initDashboard() {
     // get token from sign in and store in token variable
@@ -20,8 +24,16 @@ async function initDashboard() {
         };
     }
 
+    // logic for "My Skill Roadmap" button
+    const roadmapBtn = document.getElementById('view-roadmap-btn');
+    if (roadmapBtn) {
+        roadmapBtn.onclick = () => {
+            window.location.href = '../html/roadmap_page.html';
+        };
+    }
+
     try {
-        const [userResponse, historyResponse] = await Promise.all([
+        const [userResponse, historyResponse, gamesResponse] = await Promise.all([
             // fetch user information
             fetch('http://localhost:8000/auth/me', {
                 headers: {'Authorization': `Bearer ${token}`}
@@ -29,6 +41,13 @@ async function initDashboard() {
 
             // fetch user's recent history
             fetch('http://localhost:8000/me/recent', {
+                headers: {'Authorization': `Bearer ${token}`}
+            }),
+
+            // every quiz attempt, not just the last one. /me/recent only
+            // carries last_game, so the history table could never show more
+            // than a single row no matter how many games had been played.
+            fetch(`http://localhost:8000/me/games?limit=${GAME_HISTORY_ROWS}`, {
                 headers: {'Authorization': `Bearer ${token}`}
             })
         ]);
@@ -39,7 +58,13 @@ async function initDashboard() {
 
             // UI functions go here
             updateWelcomeMessage(userData);
-            renderGameHistory(historyData.last_game);
+            // Fall back to the single last_game if the history call failed, so
+            // a problem there costs detail rather than the whole table.
+            if (gamesResponse.ok) {
+                renderGameHistory((await gamesResponse.json()).attempts);
+            } else if (historyData.last_game) {
+                renderGameHistory([historyData.last_game]);
+            }
             renderWordCloudHistory(historyData.recent_searches);
         } else if (userResponse.status === 401 || historyResponse.status === 401) {
             // session expired
@@ -95,14 +120,47 @@ function updateWelcomeMessage(user) {
 }
 
 // render game history data into table
-function renderGameHistory(game) {
-    const keywordCell = document.getElementById('recent-game-keyword');
-    const scoreCell = document.getElementById('recent-game-score');
-
-    if (game && keywordCell && scoreCell) {
-        keywordCell.innerText = game.skill;
-        scoreCell.innerText = `${game.score} / ${game.max_score}`;
+function renderGameHistory(attempts) {
+    const body = document.getElementById('game-history-body');
+    if (!body || !attempts || attempts.length === 0) {
+        // Leave the "No available data yet" row in place.
+        return;
     }
+
+    body.replaceChildren();
+
+    attempts.slice(0, GAME_HISTORY_ROWS).forEach((attempt) => {
+        const row = document.createElement('tr');
+        row.appendChild(historyCell(attempt.skill));
+        // last_game has no difficulty field, so the fallback path shows a dash
+        // rather than "undefined".
+        row.appendChild(historyCell(formatDifficulty(attempt.difficulty)));
+        row.appendChild(historyCell(`${attempt.score} / ${attempt.max_score}`));
+        row.appendChild(historyCell(formatPlayedDate(attempt.date_taken)));
+        body.appendChild(row);
+    });
+}
+
+
+function historyCell(value) {
+    const cell = document.createElement('td');
+    cell.className = 'p-3 text-center';
+    cell.innerText = value;
+    return cell;
+}
+
+
+function formatDifficulty(difficulty) {
+    if (!difficulty) return '-';
+    return difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+}
+
+
+function formatPlayedDate(value) {
+    if (!value) return '-';
+    const when = new Date(value);
+    if (Number.isNaN(when.getTime())) return '-';
+    return when.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 function renderWordCloudHistory(searches) {
