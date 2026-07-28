@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2420" height="1250" viewBox="0 0 2420 1250">
+<rect width="2420" height="1250" fill="#F4F7FB"/>
+<text x="70" y="86" font-family="DejaVu Sans" font-size="52" font-weight="bold" fill="#1B2430">How the database is organised</text>
+<text x="70" y="140" font-family="DejaVu Sans" font-size="30" fill="#6B7787">Three subject areas, joined by the two tables every feature depends on: <tspan font-weight="bold" fill="#3F5C99">users</tspan> and <tspan font-weight="bold" fill="#1F7A6B">skills</tspan>.</text>
+<rect x="70" y="210" width="740" height="730" rx="20" fill="#FFFFFF" stroke="#1F7A6B" stroke-width="4"/>
+<path d="M70,322 L70,222 Q70,210 82,210 L798,210 Q810,210 810,222 L810,322 Z" fill="#1F7A6B"/>
+<text x="100" y="264" font-family="DejaVu Sans" font-size="36" font-weight="bold" fill="#FFFFFF">Job-market data</text>
+<text x="100" y="303" font-family="DejaVu Sans" font-size="23" fill="#FFFFFF" opacity="0.88">Where the word cloud comes from</text>
+<rect x="104" y="354" width="672" height="68" rx="10" fill="#F4F7FB" stroke="#C9D2DE" stroke-width="2"/>
+<rect x="104" y="354" width="10" height="68" rx="5" fill="#1F7A6B"/>
+<text x="136" y="399" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">roles</text>
+<rect x="104" y="444" width="672" height="68" rx="10" fill="#F4F7FB" stroke="#C9D2DE" stroke-width="2"/>
+<rect x="104" y="444" width="10" height="68" rx="5" fill="#1F7A6B"/>
+<text x="136" y="489" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">job_postings</text>
+<rect x="104" y="534" width="672" height="68" rx="10" fill="#F4F7FB" stroke="#C9D2DE" stroke-width="2"/>
+<rect x="104" y="534" width="10" height="68" rx="5" fill="#1F7A6B"/>
+<text x="136" y="579" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">skills</text>
+<rect x="104" y="624" width="672" height="68" rx="10" fill="#F4F7FB" stroke="#C9D2DE" stroke-width="2"/>
+<rect x="104" y="624" width="10" height="68" rx="5" fill="#1F7A6B"/>
+<text x="136" y="669" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">job_skills</text>
+<rect x="104" y="714" width="672" height="68" rx="10" fill="#F4F7FB" stroke="#C9D2DE" stroke-width="2"/>
+<rect x="104" y="714" width="10" height="68" rx="5" fill="#1F7A6B"/>
+<text x="136" y="759" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">role_skills</text>
+<text x="104" y="878" font-family="DejaVu Sans" font-size="22" fill="#6B7787">40 postings across 4 roles, broken down into the skills each</text>
+<text x="104" y="908" font-family="DejaVu Sans" font-size="22" fill="#6B7787">one asks for.</text>
+<rect x="840" y="210" width="740" height="730" rx="20" fill="#FFFFFF" stroke="#3F5C99" stroke-width="4"/>
+<path d="M840,322 L840,222 Q840,210 852,210 L1568,210 Q1580,210 1580,222 L1580,322 Z" fill="#3F5C99"/>
+<text x="870" y="264" font-family="DejaVu Sans" font-size="36" font-weight="bold" fill="#FFFFFF">Identity &amp; activity</text>
+<text x="870" y="303" font-family="DejaVu Sans" font-size="23" fill="#FFFFFF" opacity="0.88">Who the user is and what they did</text>
+<rect x="874" y="354" width="672" height="68" rx="10" fill="#F4F7FB" stroke="#C9D2DE" stroke-width="2"/>
+<rect x="874" y="354" width="10" height="68" rx="5" fill="#3F5C99"/>
+<text x="906" y="399" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">users</text>
+<rect x="874" y="444" width="672" height="68" rx="10" fill="#F4F7FB" stroke="#C9D2DE" stroke-width="2"/>
+<rect x="874" y="444" width="10" height="68" rx="5" fill="#3F5C99"/>
+<text x="906" y="489" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">searches</text>
+<rect x="874" y="534" width="672" height="68" rx="10" fill="#F4F7FB" stroke="#C9D2DE" stroke-width="2"/>
+<rect x="874" y="534" width="10" height="68" rx="5" fill="#3F5C99"/>
+<text x="906" y="579" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">roadmaps</text>
+<rect x="874" y="624" width="672" height="68" rx="10" fill="#F4F7FB" stroke="#C9D2DE" stroke-width="2"/>
+<rect x="874" y="624" width="10" height="68" rx="5" fill="#3F5C99"/>
+<text x="906" y="669" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">roadmap_steps</text>
+<text x="874" y="878" font-family="DejaVu Sans" font-size="22" fill="#6B7787">Accounts, saved searches and a per-user prep roadmap.</text>
+<rect x="1610" y="210" width="740" height="730" rx="20" fill="#FFFFFF" stroke="#9A4F70" stroke-width="4"/>
+<path d="M1610,322 L1610,222 Q1610,210 1622,210 L2338,210 Q2350,210 2350,222 L2350,322 Z" fill="#9A4F70"/>
+<text x="1640" y="264" font-family="DejaVu Sans" font-size="36" font-weight="bold" fill="#FFFFFF">Q&amp;A game engine</text>
+<text x="1640" y="303" font-family="DejaVu Sans" font-size="23" fill="#FFFFFF" opacity="0.88">The quiz built on those same skills</text>
+<rect x="1644" y="354" width="672" height="68" rx="10" fill="#F4F7FB" stroke="#C9D2DE" stroke-width="2"/>
+<rect x="1644" y="354" width="10" height="68" rx="5" fill="#9A4F70"/>
+<text x="1676" y="399" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">questions</text>
+<rect x="1644" y="444" width="672" height="68" rx="10" fill="#F4F7FB" stroke="#C9D2DE" stroke-width="2"/>
+<rect x="1644" y="444" width="10" height="68" rx="5" fill="#9A4F70"/>
+<text x="1676" y="489" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">answer_options</text>
+<rect x="1644" y="534" width="672" height="68" rx="10" fill="#F4F7FB" stroke="#C9D2DE" stroke-width="2"/>
+<rect x="1644" y="534" width="10" height="68" rx="5" fill="#9A4F70"/>
+<text x="1676" y="579" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">quiz_sessions</text>
+<rect x="1644" y="624" width="672" height="68" rx="10" fill="#F4F7FB" stroke="#C9D2DE" stroke-width="2"/>
+<rect x="1644" y="624" width="10" height="68" rx="5" fill="#9A4F70"/>
+<text x="1676" y="669" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">game_attempts</text>
+<text x="1644" y="878" font-family="DejaVu Sans" font-size="22" fill="#6B7787">1,260 questions; a session records what was served, an</text>
+<text x="1644" y="908" font-family="DejaVu Sans" font-size="22" fill="#6B7787">attempt records the score.</text>
+<rect x="70" y="1000" width="2280" height="188" rx="18" fill="#FFFFFF" stroke="#C9D2DE" stroke-width="2"/>
+<text x="106" y="1056" font-family="DejaVu Sans" font-size="31" font-weight="bold" fill="#1B2430">The two joins that make it one system</text>
+<rect x="106" y="1085" width="12" height="28" rx="6" fill="#1F7A6B"/>
+<text x="136" y="1106" font-family="DejaVu Sans" font-size="26" fill="#1B2430">skills is shared &#8212; the same row that sizes a word in the cloud owns that word&#8217;s question bank, so clicking a word starts a quiz.</text>
+<rect x="106" y="1131" width="12" height="28" rx="6" fill="#3F5C99"/>
+<text x="136" y="1152" font-family="DejaVu Sans" font-size="26" fill="#1B2430">users is shared &#8212; searches, quiz_sessions, game_attempts and roadmaps all hang off one account, which is what the profile page reads back.</text>
+</svg>
