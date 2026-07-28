@@ -133,6 +133,40 @@ def test_seed_questions_rejects_duplicate_question_in_bank(tmp_path, monkeypatch
         )
 
 
+@pytest.mark.parametrize(
+    "first, second",
+    [
+        # The nine pairs that got through in practice all differed like this.
+        ('What is a "sprint" in Scrum?', "What is a 'sprint' in Scrum?"),
+        ("What is a merge conflict and when does it occur?",
+         "What is a merge conflict, and when does it occur?"),
+        ("What does REST stand for?", 'What does "REST" stand for?'),
+        ("What is a Kubernetes Node?", "What is a Kubernetes 'Node'?"),
+        ("What is the purpose of a daily standup meeting?",
+         "What is the purpose of a daily stand-up meeting?"),
+    ],
+)
+def test_seed_rejects_a_question_that_is_only_reworded(
+    tmp_path, monkeypatch, first, second
+):
+    """Punctuation is not a difference worth keeping two questions over.
+
+    Matching on raw text let these pairs into the bank, and a ten-question run
+    drawn from fifteen showed the player the same question twice.
+    """
+    with pytest.raises(ValueError):
+        _run_question_seed(tmp_path, monkeypatch, [_q(text=first), _q(text=second)])
+
+
+def test_seed_still_allows_genuinely_different_questions(tmp_path, monkeypatch):
+    # The normalising must not be so loose it collapses distinct questions.
+    _run_question_seed(
+        tmp_path,
+        monkeypatch,
+        [_q(text="What is a pod?"), _q(text="What is a node?")],
+    )
+
+
 def test_seed_error_names_the_offending_question(tmp_path, monkeypatch):
     # error text should locate the bad row by skill/difficulty, not just index
     with pytest.raises(ValueError, match="SQL"):

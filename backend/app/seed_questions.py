@@ -18,6 +18,7 @@ as the whole truth (see app/autoseed.py).
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from sqlalchemy import delete, select
@@ -44,12 +45,31 @@ def _where(item: dict, i: int) -> str:
     return f"question {i} [{skill} / {difficulty}] {snippet!r}"
 
 
+def _dedup_key(text: str) -> str:
+    """Normalise a question for duplicate detection.
+
+    Comparing the raw lower-cased text only catches questions that match
+    character for character, which let nine pairs through: two batches of
+    questions were written months apart, and pairs like
+
+        What is a "sprint" in Scrum?
+        What is a 'sprint' in Scrum?
+
+    differ only in the quote marks. A player got both in the same ten-question
+    run and saw the same question twice. Stripping punctuation and collapsing
+    whitespace catches the rewordings that matter without being so loose it
+    rejects two genuinely different questions.
+    """
+    return re.sub(r"[^a-z0-9 ]", "", text.lower()).strip()
+
+
 def validate_questions(items: list[dict]) -> None:
     """Reject a broken bank before touching the DB, naming the exact entry.
 
     Catches invalid difficulty, empty text, too few options, blank or
     duplicate option text, an answer set without exactly one correct option,
-    and the same question repeated within a (skill, difficulty) bank.
+    and the same question repeated within a (skill, difficulty) bank -
+    including one only reworded, see _dedup_key.
     """
     seen: dict[tuple[str, str, str], int] = {}
     for i, item in enumerate(items):
@@ -83,7 +103,7 @@ def validate_questions(items: list[dict]) -> None:
                 f"found {correct_count}."
             )
 
-        key = (skill.lower(), item["difficulty"], text.lower())
+        key = (skill.lower(), item["difficulty"], _dedup_key(text))
         if key in seen:
             raise ValueError(f"{where} duplicates question {seen[key]} in the same bank.")
         seen[key] = i
