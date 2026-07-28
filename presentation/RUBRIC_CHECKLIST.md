@@ -10,8 +10,8 @@ recording: if a row has no tick, that is a point you have not earned yet.
 
 | Requirement | Where | Status |
 |---|---|---|
-| Under 20 minutes (rubric) | Script estimates **13:51** | ✅ |
-| Under 15 minutes (assignment) | 1:08 of headroom at 140 wpm | ✅ |
+| Under 20 minutes (rubric) | Script estimates **14:29** | ✅ |
+| Under 15 minutes (assignment) | 31s of headroom — 9:34 talking, 4:55 demo | ✅ tight |
 
 `scripts/make_script.py` re-checks the total every time it runs and prints a
 warning if an edit pushes the script over the ceiling.
@@ -21,6 +21,7 @@ warning if an edit pushes the script over the ceiling.
 | Requirement | Points | Where | Status |
 |---|---|---|---|
 | Demonstrates the system is built on a database | 9 | Slide 13 + **Demo runbook Part 3** — the live rows created during the demo, shown in the database file itself | ✅ |
+| ↳ *depends on:* finishing all ten quiz questions | — | The attempt is only written on submit. Stopping early shows an empty game history. See the warning in Part 2 | ⬜ rehearse |
 | Logs in to show the system from the perspective of **all user roles** | 8 | Slide 10 names both roles and explains why there is no third one; **Runbook Parts 1 and 2** show visitor then registered user | ✅ |
 | Walks through the ERD | 8 | Slides 8 and 9, with a scripted trace through the schema on slide 9 | ✅ |
 
@@ -53,6 +54,8 @@ forgot to demo.
 - [ ] Every name on slide 1 is spelled the way that person spells it
 - [ ] Deck opens correctly on the machine that will present it (fonts included)
 - [ ] Backend running, frontend on port 5500, DB Browser open — see the runbook
+- [ ] Internet up — the word cloud library loads from a CDN
+- [ ] You have practised playing ten questions inside a minute
 - [ ] Editor, terminal and file explorer closed (no code on screen)
 - [ ] One full rehearsal done, and it came in under 15:00
 - [ ] Everyone knows which slides are theirs (`SPEAKER_SCRIPT.md` → *Who speaks*)

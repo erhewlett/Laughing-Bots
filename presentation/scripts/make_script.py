@@ -76,7 +76,7 @@ def main() -> None:
 
         if i in DEMO_SLIDES:
             # Demo timing comes from the runbook, not from word count.
-            est = {11: 60, 12: 120, 13: 60}[i]
+            est = {11: 90, 12: 135, 13: 70}[i]
         else:
             est = spoken_words(note) / WPM * 60
         running += est

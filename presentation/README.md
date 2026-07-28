@@ -18,8 +18,8 @@ grading rubric.
 
 1. Read **`DEMO_RUNBOOK.md`** — it has the setup steps and the pre-flight
    checklist.
-2. Rehearse from **`SPEAKER_SCRIPT.md`**. Estimated runtime **13:51** against a
-   15-minute cap.
+2. Rehearse from **`SPEAKER_SCRIPT.md`**. Estimated runtime **14:29** against a
+   15-minute cap — 9:34 of talking plus a 4:55 demo budget.
 3. Record. Two rules: **no code on screen**, and **do not debug live**.
 4. Walk **`RUBRIC_CHECKLIST.md`** before you submit.
 
@@ -77,4 +77,5 @@ Every figure in the deck was taken from the repository, not estimated:
 | 40 postings across 4 roles | `backend/app/seed_data/jobhopper_seed.json` |
 | 11 HTML pages | `frontend/html/` |
 | 237 tests (209 backend, 28 frontend) | `python -m pytest` and `npm test`, both run green |
+| The demo click path | driven end to end against the running app |
 | 189 commits, 44 merged pull requests | `git log` |

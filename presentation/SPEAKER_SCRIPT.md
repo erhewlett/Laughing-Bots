@@ -3,7 +3,7 @@
 > Generated from the speaker notes inside `JobHopper_Final_Presentation.pptx`.
 > Edit the notes in `scripts/make_deck.py`, rebuild the deck, then re-run `scripts/make_script.py`.
 
-**Estimated total: 13:54**  (target 14:00, hard ceiling 15:00 — the assignment caps the video at 15 minutes; the rubric penalises going over 20.)
+**Estimated total: 14:29**  (target 14:00, hard ceiling 15:00 — the assignment caps the video at 15 minutes; the rubric penalises going over 20.)
 
 Speaking estimate assumes 140 words per minute, which is an unhurried presenting pace. The three demo slides are timed from the runbook rather than from word count.
 
@@ -16,16 +16,16 @@ Speaking estimate assumes 140 words per minute, which is an unhurried presenting
 | 3 | Functional requirements 1 of 2 | 0:45 | 1:57 |
 | 4 | Functional requirements 2 of 2 | 0:52 | 2:50 |
 | 5 | Non-functional requirements | 0:48 | 3:38 |
-| 6 | Technology stack diagram | 1:00 | 4:39 |
-| 7 | Why this stack | 1:04 | 5:44 |
-| 8 | ERD — subject areas | 0:40 | 6:24 |
-| 9 | ERD — full schema | 1:23 | 7:47 |
-| 10 | User roles | 0:36 | 8:23 |
-| 11 | Demo 1 — the visitor | 1:00 | 9:24 |
-| 12 | Demo 2 — the registered user | 2:00 | 11:24 |
-| 13 | Demo 3 — it really is a database | 1:00 | 12:24 |
-| 14 | Summary — achieved vs changed | 0:59 | 13:23 |
-| 15 | Close | 0:30 | 13:54 |
+| 6 | Technology stack diagram | 0:55 | 4:33 |
+| 7 | Why this stack | 1:00 | 5:34 |
+| 8 | ERD — subject areas | 0:40 | 6:14 |
+| 9 | ERD — full schema | 1:21 | 7:36 |
+| 10 | User roles | 0:36 | 8:12 |
+| 11 | Demo 1 — the visitor | 1:30 | 9:42 |
+| 12 | Demo 2 — the registered user | 2:15 | 11:57 |
+| 13 | Demo 3 — it really is a database | 1:10 | 13:07 |
+| 14 | Summary — achieved vs changed | 0:51 | 13:59 |
+| 15 | Close | 0:30 | 14:29 |
 
 ## Who speaks
 
@@ -124,21 +124,18 @@ account exists or not. The server decides every score, never the browser. And
 
 ## Slide 6 — Technology stack diagram
 
-**Clock:** `3:45 - 4:40`  ·  **Speaker:** SPEAKER 3  ·  **Est. length:** 1:00
+**Clock:** `3:45 - 4:40`  ·  **Speaker:** SPEAKER 3  ·  **Est. length:** 0:55
 
 The whole system on one page.
 
-Top: the browser. Eleven HTML pages, Bootstrap for the grid, Sass compiled to one
-stylesheet, plain JavaScript modules. No framework, no build step.
+Top: the browser. Eleven HTML pages, Bootstrap, Sass, plain JavaScript modules -
+no framework, no build step. It talks to exactly one thing, our API, and
+anything tied to an account carries a signed token.
 
-The browser talks to exactly one thing - our API. JSON over HTTP, and anything
-tied to an account carries a signed token.
-
-The middle band is where every rule lives: FastAPI, sixteen endpoints across six
-routers, Pydantic validating every request and response. Underneath sit the
-services - hashing and tokens, skill extraction, and the ingest that keeps our
-data current. On the right, note that our postings are real, pulled from a live
-job-search API.
+The middle band is where every rule lives: FastAPI, sixteen endpoints, Pydantic
+validating every request and response, and underneath it the services - hashing
+and tokens, skill extraction, and the ingest that keeps our data current. Note
+on the right that our postings are real, pulled from a live job-search API.
 
 The bottom is one SQLite file, reached only through SQLAlchemy.
 
@@ -147,7 +144,7 @@ touches the database, and never decides anything it could be lied to about.
 
 ## Slide 7 — Why this stack
 
-**Clock:** `4:40 - 5:35`  ·  **Speaker:** SPEAKER 3  ·  **Est. length:** 1:04
+**Clock:** `4:40 - 5:35`  ·  **Speaker:** SPEAKER 3  ·  **Est. length:** 1:00
 
 Why these choices.
 
@@ -156,14 +153,14 @@ FastAPI gave us validation for free plus live API docs - so the front end could
 build against a written contract instead of waiting for the backend.
 
 SQLite: one file, no server to install, so four laptops and the CI runner run an
-identical database with zero setup. That removed a whole category of "works on
-my machine". And SQLAlchemy keeps every query parameterised, so we're
-injection-safe by construction.
+identical database with zero setup - which removed a whole category of "works on
+my machine". SQLAlchemy keeps every query parameterised, so we're injection-safe
+by construction.
 
-On the front end - Figma first. We designed every screen before anyone built it,
-which kept four people from producing four different-looking pages. Bootstrap's
-components sped the build up and gave us a responsive grid immediately, and Sass
-let us generate custom CSS from one shared palette across eleven pages.
+On the front end, Figma first. We designed every screen before anyone built it,
+which kept four people from producing four different-looking pages. Bootstrap
+gave us a responsive grid on day one, and Sass gave us one shared palette across
+eleven pages.
 
 And GitHub Actions - the cheapest way to stop four people breaking each other's
 work.
@@ -185,7 +182,7 @@ ties everything on the right to one account.
 
 ## Slide 9 — ERD — full schema
 
-**Clock:** `6:15 - 7:35`  ·  **Speaker:** SPEAKER 4   -   Trace each table with the cursor as you name it.  ·  **Est. length:** 1:23
+**Clock:** `6:15 - 7:35`  ·  **Speaker:** SPEAKER 4   -   Trace each table with the cursor as you name it.  ·  **Est. length:** 1:21
 
 Let me trace the one path that touches most of it.
 
@@ -195,15 +192,14 @@ range, date posted.
 Now the interesting part. A posting mentions many skills, and a skill appears in
 many postings. That's many-to-many, which a relational database can't store
 directly - so JOB_SKILLS resolves it. Its primary key is the pair, job plus
-skill, and that's what guarantees one posting can only count once toward any
-given skill.
+skill, which is what guarantees one posting can only count once toward a skill.
 
-So the word cloud is one query: take the postings for this role inside the date
-window, join through job_skills, count distinct postings per skill, sort
-descending. That count is the word size.
+So the word cloud is one query: the postings for this role inside the date
+window, joined through job_skills, counted per skill, sorted descending. That
+count is the word size.
 
 Follow SKILLS right and it becomes the quiz. One skill has many QUESTIONS split
-by difficulty; each has its ANSWER_OPTIONS, one flagged correct - and that flag
+by difficulty, each with its ANSWER_OPTIONS - one flagged correct, and that flag
 never leaves the server.
 
 Starting a quiz creates a QUIZ_SESSION recording which questions went out and
@@ -228,85 +224,143 @@ would log in to do.
 
 ## Slide 11 — Demo 1 — the visitor
 
-**Clock:** `8:00 – 9:00`  ·  **Speaker:** SPEAKER 3   —   LIVE DEMO. Screen share on.  ·  **Est. length:** 1:00
+**Clock:** `8:22 - 9:22`  ·  **Speaker:** SPEAKER 3   -   LIVE DEMO, PART 1.  Share your screen now.  ·  **Est. length:** 1:30
 
-Runbook: presentation/DEMO_RUNBOOK.md, Part 1.
+Lines in quotes are what you say. Lines starting with > are what you do.
 
-1. Home page. Point out the nav — rules, stack, creators. All public.
-2. Game rules page briefly: three difficulties, three timers.
-3. Try to hit the word cloud page while signed out. It bounces you to sign-in.
-   Say out loud: "and it isn't just the page hiding a button — the API refuses
-   that request too."
-4. Register a new account live. Show the inline validation — type a 3-character
-   username so the message appears, then fix it. The registration form also
-   collects the first word-cloud search, so fill that in as you go.
-5. Submitting lands you signed in, on your first word cloud. Hand over.
+> Home page already open.
 
-If registration fails live, fall back to the pre-made account in the runbook and
-say so plainly. Do not debug on camera.
+"This is JobHopper the way anyone arrives at it - not signed in. Rules, stack
+and creators are open to everybody."
+
+> Click Game Rules. Don't scroll far.
+
+"Ten questions, three difficulties, each with its own clock."
+
+> Try to open the word cloud page directly.
+
+"Now watch what happens if I go straight for a word cloud with no account. It
+sends me to sign-in - and that's not the page hiding a button. The API refuses
+the request too, so there's no way around it."
+
+> Click Sign Up. Type a 3-character username so the validation fires.
+
+"So let's make one. Validation is inline, right where the problem is."
+
+> Fix the username, then fill the rest. Job title and location are type-ahead
+> fields - start typing and real options drop down. Keep talking while you
+> type; don't narrate the typing.
+
+"The same form takes your first search - and those suggestions are the job
+titles and locations we actually have postings for."
+
+> Submit.
+
+If registration misbehaves: sign in with the backup account, say "we've already
+got one set up", and carry on. Do not debug on camera.
 
 ## Slide 12 — Demo 2 — the registered user
 
-**Clock:** `9:00 – 11:00`  ·  **Speaker:** SPEAKER 3 and SPEAKER 4   —   LIVE DEMO. The main event.  ·  **Est. length:** 2:00
+**Clock:** `9:22 - 11:22`  ·  **Speaker:** SPEAKER 3 and SPEAKER 4   -   LIVE DEMO, PART 2. The main event.  ·  **Est. length:** 2:15
 
-Runbook: presentation/DEMO_RUNBOOK.md, Part 2.
+Lines in quotes are what you say. Lines starting with > are what you do.
 
-1. You are already on the cloud that registration generated. Read it out: name
-   the two or three biggest words. Say what the sizing means: "the big words are
-   in the most postings — that's a count, not an opinion."
-2. Optional, if you have the time: profile → Generate New Word Cloud → change the
-   role and the shape, and show a second cloud coming back different.
-3. Click a big skill. Difficulty screen. Pick Medium — 2:00 is long enough to show
-   and short enough to stay inside our slot.
-4. Play three or four questions. Deliberately get one wrong so the live feedback
-   and the score behaviour are both visible. Point at the clock.
-5. Do NOT play all ten on camera. Jump to the profile page.
-6. Profile: the search you just ran is under Recent Word Clouds; the attempt you
-   just made is under Recent Game History. Say: "we didn't refresh anything —
-   that's the database answering."
-7. Click Search Again on a saved cloud to show it re-runs.
+> You are on the cloud registration just built.
+
+"Here's what that search produced. The biggest words are the ones that appeared
+in the most postings for that role - that's a count, not our opinion. Anything
+we have questions for is clickable."
+
+> Click one of the biggest skills.
+
+"So let's take that one."
+
+> Difficulty screen. Choose EASY - three minutes, so you can finish all ten.
+> The score is only saved when the quiz is submitted, and that happens on the
+> tenth answer or when the clock runs out. Stopping early means an empty game
+> history on the profile.
+
+"Three difficulties, three timers. I'll take easy - three minutes."
+
+> Answer one question correctly.
+
+"It tells me straight away whether I got it. It can do that safely because my
+answer is already locked in on the server before I'm told - so knowing it now
+can't change what I picked."
+
+> Answer the next one wrong, on purpose.
+
+"And there's the other case. It shows me the right answer, and the clock pauses
+while I'm reading it."
+
+> Now click through questions 3 to 10 without narrating each one. About
+> sixty seconds if you don't read them aloud.
+
+"I'll speed through the rest of these."
+
+> The Submit button is replaced by a return button. Click it.
+
+"That's graded and saved. This is my profile - the search I ran is under recent
+word clouds, and the quiz I just played is under game history, score and all.
+We didn't refresh anything, and none of this is hard-coded. That's the database
+answering."
+
+> Click Search Again on the saved cloud.
+
+"And any saved search re-runs in one click."
 
 ## Slide 13 — Demo 3 — it really is a database
 
-**Clock:** `11:00 – 12:00`  ·  **Speaker:** SPEAKER 4   —   LIVE DEMO. This is the 9-point rubric item.  ·  **Est. length:** 1:00
+**Clock:** `11:22 - 12:22`  ·  **Speaker:** SPEAKER 4   -   LIVE DEMO, PART 3. This is the 9-point item.  ·  **Est. length:** 1:10
 
-Runbook: presentation/DEMO_RUNBOOK.md, Part 3. Use the DB Browser for SQLite
-window already open on the second desktop — don't open a terminal and type
-commands on camera, it reads as code.
+Switch to the DB Browser window already open on the second desktop. Do not open
+a terminal - that reads as code.
 
-1. Show the table list. Say: "fourteen tables — the same fourteen you just saw in
-   the ERD. The diagram isn't a drawing of what we planned, it's what's actually
-   in the file."
-2. Open SEARCHES. The row from ninety seconds ago is at the bottom — the role, the
-   salary, the shape, the timestamp, and a user_id pointing at the account we
-   registered on camera.
-3. Open GAME_ATTEMPTS. Same story: skill, difficulty, score, seconds taken.
-4. Open USERS. Show the password column. It's a bcrypt hash. Say: "we couldn't
-   tell you that user's password if we wanted to. We never stored it."
-5. Show the word-cloud counts next to the picture: same numbers.
+> Show the table list in the sidebar.
 
-Close with: "everything you saw on screen came out of this file. Nothing on any
-page is hard-coded."
+"Last thing - proof this is really sitting in a database. There are our fourteen
+tables, the same fourteen from the ERD. That diagram isn't what we planned; it's
+what's in the file."
+
+> DB Browser lists fifteen. The extra one is sqlite_stat1, which SQLite makes
+> for its own query statistics. Say "our fourteen tables", not "fourteen
+> tables", so the count on screen doesn't catch you out.
+
+> Browse Data, searches table, scroll to the last row.
+
+"The bottom row is the search from ninety seconds ago - role, salary, shape,
+timestamp, and a user_id pointing at the account we made on camera."
+
+> Switch to game_attempts.
+
+"Same for the quiz. Skill, difficulty, score, seconds taken."
+
+> Switch to users. Point at the password_hash column.
+
+"And this is the users table. That's a bcrypt hash. We couldn't tell you that
+password if we wanted to - we never stored it."
+
+> Stop sharing, back to the deck.
+
+"Everything you just saw came out of that one file."
 
 ## Slide 14 — Summary — achieved vs changed
 
-**Clock:** `11:20 - 12:10`  ·  **Speaker:** SPEAKER 1  ·  **Est. length:** 0:59
+**Clock:** `11:20 - 12:10`  ·  **Speaker:** SPEAKER 1  ·  **Est. length:** 0:51
 
 The honest accounting.
 
-On the left, what worked. Registration and sign-in, real postings parsed into a
-cloud from whatever the user asked for, the timed game with live scoring, every
-result saved. The question bank beat its own target - we aimed for ten per skill
-per difficulty and shipped fifteen, so 1,260 questions. And 237 tests on every
-pull request.
+On the left, what worked. Everything you just saw, plus a question bank that beat
+its own target - we aimed for ten per skill per difficulty and shipped fifteen,
+so 1,260 questions. And 237 tests on every pull request.
 
 On the right, what changed. The top two are the same story: the external API
 limited what we could reliably fetch, so typing any role became four supported
 roles, and location became a menu of places that actually have postings behind
 them. Both were us refusing to offer a search that comes back empty.
 
-The rest is us choosing depth over breadth - and one place where our
-documentation got ahead of the app, which is on us.
+The rest is choosing depth over breadth - and one place where our documentation
+got ahead of the app, which is on us.
 
 ## Slide 15 — Close
 
