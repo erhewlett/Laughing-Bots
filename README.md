@@ -110,8 +110,8 @@ Remaining work:
 - Use `GET /game/skills` to decide which word-cloud words are clickable.
 - `GET /postings` takes the same search fields as `/wordcloud` and resolves the
   role the same way, so the listings it returns are the ones a given cloud was
-  counted from. `frontend/js/postings_table.js` renders them; both the word
-  cloud page and the roadmap page use it.
+  counted from. `frontend/js/postings_table.js` renders them, and the roadmap
+  page is where they are shown.
 - Registration passwords must be 8-20 characters; usernames are 4-16 letters
   and digits. Login returns a JWT; send it as an `Authorization: Bearer` header.
 - Anyone can play quizzes; attempts are saved to the account only when logged in.
