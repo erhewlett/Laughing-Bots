@@ -122,6 +122,7 @@ def render() -> str:
     p.append(chip_row(MAIN_X + 42, y + 204, [
         ("JavaScript (ES modules)", "page controllers, no framework"),
         ("wordcloud.js", "canvas rendering"),
+        ("Figma", "every screen designed first"),
     ], CLIENT))
 
     p.append(arrow(MAIN_X + MAIN_W / 2 - 300, 490, 570,
@@ -219,23 +220,24 @@ def render() -> str:
         )
 
     y = 1050
-    p.append(band(SIDE_X, y, SIDE_W, 250, CLIENT, "Team workflow",
+    p.append(band(SIDE_X, y, SIDE_W, 250, CLIENT, "How we worked",
                   "Four people, one main branch"))
     for i, (head, sub) in enumerate([
+        ("Figma", "designs agreed before anyone implemented them"),
         ("189 commits, 44 pull requests", "one feature branch per task"),
         ("Pinned dependency versions", "all four machines resolve the same set"),
     ]):
-        yy = y + 128 + i * 62
+        yy = y + 108 + i * 52
         p.append(
             f'<circle cx="{SIDE_X + 52}" cy="{yy - 8}" r="8" fill="{CLIENT}"/>'
         )
         p.append(
-            f'<text x="{SIDE_X + 78}" y="{yy}" font-family="{FONT}" font-size="23" '
+            f'<text x="{SIDE_X + 78}" y="{yy}" font-family="{FONT}" font-size="22" '
             f'font-weight="bold" fill="{INK}">{esc(head)}</text>'
         )
         p.append(
-            f'<text x="{SIDE_X + 78}" y="{yy + 26}" font-family="{FONT}" '
-            f'font-size="19" fill="{MUTED}">{esc(sub)}</text>'
+            f'<text x="{SIDE_X + 78}" y="{yy + 24}" font-family="{FONT}" '
+            f'font-size="18" fill="{MUTED}">{esc(sub)}</text>'
         )
 
     # ------------------------------------------------------------- footnote

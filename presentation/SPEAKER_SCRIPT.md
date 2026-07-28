@@ -3,7 +3,7 @@
 > Generated from the speaker notes inside `JobHopper_Final_Presentation.pptx`.
 > Edit the notes in `scripts/make_deck.py`, rebuild the deck, then re-run `scripts/make_script.py`.
 
-**Estimated total: 13:51**  (target 14:00, hard ceiling 15:00 — the assignment caps the video at 15 minutes; the rubric penalises going over 20.)
+**Estimated total: 13:54**  (target 14:00, hard ceiling 15:00 — the assignment caps the video at 15 minutes; the rubric penalises going over 20.)
 
 Speaking estimate assumes 140 words per minute, which is an unhurried presenting pace. The three demo slides are timed from the runbook rather than from word count.
 
@@ -12,20 +12,20 @@ Speaking estimate assumes 140 words per minute, which is an unhurried presenting
 | # | Slide | Length | Ends at |
 |---|-------|--------|---------|
 | 1 | Title | 0:16 | 0:16 |
-| 2 | The goal | 0:48 | 1:05 |
-| 3 | Functional requirements 1 of 2 | 0:55 | 2:00 |
-| 4 | Functional requirements 2 of 2 | 0:58 | 2:58 |
-| 5 | Non-functional requirements | 0:49 | 3:47 |
-| 6 | Technology stack diagram | 1:00 | 4:48 |
-| 7 | Why this stack | 0:52 | 5:41 |
-| 8 | ERD — subject areas | 0:40 | 6:21 |
-| 9 | ERD — full schema | 1:24 | 7:46 |
-| 10 | User roles | 0:36 | 8:22 |
-| 11 | Demo 1 — the visitor | 1:00 | 9:22 |
-| 12 | Demo 2 — the registered user | 2:00 | 11:22 |
-| 13 | Demo 3 — it really is a database | 1:00 | 12:22 |
-| 14 | Summary — achieved vs changed | 0:58 | 13:20 |
-| 15 | Close | 0:30 | 13:51 |
+| 2 | The goal | 0:55 | 1:12 |
+| 3 | Functional requirements 1 of 2 | 0:45 | 1:57 |
+| 4 | Functional requirements 2 of 2 | 0:52 | 2:50 |
+| 5 | Non-functional requirements | 0:48 | 3:38 |
+| 6 | Technology stack diagram | 1:00 | 4:39 |
+| 7 | Why this stack | 1:04 | 5:44 |
+| 8 | ERD — subject areas | 0:40 | 6:24 |
+| 9 | ERD — full schema | 1:23 | 7:47 |
+| 10 | User roles | 0:36 | 8:23 |
+| 11 | Demo 1 — the visitor | 1:00 | 9:24 |
+| 12 | Demo 2 — the registered user | 2:00 | 11:24 |
+| 13 | Demo 3 — it really is a database | 1:00 | 12:24 |
+| 14 | Summary — achieved vs changed | 0:59 | 13:23 |
+| 15 | Close | 0:30 | 13:54 |
 
 ## Who speaks
 
@@ -58,81 +58,69 @@ asking for, and lets you quiz yourself on any of them.
 
 ## Slide 2 — The goal
 
-**Clock:** `0:15 - 1:00`  ·  **Speaker:** SPEAKER 1  ·  **Est. length:** 0:48
+**Clock:** `0:15 - 1:00`  ·  **Speaker:** SPEAKER 1  ·  **Est. length:** 0:55
 
-The problem isn't that this information is secret - job postings are public. It's
-volume. Search one title and you get forty postings, each with its own wall of
-requirements. The signal is which tools keep repeating, and nobody reads forty
-postings to find it. So people guess at what to learn next.
+The problem isn't that this information is secret - job postings are public.
+It's volume. Search one title and you get forty postings, each with its own wall
+of requirements. The signal is which tools keep repeating, and nobody reads
+forty postings to find it. So people guess at what to learn next.
 
-JobHopper does the reading. It pulls the current postings for a role, extracts
-the tools and skills, and sizes them by how many postings actually mention each
-one. The big words are what the market keeps asking for.
+So our goal was this: analyse the job postings for a target role, identify the
+most in-demand skills, and show them as a word cloud - then help people actually
+build those skills through interactive Q&A games.
 
-Then it does one more thing: every skill in that picture is clickable. Click
-Python, and you're in a timed quiz on Python.
+That second half is what we care about. Every skill in the picture is clickable.
+Click Python, and you're in a timed quiz on Python. It doesn't just tell you
+what to learn - it gives you somewhere to start.
 
 ## Slide 3 — Functional requirements 1 of 2
 
-**Clock:** `1:00 - 1:55`  ·  **Speaker:** SPEAKER 2  ·  **Est. length:** 0:55
+**Clock:** `1:00 - 1:50`  ·  **Speaker:** SPEAKER 2  ·  **Est. length:** 0:45
 
-These are our functional requirements - what the system has to do.
+These are our functional requirements, written the way we specified them. I
+won't read them all - two things to point at.
 
-FR1, accounts: register, sign in, stay signed in, sign out. Usernames four to
-sixteen characters, passwords eight to twenty, sessions last twenty-four hours.
+In registration and login, it's the last pair: showing you your most recent game
+score, and your three most recent searches. Those are the requirements that
+forced everything to be stored against a real account rather than sitting in the
+browser.
 
-FR2 is the core feature. Pick a job title, optionally a location and a minimum
-salary, then how many keywords and a shape. What comes back is the tools and
-skills for that role, weighted by how many current postings mention each one.
-
-FR3, we remember it - every cloud a signed-in user generates is saved, and can be
-re-run in one click.
-
-FR4 is the one people forget to write down. If the filters match too little data
-to build an honest picture, the app says so rather than draw a misleading cloud.
+And in word cloud creation, it's the last line. The size of each word is based
+on how often that skill appears across the postings we pulled. Size equals
+frequency - a count, not an opinion. That one sentence is the whole product.
 
 ## Slide 4 — Functional requirements 2 of 2
 
-**Clock:** `2:00 - 2:55`  ·  **Speaker:** SPEAKER 2  ·  **Est. length:** 0:58
+**Clock:** `1:50 - 2:40`  ·  **Speaker:** SPEAKER 2  ·  **Est. length:** 0:52
 
-The second half turns that picture into practice.
+Job scraping is two requirements. Count how often each keyword appears - and
+display an error when there isn't enough job information to build a cloud. A
+thin, misleading picture is worse than saying we can't build one, so we made
+that a requirement rather than an edge case.
 
-FR5: any skill with a question bank behind it is clickable. Ten multiple-choice
-questions at easy, medium or hard, each with its own clock - three minutes, two,
-or a minute and a half.
+The Q&A game block is the exact path you'll see in the demo: click any word, get
+sent to that word's game, get questions matching the keyword and difficulty you
+chose, on a timer, with your score at the end.
 
-FR6 is the one we're most careful about. Every answer is locked in on the server
-the moment it's chosen, and only then are you told whether it was right. Because
-the choice is already committed, knowing the answer afterwards can't change it -
-so the running score and the final score can never disagree.
-
-FR7: completed quizzes are saved with the skill, the difficulty and the score.
-
-FR8, the prep roadmap. I'll be straight - the API is built and tested, but it
-never got a screen. More on that at the end.
+One thing that isn't on the slide - every answer is locked in on the server
+before you're told whether it was right, so the running score and the final
+score can never disagree.
 
 ## Slide 5 — Non-functional requirements
 
-**Clock:** `2:50 - 3:45`  ·  **Speaker:** SPEAKER 2  ·  **Est. length:** 0:49
+**Clock:** `2:40 - 3:30`  ·  **Speaker:** SPEAKER 2  ·  **Est. length:** 0:48
 
 Non-functional requirements - not features, but the app is wrong without them.
 
-Security: passwords are bcrypt-hashed, never stored or returned, and a failed
-login gives one generic message either way - so you can't use our login form to
-find out who has an account.
+The top row is what we committed to in our spec: the cloud back within ten
+seconds, the game open within ten and scored within seven, and all user input
+validated and sanitised against injection. We get that last one structurally -
+every query goes through the ORM, parameterised, never built by string.
 
-Integrity: the server decides every score, never the browser, and a finished quiz
-can't be replayed.
-
-Performance: the two hottest queries each run against a composite index we added
-deliberately for them.
-
-Reliability: 237 automated tests, and nothing merges until both suites pass.
-
-Usability: responsive, validation next to the field, and every API error in one
-shape.
-
-Portability: pinned versions, and the app builds its own database on first run.
+The bottom row we held ourselves to as we built. Passwords bcrypt-hashed and
+never returned, and a failed login gives the same generic message whether the
+account exists or not. The server decides every score, never the browser. And
+237 tests, with nothing merging until both suites pass.
 
 ## Slide 6 — Technology stack diagram
 
@@ -159,7 +147,7 @@ touches the database, and never decides anything it could be lied to about.
 
 ## Slide 7 — Why this stack
 
-**Clock:** `4:40 - 5:30`  ·  **Speaker:** SPEAKER 3  ·  **Est. length:** 0:52
+**Clock:** `4:40 - 5:35`  ·  **Speaker:** SPEAKER 3  ·  **Est. length:** 1:04
 
 Why these choices.
 
@@ -168,12 +156,14 @@ FastAPI gave us validation for free plus live API docs - so the front end could
 build against a written contract instead of waiting for the backend.
 
 SQLite: one file, no server to install, so four laptops and the CI runner run an
-identical database with zero setup. That removed a whole category of "works on my
-machine". And SQLAlchemy keeps every query parameterised, so we're injection-safe
-by construction.
+identical database with zero setup. That removed a whole category of "works on
+my machine". And SQLAlchemy keeps every query parameterised, so we're
+injection-safe by construction.
 
-Plain JavaScript, Bootstrap and Sass: a framework would have cost us a build step
-and a learning curve on a semester clock.
+On the front end - Figma first. We designed every screen before anyone built it,
+which kept four people from producing four different-looking pages. Bootstrap's
+components sped the build up and gave us a responsive grid immediately, and Sass
+let us generate custom CSS from one shared palette across eleven pages.
 
 And GitHub Actions - the cheapest way to stop four people breaking each other's
 work.
@@ -195,7 +185,7 @@ ties everything on the right to one account.
 
 ## Slide 9 — ERD — full schema
 
-**Clock:** `6:15 - 7:35`  ·  **Speaker:** SPEAKER 4   -   Trace each table with the cursor as you name it.  ·  **Est. length:** 1:24
+**Clock:** `6:15 - 7:35`  ·  **Speaker:** SPEAKER 4   -   Trace each table with the cursor as you name it.  ·  **Est. length:** 1:23
 
 Let me trace the one path that touches most of it.
 
@@ -217,11 +207,10 @@ by difficulty; each has its ANSWER_OPTIONS, one flagged correct - and that flag
 never leaves the server.
 
 Starting a quiz creates a QUIZ_SESSION recording which questions went out and
-what you picked. That is what makes live scoring trustworthy, and what stops a
+what you picked - that is what makes live scoring trustworthy, and what stops a
 finished quiz being replayed. Submitting lands the result in GAME_ATTEMPTS.
 
-Down the middle, USERS - every search, every attempt, and one roadmap per user
-all hang off it.
+And down the middle, USERS - every search and every attempt hangs off it.
 
 ## Slide 10 — User roles
 
@@ -301,24 +290,23 @@ page is hard-coded."
 
 ## Slide 14 — Summary — achieved vs changed
 
-**Clock:** `11:30 - 12:30`  ·  **Speaker:** SPEAKER 1  ·  **Est. length:** 0:58
+**Clock:** `11:20 - 12:10`  ·  **Speaker:** SPEAKER 1  ·  **Est. length:** 0:59
 
 The honest accounting.
 
-On the left. Every core feature is live. Our postings are real - ingested from a
-live job-search API, which meant dealing with genuinely messy description text.
-The question bank beat its own target: we aimed for ten per skill per difficulty
-and shipped fifteen, which is 1,260 questions. And the process held - 189
-commits, 44 reviewed pull requests, 237 tests.
+On the left, what worked. Registration and sign-in, real postings parsed into a
+cloud from whatever the user asked for, the timed game with live scoring, every
+result saved. The question bank beat its own target - we aimed for ten per skill
+per difficulty and shipped fifteen, so 1,260 questions. And 237 tests on every
+pull request.
 
-On the right, what changed. The prep roadmap has a finished, tested API and no
-screen; with the time left, we chose to make the quiz good rather than make the
-roadmap merely exist.
+On the right, what changed. The top two are the same story: the external API
+limited what we could reliably fetch, so typing any role became four supported
+roles, and location became a menu of places that actually have postings behind
+them. Both were us refusing to offer a search that comes back empty.
 
-Maximum salary we removed rather than ship a filter that quietly did nothing.
-
-Named ranks are on our rules page but not in the scoring yet - our docs got ahead
-of the app, and that's on us.
+The rest is us choosing depth over breadth - and one place where our
+documentation got ahead of the app, which is on us.
 
 ## Slide 15 — Close
 

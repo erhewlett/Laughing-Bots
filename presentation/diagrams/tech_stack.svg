@@ -21,6 +21,9 @@
 <rect x="523.0" y="394" width="228.0" height="74" rx="37.0" fill="#FFFFFF" stroke="#3F5C99" stroke-width="2.5"/>
 <text x="547.0" y="430" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">wordcloud.js</text>
 <text x="547.0" y="454" font-family="DejaVu Sans" font-size="18" fill="#6B7787">canvas rendering</text>
+<rect x="769.0" y="394" width="339.59999999999997" height="74" rx="37.0" fill="#FFFFFF" stroke="#3F5C99" stroke-width="2.5"/>
+<text x="793.0" y="430" font-family="DejaVu Sans" font-size="25" font-weight="bold" fill="#1B2430">Figma</text>
+<text x="793.0" y="454" font-family="DejaVu Sans" font-size="18" fill="#6B7787">every screen designed first</text>
 <line x1="580.0" y1="490" x2="580.0" y2="554" stroke="#3F5C99" stroke-width="4"/>
 <path d="M567.0,552 L580.0,570 L593.0,552 Z" fill="#3F5C99"/>
 <line x1="567.0" y1="490" x2="593.0" y2="490" stroke="#3F5C99" stroke-width="4" stroke-linecap="round"/>
@@ -113,14 +116,17 @@
 <rect x="1750" y="1050" width="600" height="250" rx="20" fill="#FFFFFF" stroke="#C9D2DE" stroke-width="2"/>
 <path d="M1750,1280 L1750,1070 Q1750,1050 1770,1050 L1764,1050 L1764,1300 L1770,1300 Q1750,1300 1750,1280 Z" fill="#3F5C99"/>
 <rect x="1750" y="1050" width="14" height="250" fill="#3F5C99"/>
-<text x="1792" y="1100" font-family="DejaVu Sans" font-size="34" font-weight="bold" fill="#3F5C99">Team workflow</text>
+<text x="1792" y="1100" font-family="DejaVu Sans" font-size="34" font-weight="bold" fill="#3F5C99">How we worked</text>
 <text x="1792" y="1134" font-family="DejaVu Sans" font-size="22" fill="#6B7787">Four people, one main branch</text>
-<circle cx="1802" cy="1170" r="8" fill="#3F5C99"/>
-<text x="1828" y="1178" font-family="DejaVu Sans" font-size="23" font-weight="bold" fill="#1B2430">189 commits, 44 pull requests</text>
-<text x="1828" y="1204" font-family="DejaVu Sans" font-size="19" fill="#6B7787">one feature branch per task</text>
-<circle cx="1802" cy="1232" r="8" fill="#3F5C99"/>
-<text x="1828" y="1240" font-family="DejaVu Sans" font-size="23" font-weight="bold" fill="#1B2430">Pinned dependency versions</text>
-<text x="1828" y="1266" font-family="DejaVu Sans" font-size="19" fill="#6B7787">all four machines resolve the same set</text>
+<circle cx="1802" cy="1150" r="8" fill="#3F5C99"/>
+<text x="1828" y="1158" font-family="DejaVu Sans" font-size="22" font-weight="bold" fill="#1B2430">Figma</text>
+<text x="1828" y="1182" font-family="DejaVu Sans" font-size="18" fill="#6B7787">designs agreed before anyone implemented them</text>
+<circle cx="1802" cy="1202" r="8" fill="#3F5C99"/>
+<text x="1828" y="1210" font-family="DejaVu Sans" font-size="22" font-weight="bold" fill="#1B2430">189 commits, 44 pull requests</text>
+<text x="1828" y="1234" font-family="DejaVu Sans" font-size="18" fill="#6B7787">one feature branch per task</text>
+<circle cx="1802" cy="1254" r="8" fill="#3F5C99"/>
+<text x="1828" y="1262" font-family="DejaVu Sans" font-size="22" font-weight="bold" fill="#1B2430">Pinned dependency versions</text>
+<text x="1828" y="1286" font-family="DejaVu Sans" font-size="18" fill="#6B7787">all four machines resolve the same set</text>
 <rect x="70" y="1340" width="2310" height="86" rx="16" fill="#FFFFFF" stroke="#C9D2DE" stroke-width="2"/>
 <text x="104" y="1376" font-family="DejaVu Sans" font-size="24" font-weight="bold" fill="#1B2430">The rule that shaped the whole design:</text>
 <text x="104" y="1408" font-family="DejaVu Sans" font-size="23" fill="#6B7787">the browser never touches the database, and it never decides anything it could be lied to about — scoring, ownership and validation all happen in the API.</text>

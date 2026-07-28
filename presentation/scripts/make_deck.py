@@ -360,18 +360,18 @@ asking for, and lets you quiz yourself on any of them.
     # 2 --------------------------------------------------------------- goal
     s = blank(prs)
     canvas(s)
-    top = heading(s, "The goal",
+    top = heading(s, "Application goal",
                   "The information is public. Reading it is the problem.", BLUE)
     col_w = (CONTENT_W - Inches(0.34)) / 2
     y = top
     for para in [
         "Somebody trying to move up in tech opens a job board and finds forty "
-        "postings for the same title — each one a different wall of "
+        "postings for the same title - each one a different wall of "
         "requirements.",
         "The useful signal is which tools keep coming up. That signal is real, "
-        "it is public, and it is completely buried.",
-        "Reading forty postings by hand is the thing nobody actually does. So "
-        "people guess at what to learn next.",
+        "it is public, and it is completely buried. Reading forty postings by "
+        "hand is the thing nobody actually does, so people guess at what to "
+        "learn next.",
     ]:
         lines = wrap(para, pt(col_w - SLOP), 19)
         h = Pt(len(lines) * 19 * LINE)
@@ -381,135 +381,127 @@ asking for, and lets you quiz yourself on any of them.
         y += h + Pt(16)
 
     x2 = MARGIN + col_w + Inches(0.34)
-    cy = top
-    for accent, title, body in [
-        (TEAL, "What JobHopper does",
-         "Reads the current postings for a role and draws the tools and skills "
-         "sized by how many of those postings actually mention them."),
-        (PLUM, "And then makes it actionable",
-         "Every skill in that picture is clickable. Click it and you are in a "
-         "timed, multiple-choice quiz on that exact skill."),
-    ]:
-        _, _, h = card_metrics(col_w, title, body, 19, 15)
-        card(s, x2, cy, col_w, h, accent, title, body, title_size=19,
-             body_size=15)
-        cy += h + Inches(0.22)
+    goal = ("JobHopper's goal is to analyze job postings for a target role, "
+            "identify the most in-demand skills in the job market for that "
+            "role, and present those findings to the user through a word cloud "
+            "visual. Additionally, JobHopper aims to help people build those "
+            "skills through interactive Q&A games.")
+    _, _, gh = card_metrics(col_w, "What we set out to build", goal, 19, 15.5)
+    card(s, x2, top, col_w, gh, TEAL, "What we set out to build", goal,
+         title_size=19, body_size=15.5)
 
-    b = banner(s, max(y, cy) + Inches(0.16),
-               "In one sentence:  show people what the market is asking for, "
-               "and give them a way to practise it.", size=19, fill=INK,
-               color=PAPER)
+    b = banner(s, max(y, top + gh) + Inches(0.22),
+               "And every skill in that picture is clickable - click it and "
+               "you are in a timed quiz on that exact skill.", size=19,
+               fill=INK, color=PAPER)
     check("s2", b)
     footer(s, "2")
     notes(s, """
 [0:15 - 1:00]   SPEAKER 1
 
-The problem isn't that this information is secret - job postings are public. It's
-volume. Search one title and you get forty postings, each with its own wall of
-requirements. The signal is which tools keep repeating, and nobody reads forty
-postings to find it. So people guess at what to learn next.
+The problem isn't that this information is secret - job postings are public.
+It's volume. Search one title and you get forty postings, each with its own wall
+of requirements. The signal is which tools keep repeating, and nobody reads
+forty postings to find it. So people guess at what to learn next.
 
-JobHopper does the reading. It pulls the current postings for a role, extracts
-the tools and skills, and sizes them by how many postings actually mention each
-one. The big words are what the market keeps asking for.
+So our goal was this: analyse the job postings for a target role, identify the
+most in-demand skills, and show them as a word cloud - then help people actually
+build those skills through interactive Q&A games.
 
-Then it does one more thing: every skill in that picture is clickable. Click
-Python, and you're in a timed quiz on Python.
+That second half is what we care about. Every skill in the picture is clickable.
+Click Python, and you're in a timed quiz on Python. It doesn't just tell you
+what to learn - it gives you somewhere to start.
 """)
 
     # 3 ------------------------------------------------ functional reqs 1/2
     s = blank(prs)
     canvas(s)
     top = heading(s, "Functional requirements  ·  1 of 2",
-                  "What the system has to do", TEAL,
-                  sub="Everything below is built and demonstrable unless it "
-                      "carries a flag.")
-    end = card_grid(s, top, [
-        (BLUE, "FR1 · Accounts",
-         "Register, sign in, stay signed in, sign out. Usernames are 4–16 "
-         "letters and digits; passwords 8–20 characters. A session lasts 24 "
-         "hours.", None),
-        (TEAL, "FR2 · Generate a skills word cloud",
-         "Choose a job title, and optionally a location and a minimum salary. "
-         "Pick up to 40 keywords and a shape. Get back the tools and skills "
-         "weighted by how many current postings mention each one.", None),
-        (BLUE, "FR3 · Remember what you searched",
-         "Every cloud a signed-in user generates is saved to their account and "
-         "can be re-run from their profile in one click.", None),
-        (TEAL, "FR4 · Fail honestly",
-         "If the filters match too little posting data to build a cloud, the "
-         "app says so. It never draws an empty or misleading picture.", None),
-    ], 2)
-    b = banner(s, end + Inches(0.26),
-               "The word cloud is the front door — everything else in the app "
-               "is reached through it.")
-    check("s3", b)
+                  "Accounts, and building the word cloud", TEAL)
+    cw2 = (CONTENT_W - Inches(0.3)) / 2
+    fr1 = [
+        (BLUE, "User registration and login",
+         "The system shall allow users to register an account using a username "
+         "and password input, with the option to include name and email.\n\n"
+         "The system shall validate that the user's credentials are correct "
+         "before allowing them to sign in.\n\n"
+         "The system shall allow the user to see their most recent game keyword "
+         "and score after the user logs in.\n\n"
+         "The system shall allow the user to see their three most recent job "
+         "title searches after the user logs in."),
+        (TEAL, "Word cloud creation",
+         "The system shall allow the user to input job search parameters "
+         "including job title, location, and minimum salary.\n\n"
+         "The system shall allow the user to select word cloud configurations "
+         "such as shape and number of words.\n\n"
+         "The system shall generate a word cloud where the size of each word is "
+         "based on the frequency of tool and skill keywords extracted from "
+         "online job postings."),
+    ]
+    h = max(card_metrics(cw2, t, b, 20, 14)[2] for _a, t, b in fr1)
+    for i, (accent, title, body) in enumerate(fr1):
+        card(s, MARGIN + i * (cw2 + Inches(0.3)), top, cw2, h, accent, title,
+             body, title_size=20, body_size=14)
+    check("s3", top + h)
     footer(s, "3")
     notes(s, """
-[1:00 - 1:55]   SPEAKER 2
+[1:00 - 1:50]   SPEAKER 2
 
-These are our functional requirements - what the system has to do.
+These are our functional requirements, written the way we specified them. I
+won't read them all - two things to point at.
 
-FR1, accounts: register, sign in, stay signed in, sign out. Usernames four to
-sixteen characters, passwords eight to twenty, sessions last twenty-four hours.
+In registration and login, it's the last pair: showing you your most recent game
+score, and your three most recent searches. Those are the requirements that
+forced everything to be stored against a real account rather than sitting in the
+browser.
 
-FR2 is the core feature. Pick a job title, optionally a location and a minimum
-salary, then how many keywords and a shape. What comes back is the tools and
-skills for that role, weighted by how many current postings mention each one.
-
-FR3, we remember it - every cloud a signed-in user generates is saved, and can be
-re-run in one click.
-
-FR4 is the one people forget to write down. If the filters match too little data
-to build an honest picture, the app says so rather than draw a misleading cloud.
+And in word cloud creation, it's the last line. The size of each word is based
+on how often that skill appears across the postings we pulled. Size equals
+frequency - a count, not an opinion. That one sentence is the whole product.
 """)
 
     # 4 ------------------------------------------------ functional reqs 2/2
     s = blank(prs)
     canvas(s)
     top = heading(s, "Functional requirements  ·  2 of 2",
-                  "From a picture to practice", TEAL)
-    end = card_grid(s, top, [
-        (PLUM, "FR5 · Play a quiz on any skill",
-         "Any skill backed by a question bank is clickable. Ten multiple-choice "
-         "questions at easy, medium or hard, each difficulty on its own timer — "
-         "3:00, 2:00 or 1:30.", None),
-        (PLUM, "FR6 · Live scoring, honestly done",
-         "Each answer is locked in on the server as it is chosen, and only then "
-         "is the player told whether it was right. Knowing the answer afterwards "
-         "cannot change it, so the running score and the final score always "
-         "agree.", None),
-        (BLUE, "FR7 · Remember how you did",
-         "Completed quizzes are saved to the account with the skill, the "
-         "difficulty and the score, and shown back on the profile page.", None),
-        (SLATE, "FR8 · Personal prep roadmap",
-         "An ordered list of skills to learn for a target role, each step "
-         "markable as you go. The API is built and covered by tests — it never "
-         "got a screen. More on that at the end.", "API ONLY"),
-    ], 2)
-    b = banner(s, end + Inches(0.26),
-               "Behind it: 1,260 questions — 28 skills × 3 difficulties × 15 "
-               "questions each.")
-    check("s4", b)
+                  "Scraping the postings, and the Q&A game", TEAL)
+    scrape = ("The system shall calculate the frequency of tool and skill "
+              "keywords extracted from online job postings.\n\n"
+              "The system shall display an error in the event that there is not "
+              "enough job information for the word cloud.")
+    game = ("The system shall allow the user to click on any word in the word "
+            "cloud.\n\n"
+            "The system shall redirect the user to the respective Q&A game "
+            "dashboard after the user clicks on a word from the word cloud.\n\n"
+            "The system shall select Q&A game questions that are related to the "
+            "skill or tool keyword and the difficulty that the user selected.\n\n"
+            "The system shall keep a timer for the user's quiz completion based "
+            "on the selected difficulty.\n\n"
+            "The system shall display the score to the user.")
+    _, _, h1 = card_metrics(CONTENT_W, "Job scraping", scrape, 20, 14)
+    card(s, MARGIN, top, CONTENT_W, h1, PLUM, "Job scraping", scrape,
+         title_size=20, body_size=14)
+    y = top + h1 + Inches(0.24)
+    _, _, h2 = card_metrics(CONTENT_W, "Q&A game", game, 20, 14)
+    card(s, MARGIN, y, CONTENT_W, h2, PLUM, "Q&A game", game, title_size=20,
+         body_size=14)
+    check("s4", y + h2)
     footer(s, "4")
     notes(s, """
-[2:00 - 2:55]   SPEAKER 2
+[1:50 - 2:40]   SPEAKER 2
 
-The second half turns that picture into practice.
+Job scraping is two requirements. Count how often each keyword appears - and
+display an error when there isn't enough job information to build a cloud. A
+thin, misleading picture is worse than saying we can't build one, so we made
+that a requirement rather than an edge case.
 
-FR5: any skill with a question bank behind it is clickable. Ten multiple-choice
-questions at easy, medium or hard, each with its own clock - three minutes, two,
-or a minute and a half.
+The Q&A game block is the exact path you'll see in the demo: click any word, get
+sent to that word's game, get questions matching the keyword and difficulty you
+chose, on a timer, with your score at the end.
 
-FR6 is the one we're most careful about. Every answer is locked in on the server
-the moment it's chosen, and only then are you told whether it was right. Because
-the choice is already committed, knowing the answer afterwards can't change it -
-so the running score and the final score can never disagree.
-
-FR7: completed quizzes are saved with the skill, the difficulty and the score.
-
-FR8, the prep roadmap. I'll be straight - the API is built and tested, but it
-never got a screen. More on that at the end.
+One thing that isn't on the slide - every answer is locked in on the server
+before you're told whether it was right, so the running score and the final
+score can never disagree.
 """)
 
     # 5 ------------------------------------------- non-functional reqs
@@ -517,55 +509,46 @@ never got a screen. More on that at the end.
     canvas(s)
     top = heading(s, "Non-functional requirements", "How well it has to do it",
                   PLUM,
-                  sub="Not features — but the app is wrong without them.")
+                  sub="Not features - but the app is wrong without them.")
     end = card_grid(s, top, [
-        (BLUE, "Security",
-         "Passwords are bcrypt-hashed, never stored or returned. Tokens are "
-         "signed and expire in 24 hours. A failed login gives one generic "
-         "message, so it can't reveal which usernames exist.", None),
-        (PLUM, "Integrity",
-         "The server decides every score, never the browser. A finished quiz "
-         "can't be replayed, and importing the same posting twice can't "
-         "duplicate it.", None),
-        (TEAL, "Performance",
-         "The two hottest queries — building a cloud and pulling a quiz — each "
-         "run against a composite index. Responses over 500 bytes are "
-         "compressed.", None),
+        (TEAL, "Word cloud speed",
+         "The system should generate and display the skill word cloud within 10 "
+         "seconds of the user submitting valid search criteria.", None),
+        (TEAL, "Game responsiveness",
+         "The system should redirect the user to the Q&A game within 10 "
+         "seconds, and calculate their score within 7 seconds of finishing.",
+         None),
+        (BLUE, "Input safety",
+         "The system should validate and sanitize all user input to prevent "
+         "injection. Every query goes through the ORM, parameterised - never "
+         "built by string.", None),
+        (BLUE, "Credential security",
+         "Passwords are bcrypt-hashed, never stored or returned. Tokens expire "
+         "in 24 hours, and a failed login gives one generic message either way.",
+         None),
+        (PLUM, "Score integrity",
+         "The server decides every score, never the browser, and a finished "
+         "quiz cannot be replayed.", None),
         (SLATE, "Reliability",
-         "237 automated tests: 209 on the backend, 28 on the front end. Both "
-         "suites run on every pull request before anything can merge.", None),
-        (BLUE, "Usability",
-         "Responsive at phone and desktop widths. Validation appears next to "
-         "the field. Every API error arrives in one shape, so no screen shows a "
-         "user a raw error object.", None),
-        (TEAL, "Portability",
-         "Dependency versions are pinned so four laptops and the CI runner "
-         "resolve the same set, and the app builds and migrates its own "
-         "database on first run.", None),
+         "237 automated tests - 209 backend, 28 front end - and nothing merges "
+         "until both suites pass.", None),
     ], 3, title_size=19, body_size=13.5)
     check("s5", end)
     footer(s, "5")
     notes(s, """
-[2:50 - 3:45]   SPEAKER 2
+[2:40 - 3:30]   SPEAKER 2
 
 Non-functional requirements - not features, but the app is wrong without them.
 
-Security: passwords are bcrypt-hashed, never stored or returned, and a failed
-login gives one generic message either way - so you can't use our login form to
-find out who has an account.
+The top row is what we committed to in our spec: the cloud back within ten
+seconds, the game open within ten and scored within seven, and all user input
+validated and sanitised against injection. We get that last one structurally -
+every query goes through the ORM, parameterised, never built by string.
 
-Integrity: the server decides every score, never the browser, and a finished quiz
-can't be replayed.
-
-Performance: the two hottest queries each run against a composite index we added
-deliberately for them.
-
-Reliability: 237 automated tests, and nothing merges until both suites pass.
-
-Usability: responsive, validation next to the field, and every API error in one
-shape.
-
-Portability: pinned versions, and the app builds its own database on first run.
+The bottom row we held ourselves to as we built. Passwords bcrypt-hashed and
+never returned, and a failed login gives the same generic message whether the
+account exists or not. The server decides every score, never the browser. And
+237 tests, with nothing merging until both suites pass.
 """)
 
     # 6 ----------------------------------------------------- stack diagram
@@ -604,20 +587,21 @@ touches the database, and never decides anything it could be lied to about.
     end = card_grid(s, top, [
         (TEAL, "Python + FastAPI",
          "Python is the strongest shared language on this team. FastAPI gave us "
-         "request and response validation for free and generated live API docs — "
+         "request and response validation for free and generated live API docs - "
          "so the front end could build against a written contract instead of "
          "waiting for the backend to finish.", None),
         (PLUM, "SQLite + SQLAlchemy",
          "SQLite is a single file: no database server to install, so four "
          "laptops and the CI runner all run an identical database with zero "
-         "setup. SQLAlchemy keeps every query parameterised — injection-safe by "
-         "construction — and moving to PostgreSQL later is one connection "
+         "setup. SQLAlchemy keeps every query parameterised - injection-safe by "
+         "construction - and moving to PostgreSQL later is one connection "
          "string.", None),
-        (BLUE, "Plain JavaScript, Bootstrap, Sass",
-         "A framework would have added a build step and a learning curve to a "
-         "team of four on a semester clock. Bootstrap gave us a responsive grid "
-         "on day one; Sass gave us one shared palette across eleven pages "
-         "instead of eleven copies of it.", None),
+        (BLUE, "Figma, Bootstrap and Sass",
+         "Figma let us agree on every screen before anyone implemented it, and "
+         "kept us coordinated once we started. Bootstrap's components sped up "
+         "the build and gave us a responsive grid on day one. Sass let us "
+         "generate custom CSS quickly, from one shared palette across eleven "
+         "pages.", None),
         (SLATE, "GitHub Actions + pytest + Jest",
          "The cheapest way to stop four people breaking each other's work. Both "
          "suites run on every pull request, so a regression is caught by the "
@@ -626,7 +610,7 @@ touches the database, and never decides anything it could be lied to about.
     check("s7", end)
     footer(s, "7")
     notes(s, """
-[4:40 - 5:30]   SPEAKER 3
+[4:40 - 5:35]   SPEAKER 3
 
 Why these choices.
 
@@ -635,12 +619,14 @@ FastAPI gave us validation for free plus live API docs - so the front end could
 build against a written contract instead of waiting for the backend.
 
 SQLite: one file, no server to install, so four laptops and the CI runner run an
-identical database with zero setup. That removed a whole category of "works on my
-machine". And SQLAlchemy keeps every query parameterised, so we're injection-safe
-by construction.
+identical database with zero setup. That removed a whole category of "works on
+my machine". And SQLAlchemy keeps every query parameterised, so we're
+injection-safe by construction.
 
-Plain JavaScript, Bootstrap and Sass: a framework would have cost us a build step
-and a learning curve on a semester clock.
+On the front end - Figma first. We designed every screen before anyone built it,
+which kept four people from producing four different-looking pages. Bootstrap's
+components sped the build up and gave us a responsive grid immediately, and Sass
+let us generate custom CSS from one shared palette across eleven pages.
 
 And GitHub Actions - the cheapest way to stop four people breaking each other's
 work.
@@ -693,11 +679,10 @@ by difficulty; each has its ANSWER_OPTIONS, one flagged correct - and that flag
 never leaves the server.
 
 Starting a quiz creates a QUIZ_SESSION recording which questions went out and
-what you picked. That is what makes live scoring trustworthy, and what stops a
+what you picked - that is what makes live scoring trustworthy, and what stops a
 finished quiz being replayed. Submitting lands the result in GAME_ATTEMPTS.
 
-Down the middle, USERS - every search, every attempt, and one roadmap per user
-all hang off it.
+And down the middle, USERS - every search and every attempt hangs off it.
 """)
     footer(s, "9")
 
@@ -858,55 +843,57 @@ page is hard-coded."
     # 14 --------------------------------------------- achieved vs altered
     s = blank(prs)
     canvas(s)
-    top = heading(s, "Summary", "What we achieved, and what we changed", TEAL,
+    top = heading(s, "Summary", "How much was achieved, and what was altered",
+                  TEAL,
                   sub="We planned more than we shipped. Here is the honest "
                       "accounting.")
+    cw2 = (CONTENT_W - Inches(0.3)) / 2
     pair = [
         (TEAL, "Achieved",
-         "▸  Every core feature is live: accounts, word cloud, timed quiz with "
-         "live scoring, and saved history.\n\n"
-         "▸  Real posting data — ingested from a live job-search API rather "
-         "than invented: 40 postings across 4 roles.\n\n"
-         "▸  The question bank beat its own target. We aimed for 10 per skill "
-         "per difficulty and shipped 15 — 1,260 questions.\n\n"
-         "▸  237 automated tests with CI on every pull request. 189 commits, "
-         "44 reviewed pull requests."),
+         "▸  Users can register, sign in, and stay signed in.\n\n"
+         "▸  The app parses job postings and generates a word cloud from the "
+         "user's own search parameters.\n\n"
+         "▸  The Q&A game runs on a timer with live scoring, and every result "
+         "is saved to the account.\n\n"
+         "▸  The question bank beat its target: 15 per skill per difficulty, "
+         "which is 1,260 questions across 28 skills.\n\n"
+         "▸  237 automated tests, run on every pull request."),
         (AMBER, "Altered or cut",
-         "▸  The prep roadmap has a finished, tested API and no screen. With "
-         "the time left we chose to make the quiz good rather than make the "
-         "roadmap merely exist.\n\n"
-         "▸  Maximum salary: we removed the field instead of shipping a filter "
-         "that quietly did nothing. Minimum salary works.\n\n"
-         "▸  Named ranks are described on our rules page, but scoring currently "
-         "ends at a normalised number. The docs got ahead of the app.\n\n"
-         "▸  Word clouds ended up behind sign-in, so every search could be "
-         "saved to a real account and offered back."),
+         "▸  Users were originally going to type in any role. External API "
+         "limitations reduced that to 4 supported roles.\n\n"
+         "▸  Location became a dynamic menu, listing only places that have "
+         "enough postings to build a cloud from.\n\n"
+         "▸  Maximum salary was removed rather than shipped as a filter that "
+         "quietly did nothing.\n\n"
+         "▸  The prep roadmap has a finished, tested API but no screen - we "
+         "chose to finish the quiz instead.\n\n"
+         "▸  Named ranks are on the rules page, but scoring currently ends at a "
+         "normalised number."),
     ]
-    h = max(card_metrics(cw2, t, b, 22, 14.5)[2] for _a, t, b in pair)
+    h = max(card_metrics(cw2, t, b, 22, 14)[2] for _a, t, b in pair)
     for i, (accent, title, body) in enumerate(pair):
         card(s, MARGIN + i * (cw2 + Inches(0.3)), top, cw2, h, accent, title,
-             body, title_size=22, body_size=14.5)
+             body, title_size=22, body_size=14)
     check("s14", top + h)
     footer(s, "14")
     notes(s, """
-[11:30 - 12:30]   SPEAKER 1
+[11:20 - 12:10]   SPEAKER 1
 
 The honest accounting.
 
-On the left. Every core feature is live. Our postings are real - ingested from a
-live job-search API, which meant dealing with genuinely messy description text.
-The question bank beat its own target: we aimed for ten per skill per difficulty
-and shipped fifteen, which is 1,260 questions. And the process held - 189
-commits, 44 reviewed pull requests, 237 tests.
+On the left, what worked. Registration and sign-in, real postings parsed into a
+cloud from whatever the user asked for, the timed game with live scoring, every
+result saved. The question bank beat its own target - we aimed for ten per skill
+per difficulty and shipped fifteen, so 1,260 questions. And 237 tests on every
+pull request.
 
-On the right, what changed. The prep roadmap has a finished, tested API and no
-screen; with the time left, we chose to make the quiz good rather than make the
-roadmap merely exist.
+On the right, what changed. The top two are the same story: the external API
+limited what we could reliably fetch, so typing any role became four supported
+roles, and location became a menu of places that actually have postings behind
+them. Both were us refusing to offer a search that comes back empty.
 
-Maximum salary we removed rather than ship a filter that quietly did nothing.
-
-Named ranks are on our rules page but not in the scoring yet - our docs got ahead
-of the app, and that's on us.
+The rest is us choosing depth over breadth - and one place where our
+documentation got ahead of the app, which is on us.
 """)
 
     # 15 -------------------------------------------------------- close
