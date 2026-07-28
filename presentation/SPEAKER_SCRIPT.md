@@ -3,7 +3,7 @@
 > Generated from the speaker notes inside `JobHopper_Final_Presentation.pptx`.
 > Edit the notes in `scripts/make_deck.py`, rebuild the deck, then re-run `scripts/make_script.py`.
 
-**Estimated total: 14:29**  (target 14:00, hard ceiling 15:00 — the assignment caps the video at 15 minutes; the rubric penalises going over 20.)
+**Estimated total: 14:44**  (target 14:00, hard ceiling 15:00 — the assignment caps the video at 15 minutes; the rubric penalises going over 20.)
 
 Speaking estimate assumes 140 words per minute, which is an unhurried presenting pace. The three demo slides are timed from the runbook rather than from word count.
 
@@ -12,20 +12,20 @@ Speaking estimate assumes 140 words per minute, which is an unhurried presenting
 | # | Slide | Length | Ends at |
 |---|-------|--------|---------|
 | 1 | Title | 0:16 | 0:16 |
-| 2 | The goal | 0:55 | 1:12 |
-| 3 | Functional requirements 1 of 2 | 0:45 | 1:57 |
-| 4 | Functional requirements 2 of 2 | 0:52 | 2:50 |
-| 5 | Non-functional requirements | 0:48 | 3:38 |
-| 6 | Technology stack diagram | 0:55 | 4:33 |
-| 7 | Why this stack | 1:00 | 5:34 |
-| 8 | ERD — subject areas | 0:40 | 6:14 |
-| 9 | ERD — full schema | 1:21 | 7:36 |
-| 10 | User roles | 0:36 | 8:12 |
-| 11 | Demo 1 — the visitor | 1:30 | 9:42 |
-| 12 | Demo 2 — the registered user | 2:15 | 11:57 |
-| 13 | Demo 3 — it really is a database | 1:10 | 13:07 |
-| 14 | Summary — achieved vs changed | 0:51 | 13:59 |
-| 15 | Close | 0:30 | 14:29 |
+| 2 | The goal | 0:50 | 1:06 |
+| 3 | Functional requirements 1 of 2 | 0:45 | 1:51 |
+| 4 | Functional requirements 2 of 2 | 0:52 | 2:44 |
+| 5 | Non-functional requirements | 0:48 | 3:33 |
+| 6 | Technology stack diagram | 0:48 | 4:21 |
+| 7 | Why this stack | 0:54 | 5:16 |
+| 8 | ERD — subject areas | 0:40 | 5:56 |
+| 9 | ERD — full schema | 1:14 | 7:11 |
+| 10 | User roles | 0:36 | 7:47 |
+| 11 | Demo 1 — the visitor | 1:30 | 9:17 |
+| 12 | Demo 2 — the registered user | 3:00 | 12:17 |
+| 13 | Demo 3 — it really is a database | 1:10 | 13:27 |
+| 14 | Summary — achieved vs changed | 0:44 | 14:12 |
+| 15 | Close | 0:32 | 14:44 |
 
 ## Who speaks
 
@@ -50,7 +50,7 @@ The assignment does not require everyone to speak, but the rubric rewards a pres
 
 ## Slide 1 — Title
 
-**Clock:** `0:00 - 0:15`  ·  **Speaker:** SPEAKER 1  ·  **Est. length:** 0:16
+**Clock:** `0:00 - 0:16`  ·  **Speaker:** SPEAKER 1  ·  **Est. length:** 0:16
 
 Hi, we're the Laughing Bots - Rose, Elijah, Angel and Terrell. This is JobHopper:
 it reads real job postings, shows you which skills those postings are actually
@@ -58,16 +58,16 @@ asking for, and lets you quiz yourself on any of them.
 
 ## Slide 2 — The goal
 
-**Clock:** `0:15 - 1:00`  ·  **Speaker:** SPEAKER 1  ·  **Est. length:** 0:55
+**Clock:** `0:16 - 1:06`  ·  **Speaker:** SPEAKER 1  ·  **Est. length:** 0:50
 
 The problem isn't that this information is secret - job postings are public.
 It's volume. Search one title and you get forty postings, each with its own wall
 of requirements. The signal is which tools keep repeating, and nobody reads
-forty postings to find it. So people guess at what to learn next.
+forty postings to find it.
 
-So our goal was this: analyse the job postings for a target role, identify the
-most in-demand skills, and show them as a word cloud - then help people actually
-build those skills through interactive Q&A games.
+So our goal: analyse the postings for a target role, identify the most in-demand
+skills, show them as a word cloud - then help people build those skills through
+interactive Q&A games.
 
 That second half is what we care about. Every skill in the picture is clickable.
 Click Python, and you're in a timed quiz on Python. It doesn't just tell you
@@ -75,7 +75,7 @@ what to learn - it gives you somewhere to start.
 
 ## Slide 3 — Functional requirements 1 of 2
 
-**Clock:** `1:00 - 1:50`  ·  **Speaker:** SPEAKER 2  ·  **Est. length:** 0:45
+**Clock:** `1:06 - 1:51`  ·  **Speaker:** SPEAKER 2  ·  **Est. length:** 0:45
 
 These are our functional requirements, written the way we specified them. I
 won't read them all - two things to point at.
@@ -91,7 +91,7 @@ frequency - a count, not an opinion. That one sentence is the whole product.
 
 ## Slide 4 — Functional requirements 2 of 2
 
-**Clock:** `1:50 - 2:40`  ·  **Speaker:** SPEAKER 2  ·  **Est. length:** 0:52
+**Clock:** `1:52 - 2:44`  ·  **Speaker:** SPEAKER 2  ·  **Est. length:** 0:52
 
 Job scraping is two requirements. Count how often each keyword appears - and
 display an error when there isn't enough job information to build a cloud. A
@@ -108,7 +108,7 @@ score can never disagree.
 
 ## Slide 5 — Non-functional requirements
 
-**Clock:** `2:40 - 3:30`  ·  **Speaker:** SPEAKER 2  ·  **Est. length:** 0:48
+**Clock:** `2:45 - 3:33`  ·  **Speaker:** SPEAKER 2  ·  **Est. length:** 0:48
 
 Non-functional requirements - not features, but the app is wrong without them.
 
@@ -124,7 +124,7 @@ account exists or not. The server decides every score, never the browser. And
 
 ## Slide 6 — Technology stack diagram
 
-**Clock:** `3:45 - 4:40`  ·  **Speaker:** SPEAKER 3  ·  **Est. length:** 0:55
+**Clock:** `3:33 - 4:21`  ·  **Speaker:** SPEAKER 3  ·  **Est. length:** 0:48
 
 The whole system on one page.
 
@@ -134,8 +134,7 @@ anything tied to an account carries a signed token.
 
 The middle band is where every rule lives: FastAPI, seventeen endpoints, Pydantic
 validating every request and response, and underneath it the services - hashing
-and tokens, skill extraction, and the ingest that keeps our data current. Note
-on the right that our postings are real, pulled from a live job-search API.
+and tokens, skill extraction, and the ingest that keeps our postings current.
 
 The bottom is one SQLite file, reached only through SQLAlchemy.
 
@@ -144,30 +143,29 @@ touches the database, and never decides anything it could be lied to about.
 
 ## Slide 7 — Why this stack
 
-**Clock:** `4:40 - 5:35`  ·  **Speaker:** SPEAKER 3  ·  **Est. length:** 1:00
+**Clock:** `4:22 - 5:16`  ·  **Speaker:** SPEAKER 3  ·  **Est. length:** 0:54
 
 Why these choices.
 
-Python and FastAPI: Python is the strongest shared language on this team, and
-FastAPI gave us validation for free plus live API docs - so the front end could
-build against a written contract instead of waiting for the backend.
+Python and FastAPI: the strongest shared language on this team, and FastAPI gave
+us validation for free plus live API docs - so the front end could build against
+a written contract instead of waiting for the backend.
 
 SQLite: one file, no server to install, so four laptops and the CI runner run an
-identical database with zero setup - which removed a whole category of "works on
-my machine". SQLAlchemy keeps every query parameterised, so we're injection-safe
-by construction.
+identical database with zero setup. SQLAlchemy keeps every query parameterised,
+so we're injection-safe by construction.
 
-On the front end, Figma first. We designed every screen before anyone built it,
+On the front end, Figma first - we designed every screen before anyone built it,
 which kept four people from producing four different-looking pages. Bootstrap
-gave us a responsive grid on day one, and Sass gave us one shared palette across
-twelve pages.
+gave us a responsive grid on day one, Sass one shared palette across twelve
+pages.
 
-And GitHub Actions - the cheapest way to stop four people breaking each other's
-work.
+And GitHub Actions, so a regression is caught by the robot, not by whoever pulls
+next.
 
 ## Slide 8 — ERD — subject areas
 
-**Clock:** `5:50 - 6:30`  ·  **Speaker:** SPEAKER 4  ·  **Est. length:** 0:40
+**Clock:** `5:16 - 5:56`  ·  **Speaker:** SPEAKER 4  ·  **Est. length:** 0:40
 
 Before the full diagram, the shape of it. Fourteen tables in three groups.
 
@@ -182,7 +180,7 @@ ties everything on the right to one account.
 
 ## Slide 9 — ERD — full schema
 
-**Clock:** `6:15 - 7:35`  ·  **Speaker:** SPEAKER 4   -   Trace each table with the cursor as you name it.  ·  **Est. length:** 1:21
+**Clock:** `5:57 - 7:11`  ·  **Speaker:** SPEAKER 4   -   Trace each table with the cursor as you name it.  ·  **Est. length:** 1:14
 
 Let me trace the one path that touches most of it.
 
@@ -192,25 +190,24 @@ range, date posted.
 Now the interesting part. A posting mentions many skills, and a skill appears in
 many postings. That's many-to-many, which a relational database can't store
 directly - so JOB_SKILLS resolves it. Its primary key is the pair, job plus
-skill, which is what guarantees one posting can only count once toward a skill.
+skill, which guarantees one posting can only count once toward a skill.
 
 So the word cloud is one query: the postings for this role inside the date
 window, joined through job_skills, counted per skill, sorted descending. That
 count is the word size.
 
-Follow SKILLS right and it becomes the quiz. One skill has many QUESTIONS split
-by difficulty, each with its ANSWER_OPTIONS - one flagged correct, and that flag
-never leaves the server.
+Follow SKILLS right and it becomes the quiz - QUESTIONS split by difficulty, each
+with its ANSWER_OPTIONS, one flagged correct. That flag never leaves the server.
 
-Starting a quiz creates a QUIZ_SESSION recording which questions went out and
-what you picked - that is what makes live scoring trustworthy, and what stops a
-finished quiz being replayed. Submitting lands the result in GAME_ATTEMPTS.
+Starting a quiz creates a QUIZ_SESSION recording what was served and what you
+picked, which is what makes live scoring trustworthy. Submitting lands the result
+in GAME_ATTEMPTS.
 
 And down the middle, USERS - every search and every attempt hangs off it.
 
 ## Slide 10 — User roles
 
-**Clock:** `7:55 - 8:30`  ·  **Speaker:** SPEAKER 1   -   sets up the demo  ·  **Est. length:** 0:36
+**Clock:** `7:11 - 7:47`  ·  **Speaker:** SPEAKER 1   -   sets up the demo  ·  **Est. length:** 0:36
 
 One note before the demo, because it shapes what you'll see.
 
@@ -224,7 +221,7 @@ would log in to do.
 
 ## Slide 11 — Demo 1 — the visitor
 
-**Clock:** `8:22 - 9:22`  ·  **Speaker:** SPEAKER 3   -   LIVE DEMO, PART 1.  Share your screen now.  ·  **Est. length:** 1:30
+**Clock:** `7:47 - 9:17`  ·  **Speaker:** SPEAKER 3   -   LIVE DEMO, PART 1.  Share your screen now.  ·  **Est. length:** 1:30
 
 Lines in quotes are what you say. Lines starting with > are what you do.
 
@@ -261,7 +258,7 @@ got one set up", and carry on. Do not debug on camera.
 
 ## Slide 12 — Demo 2 — the registered user
 
-**Clock:** `9:22 - 11:22`  ·  **Speaker:** SPEAKER 3 and SPEAKER 4   -   LIVE DEMO, PART 2. The main event.  ·  **Est. length:** 2:15
+**Clock:** `9:17 - 12:17`  ·  **Speaker:** SPEAKER 3 and SPEAKER 4   -   LIVE DEMO, PART 2. The main event.  ·  **Est. length:** 3:00
 
 Lines in quotes are what you say. Lines starting with > are what you do.
 
@@ -311,7 +308,7 @@ answering."
 
 ## Slide 13 — Demo 3 — it really is a database
 
-**Clock:** `11:22 - 12:22`  ·  **Speaker:** SPEAKER 4   -   LIVE DEMO, PART 3. This is the 9-point item.  ·  **Est. length:** 1:10
+**Clock:** `12:17 - 13:27`  ·  **Speaker:** SPEAKER 4   -   LIVE DEMO, PART 3. This is the 9-point item.  ·  **Est. length:** 1:10
 
 Switch to the DB Browser window already open on the second desktop. Do not open
 a terminal - that reads as code.
@@ -346,7 +343,7 @@ password if we wanted to - we never stored it."
 
 ## Slide 14 — Summary — achieved vs changed
 
-**Clock:** `11:20 - 12:10`  ·  **Speaker:** SPEAKER 1  ·  **Est. length:** 0:51
+**Clock:** `13:28 - 14:12`  ·  **Speaker:** SPEAKER 1  ·  **Est. length:** 0:44
 
 The honest accounting.
 
@@ -359,17 +356,16 @@ limited what we could reliably fetch, so typing any role became four supported
 roles, and location became a menu of places that actually have postings behind
 them. Both were us refusing to offer a search that comes back empty.
 
-The rest is choosing depth over breadth - and one place where our documentation
-got ahead of the app, which is on us.
+The rest is choosing depth over breadth.
 
 ## Slide 15 — Close
 
-**Clock:** `12:30 - 13:00`  ·  **Speaker:** SPEAKER 1   -   close  ·  **Est. length:** 0:30
+**Clock:** `14:12 - 14:44`  ·  **Speaker:** SPEAKER 1   -   close  ·  **Est. length:** 0:32
 
 Three things next. Rank the roadmap by what you're weak at, not just by what the
-ingest; the pipeline isn't the limit, the skill vocabulary is. And the one we
-actually want: close the loop, so the skills you keep getting wrong become the
-ones your cloud puts in front of you.
+market wants. Widen the ingest; the pipeline isn't the limit, the skill
+vocabulary is. And the one we actually want: close the loop, so the skills you
+keep getting wrong become the ones your cloud puts in front of you.
 
 Right now the two halves of the app share a database. They should share a memory.
 

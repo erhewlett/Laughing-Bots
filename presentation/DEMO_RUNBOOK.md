@@ -1,6 +1,6 @@
 # JobHopper — live demo runbook
 
-Everything the demo needs, in the order it happens. Total demo budget: **4:55**
+Everything the demo needs, in the order it happens. Total demo budget: **5:40**
 inside a 15-minute video — 1:30 for the visitor, 2:15 for the registered user,
 1:10 for the database.
 

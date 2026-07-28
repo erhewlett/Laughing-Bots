@@ -35,6 +35,33 @@ TITLES = [
 
 # Slides whose time is dominated by clicking, not talking.
 DEMO_SLIDES = {11, 12, 13}
+RUNBOOK = ROOT / "DEMO_RUNBOOK.md"
+
+
+def demo_budgets() -> dict[int, int]:
+    """Read the per-part demo budgets out of the runbook headings.
+
+    The runbook is where the demo is actually planned, so it owns these
+    numbers. Parsing them rather than repeating them here is what stops the
+    two drifting - which they did once already: Part 2 grew from 2:15 to 3:00
+    in the runbook while this file still assumed 2:15, quietly understating
+    the talk by 45 seconds.
+    """
+    pattern = re.compile(
+        r"^## Part \d+ .*?·\s*(\d+):(\d{2})\s*·\s*Slide (\d+)", re.M
+    )
+    found = {
+        int(slide): int(mins) * 60 + int(secs)
+        for mins, secs, slide in pattern.findall(RUNBOOK.read_text(encoding="utf-8"))
+    }
+    missing = DEMO_SLIDES - found.keys()
+    if missing:
+        raise SystemExit(
+            f"make_script: no budget found in {RUNBOOK.name} for slide(s) "
+            f"{sorted(missing)}. Each demo part needs a heading like "
+            f'"## Part 1 - Role 1: the visitor  .  1:30  .  Slide 11".'
+        )
+    return found
 
 
 def spoken_words(note: str) -> int:
@@ -63,6 +90,7 @@ def mmss(seconds: float) -> str:
 
 
 def main() -> None:
+    budgets = demo_budgets()
     prs = Presentation(DECK)
     rows = []
     running = 0.0
@@ -76,7 +104,7 @@ def main() -> None:
 
         if i in DEMO_SLIDES:
             # Demo timing comes from the runbook, not from word count.
-            est = {11: 90, 12: 135, 13: 70}[i]
+            est = budgets[i]
         else:
             est = spoken_words(note) / WPM * 60
         running += est
@@ -94,6 +122,15 @@ def main() -> None:
         body.append(stripped + "\n")
 
     total = running
+    stated = re.search(r"Total demo budget: \*\*(\d+):(\d{2})\*\*",
+                       RUNBOOK.read_text(encoding="utf-8"))
+    demo_total = sum(budgets[i] for i in sorted(DEMO_SLIDES))
+    if stated:
+        claimed = int(stated.group(1)) * 60 + int(stated.group(2))
+        if claimed != demo_total:
+            print(f"  ! {RUNBOOK.name} says the demo totals "
+                  f"{mmss(claimed)}, but its parts add up to "
+                  f"{mmss(demo_total)}")
     lines = [
         "# JobHopper — final presentation speaker script",
         "",

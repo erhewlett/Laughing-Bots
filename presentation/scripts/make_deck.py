@@ -379,7 +379,7 @@ def build() -> None:
         color=MUTED, space_before=7)
     footer(s, "1")
     notes(s, """
-[0:00 - 0:15]   SPEAKER 1
+[0:00 - 0:16]   SPEAKER 1
 
 Hi, we're the Laughing Bots - Rose, Elijah, Angel and Terrell. This is JobHopper:
 it reads real job postings, shows you which skills those postings are actually
@@ -426,16 +426,16 @@ asking for, and lets you quiz yourself on any of them.
     check("s2", b)
     footer(s, "2")
     notes(s, """
-[0:15 - 1:00]   SPEAKER 1
+[0:16 - 1:06]   SPEAKER 1
 
 The problem isn't that this information is secret - job postings are public.
 It's volume. Search one title and you get forty postings, each with its own wall
 of requirements. The signal is which tools keep repeating, and nobody reads
-forty postings to find it. So people guess at what to learn next.
+forty postings to find it.
 
-So our goal was this: analyse the job postings for a target role, identify the
-most in-demand skills, and show them as a word cloud - then help people actually
-build those skills through interactive Q&A games.
+So our goal: analyse the postings for a target role, identify the most in-demand
+skills, show them as a word cloud - then help people build those skills through
+interactive Q&A games.
 
 That second half is what we care about. Every skill in the picture is clickable.
 Click Python, and you're in a timed quiz on Python. It doesn't just tell you
@@ -474,7 +474,7 @@ what to learn - it gives you somewhere to start.
     check("s3", top + h)
     footer(s, "3")
     notes(s, """
-[1:00 - 1:50]   SPEAKER 2
+[1:06 - 1:51]   SPEAKER 2
 
 These are our functional requirements, written the way we specified them. I
 won't read them all - two things to point at.
@@ -517,7 +517,7 @@ frequency - a count, not an opinion. That one sentence is the whole product.
     check("s4", y + h2)
     footer(s, "4")
     notes(s, """
-[1:50 - 2:40]   SPEAKER 2
+[1:52 - 2:44]   SPEAKER 2
 
 Job scraping is two requirements. Count how often each keyword appears - and
 display an error when there isn't enough job information to build a cloud. A
@@ -565,7 +565,7 @@ score can never disagree.
     check("s5", end)
     footer(s, "5")
     notes(s, """
-[2:40 - 3:30]   SPEAKER 2
+[2:45 - 3:33]   SPEAKER 2
 
 Non-functional requirements - not features, but the app is wrong without them.
 
@@ -585,7 +585,7 @@ account exists or not. The server decides every score, never the browser. And
     canvas(s)
     full_bleed(s, DIAGRAMS / "tech_stack.png")
     notes(s, """
-[3:45 - 4:40]   SPEAKER 3
+[3:33 - 4:21]   SPEAKER 3
 
 The whole system on one page.
 
@@ -595,8 +595,7 @@ anything tied to an account carries a signed token.
 
 The middle band is where every rule lives: FastAPI, seventeen endpoints, Pydantic
 validating every request and response, and underneath it the services - hashing
-and tokens, skill extraction, and the ingest that keeps our data current. Note
-on the right that our postings are real, pulled from a live job-search API.
+and tokens, skill extraction, and the ingest that keeps our postings current.
 
 The bottom is one SQLite file, reached only through SQLAlchemy.
 
@@ -636,26 +635,25 @@ touches the database, and never decides anything it could be lied to about.
     check("s7", end)
     footer(s, "7")
     notes(s, """
-[4:40 - 5:35]   SPEAKER 3
+[4:22 - 5:16]   SPEAKER 3
 
 Why these choices.
 
-Python and FastAPI: Python is the strongest shared language on this team, and
-FastAPI gave us validation for free plus live API docs - so the front end could
-build against a written contract instead of waiting for the backend.
+Python and FastAPI: the strongest shared language on this team, and FastAPI gave
+us validation for free plus live API docs - so the front end could build against
+a written contract instead of waiting for the backend.
 
 SQLite: one file, no server to install, so four laptops and the CI runner run an
-identical database with zero setup - which removed a whole category of "works on
-my machine". SQLAlchemy keeps every query parameterised, so we're injection-safe
-by construction.
+identical database with zero setup. SQLAlchemy keeps every query parameterised,
+so we're injection-safe by construction.
 
-On the front end, Figma first. We designed every screen before anyone built it,
+On the front end, Figma first - we designed every screen before anyone built it,
 which kept four people from producing four different-looking pages. Bootstrap
-gave us a responsive grid on day one, and Sass gave us one shared palette across
-twelve pages.
+gave us a responsive grid on day one, Sass one shared palette across twelve
+pages.
 
-And GitHub Actions - the cheapest way to stop four people breaking each other's
-work.
+And GitHub Actions, so a regression is caught by the robot, not by whoever pulls
+next.
 """)
 
     # 8 ------------------------------------------------------ ERD overview
@@ -663,7 +661,7 @@ work.
     canvas(s)
     full_bleed(s, DIAGRAMS / "erd_overview.png")
     notes(s, """
-[5:50 - 6:30]   SPEAKER 4
+[5:16 - 5:56]   SPEAKER 4
 
 Before the full diagram, the shape of it. Fourteen tables in three groups.
 
@@ -683,7 +681,7 @@ ties everything on the right to one account.
     canvas(s)
     full_bleed(s, DIAGRAMS / "erd_full.png")
     notes(s, """
-[6:15 - 7:35]   SPEAKER 4   -   Trace each table with the cursor as you name it.
+[5:57 - 7:11]   SPEAKER 4   -   Trace each table with the cursor as you name it.
 
 Let me trace the one path that touches most of it.
 
@@ -693,19 +691,18 @@ range, date posted.
 Now the interesting part. A posting mentions many skills, and a skill appears in
 many postings. That's many-to-many, which a relational database can't store
 directly - so JOB_SKILLS resolves it. Its primary key is the pair, job plus
-skill, which is what guarantees one posting can only count once toward a skill.
+skill, which guarantees one posting can only count once toward a skill.
 
 So the word cloud is one query: the postings for this role inside the date
 window, joined through job_skills, counted per skill, sorted descending. That
 count is the word size.
 
-Follow SKILLS right and it becomes the quiz. One skill has many QUESTIONS split
-by difficulty, each with its ANSWER_OPTIONS - one flagged correct, and that flag
-never leaves the server.
+Follow SKILLS right and it becomes the quiz - QUESTIONS split by difficulty, each
+with its ANSWER_OPTIONS, one flagged correct. That flag never leaves the server.
 
-Starting a quiz creates a QUIZ_SESSION recording which questions went out and
-what you picked - that is what makes live scoring trustworthy, and what stops a
-finished quiz being replayed. Submitting lands the result in GAME_ATTEMPTS.
+Starting a quiz creates a QUIZ_SESSION recording what was served and what you
+picked, which is what makes live scoring trustworthy. Submitting lands the result
+in GAME_ATTEMPTS.
 
 And down the middle, USERS - every search and every attempt hangs off it.
 """)
@@ -752,7 +749,7 @@ And down the middle, USERS - every search and every attempt hangs off it.
     check("s10", y + ch)
     footer(s, "10")
     notes(s, """
-[7:55 - 8:30]   SPEAKER 1   -   sets up the demo
+[7:11 - 7:47]   SPEAKER 1   -   sets up the demo
 
 One note before the demo, because it shapes what you'll see.
 
@@ -773,7 +770,7 @@ would log in to do.
             "Register a brand-new account live — the form builds your first "
             "cloud with you",
         ], "11", """
-[8:22 - 9:22]   SPEAKER 3   -   LIVE DEMO, PART 1.  Share your screen now.
+[7:47 - 9:17]   SPEAKER 3   -   LIVE DEMO, PART 1.  Share your screen now.
 Lines in quotes are what you say. Lines starting with > are what you do.
 
 > Home page already open.
@@ -814,7 +811,7 @@ got one set up", and carry on. Do not debug on camera.
             "Watch the live score move as each answer locks in",
             "Open the profile: the search and the score are both already there",
         ], "12", """
-[9:22 - 11:22]   SPEAKER 3 and SPEAKER 4   -   LIVE DEMO, PART 2. The main event.
+[9:17 - 12:17]   SPEAKER 3 and SPEAKER 4   -   LIVE DEMO, PART 2. The main event.
 Lines in quotes are what you say. Lines starting with > are what you do.
 
 > You are on the cloud registration just built.
@@ -869,7 +866,7 @@ answering."
             "Show a stored password — a bcrypt hash, not the password we typed",
             "Show the word-cloud counts matching the picture we just drew",
         ], "13", """
-[11:22 - 12:22]   SPEAKER 4   -   LIVE DEMO, PART 3. This is the 9-point item.
+[12:17 - 13:27]   SPEAKER 4   -   LIVE DEMO, PART 3. This is the 9-point item.
 Switch to the DB Browser window already open on the second desktop. Do not open
 a terminal - that reads as code.
 
@@ -959,7 +956,7 @@ password if we wanted to - we never stored it."
     check("s14", top + h)
     footer(s, "14")
     notes(s, """
-[11:20 - 12:10]   SPEAKER 1
+[13:28 - 14:12]   SPEAKER 1
 
 The honest accounting.
 
@@ -972,8 +969,7 @@ limited what we could reliably fetch, so typing any role became four supported
 roles, and location became a menu of places that actually have postings behind
 them. Both were us refusing to offer a search that comes back empty.
 
-The rest is choosing depth over breadth - and one place where our documentation
-got ahead of the app, which is on us.
+The rest is choosing depth over breadth.
 """)
 
     # 15 -------------------------------------------------------- close
@@ -1021,7 +1017,7 @@ got ahead of the app, which is on us.
     check("s15", y + Inches(2.5))
     footer(s, "15")
     notes(s, """
-[12:30 - 13:00]   SPEAKER 1   -   close
+[14:12 - 14:44]   SPEAKER 1   -   close
 
 Three things next. Rank the roadmap by what you're weak at, not just by what the
 market wants. Widen the ingest; the pipeline isn't the limit, the skill
