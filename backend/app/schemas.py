@@ -74,6 +74,32 @@ class WordCloudResponse(BaseModel):
     username: str = ""
 
 
+class JobPostingOut(BaseModel):
+    """One job posting, as shown to a user.
+
+    This is the evidence behind the word cloud: the same postings the skill
+    counts were derived from, so the cloud can be traced back to real listings
+    instead of being taken on trust.
+    """
+
+    job_id: int
+    title: str | None
+    company_name: str | None
+    location: str | None
+    salary_min: int | None
+    salary_max: int | None
+    date_posted: datetime | None
+    source_url: str | None
+
+    model_config = {"from_attributes": True}
+
+
+class JobPostingsResponse(BaseModel):
+    role: str                     # the matched role, same resolution the cloud uses
+    total: int                    # postings matching the search, before `limit`
+    postings: list[JobPostingOut]
+
+
 class RoleOut(BaseModel):
     role_id: int
     role_name: str
