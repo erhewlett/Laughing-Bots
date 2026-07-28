@@ -25,6 +25,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitAnswerBtn = document.querySelector("#submit-answer-btn");
 
     /*
+    * The button that appears after the quiz has been completed to return users
+    * back to the user view page
+    */
+    const returnPlayersBtn = document.createElement("button");
+
+    returnPlayersBtn.type = "button";
+    returnPlayersBtn.id = "user-view-btn";
+    returnPlayersBtn.className = submitAnswerBtn.className;
+    returnPlayersBtn.textContent = "Return to User View";
+    returnPlayersBtn.hidden = true;
+
+    submitAnswerBtn.insertAdjacentElement(
+        "afterend",
+        returnPlayersBtn
+    );
+
+    /*
      * The progress bar is optional. It is not in the required-element
      * check below, so a page without it still plays.
      */
@@ -233,6 +250,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         submitCurrentAnswer();
+    });
+
+    /*
+    * Redirect the player to the user-view page after
+    * the completed quiz has been graded.
+    */
+    returnPlayersBtn.addEventListener("click", () => {
+
+        window.location.href = "../html/user_info_view_page.html";
     });
 
     /**
@@ -686,6 +712,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /**
+     * Replaces the Submit button after the game is complete.
+     */
+    function returnPlayerBtn() {
+        submitAnswerBtn.hidden = true;
+        submitAnswerBtn.disabled = true;
+
+        returnPlayersBtn.hidden = false;
+        returnPlayersBtn.disabled = false;
+
+        returnPlayersBtn.focus();
+    }
+
+    /**
      * Request headers for the game endpoints.
      *
      * The token is only attached when there is one. Sending
@@ -941,6 +980,8 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Game results:", gameResults);
 
         displayGameResults(gameResults);
+
+        returnPlayerBtn();
     }
 
     /**
