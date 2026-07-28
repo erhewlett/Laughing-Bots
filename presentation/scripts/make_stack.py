@@ -200,10 +200,10 @@ def render() -> str:
     p.append(band(SIDE_X, y, SIDE_W, 400, QUALITY, "How we kept it working",
                   "Every merge had to pass this"))
     for i, (head, sub) in enumerate([
-        ("pytest", "209 backend tests"),
+        ("pytest", "222 backend tests"),
         ("Jest + jsdom", "28 frontend tests"),
         ("GitHub Actions", "both suites run on every pull request"),
-        ("Pull requests", "44 merged into main, reviewed first"),
+        ("Pull requests", "48 merged into main, reviewed first"),
     ]):
         yy = y + 122 + i * 70
         p.append(
@@ -224,7 +224,7 @@ def render() -> str:
                   "Four people, one main branch"))
     for i, (head, sub) in enumerate([
         ("Figma", "designs agreed before anyone implemented them"),
-        ("189 commits, 44 pull requests", "one feature branch per task"),
+        ("198 commits, 48 pull requests", "one feature branch per task"),
         ("Pinned dependency versions", "all four machines resolve the same set"),
     ]):
         yy = y + 108 + i * 52

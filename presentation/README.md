@@ -18,8 +18,10 @@ grading rubric.
 
 1. Read **`DEMO_RUNBOOK.md`** — it has the setup steps and the pre-flight
    checklist.
-2. Rehearse from **`SPEAKER_SCRIPT.md`**. Estimated runtime **14:29** against a
-   15-minute cap — 9:34 of talking plus a 4:55 demo budget.
+2. Rehearse from **`SPEAKER_SCRIPT.md`**. Estimated runtime **14:31** against a
+   15-minute cap. That is 29 seconds of headroom, so the demo parts are where a
+   long take will cost you — the runbook marks the roadmap steps as the safe
+   thing to drop.
 3. Record. Two rules: **no code on screen**, and **do not debug live**.
 4. Walk **`RUBRIC_CHECKLIST.md`** before you submit.
 
@@ -42,7 +44,20 @@ grading rubric.
 ## Rebuilding
 
 The diagrams and the deck are generated, so they stay consistent with each other
-and with the schema. Requires `python-pptx`, `cairosvg` and `pillow`.
+and with the schema. Requires `python-pptx`, `cairosvg` and `pillow`, plus the
+Carlito font — the slide layout is measured in it, so no other font will do.
+
+```bash
+pip install python-pptx cairosvg pillow
+```
+
+Carlito, by platform:
+
+- **Debian / Ubuntu:** `sudo apt install fonts-crosextra-carlito`
+- **macOS:** download `Carlito-Regular.ttf` and `Carlito-Bold.ttf` from Google
+  Fonts into `~/Library/Fonts`
+- **Anywhere:** put both files in a folder and point `JOBHOPPER_DECK_FONT_DIR`
+  at it
 
 ```bash
 python presentation/scripts/make_erd.py      # ERD images
@@ -78,4 +93,4 @@ Every figure in the deck was taken from the repository, not estimated:
 | 11 HTML pages | `frontend/html/` |
 | 250 tests (222 backend, 28 frontend) | `python -m pytest` and `npm test`, both run green |
 | The demo click path | driven end to end against the running app |
-| 189 commits, 44 merged pull requests | `git log` |
+| 198 commits, 48 merged pull requests | `git log` |

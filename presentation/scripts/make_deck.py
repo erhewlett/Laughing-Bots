@@ -589,7 +589,7 @@ account exists or not. The server decides every score, never the browser. And
 
 The whole system on one page.
 
-Top: the browser. Eleven HTML pages, Bootstrap, Sass, plain JavaScript modules -
+Top: the browser. Twelve HTML pages, Bootstrap, Sass, plain JavaScript modules -
 no framework, no build step. It talks to exactly one thing, our API, and
 anything tied to an account carries a signed token.
 
@@ -626,7 +626,7 @@ touches the database, and never decides anything it could be lied to about.
          "Figma let us agree on every screen before anyone implemented it, and "
          "kept us coordinated once we started. Bootstrap's components sped up "
          "the build and gave us a responsive grid on day one. Sass let us "
-         "generate custom CSS quickly, from one shared palette across eleven "
+         "generate custom CSS quickly, from one shared palette across twelve "
          "pages.", None),
         (SLATE, "GitHub Actions + pytest + Jest",
          "The cheapest way to stop four people breaking each other's work. Both "
